@@ -1,0 +1,6 @@
+{
+  "name": "NetBill ISP Ops - ISP Bill Management",
+  "description": "Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
