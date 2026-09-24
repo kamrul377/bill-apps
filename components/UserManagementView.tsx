@@ -319,7 +319,7 @@ export default function UserManagementView({
 
         {/* User Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[620px]">
             <thead>
               <tr className="bg-surface-container-low text-secondary uppercase tracking-wider h-9">
                 <th className="px-4 font-semibold">Email / Login ID</th>

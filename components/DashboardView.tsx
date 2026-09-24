@@ -30,7 +30,8 @@ export default function DashboardView({
       !search ||
       b.ticket_id.toLowerCase().includes(search.toLowerCase()) ||
       b.user_id.toLowerCase().includes(search.toLowerCase()) ||
-      b.description.toLowerCase().includes(search.toLowerCase());
+      b.description.toLowerCase().includes(search.toLowerCase()) ||
+      (b.created_by || '').toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus =
       statusFilter === 'ALL' || b.status.toUpperCase() === statusFilter.toUpperCase();
@@ -46,6 +47,13 @@ export default function DashboardView({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'Paid':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+            Paid
+          </span>
+        );
       case 'Pending':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
@@ -80,8 +88,21 @@ export default function DashboardView({
           <h1 className="text-xl font-bold text-on-surface tracking-tight">
             Billing Overview
           </h1>
-          <p className="text-xs text-secondary mt-0.5">
-            Active operator: <span className="font-semibold text-teal-700">{currentUser.name}</span> ({currentUser.role.toUpperCase()})
+          <p className="text-xs text-secondary mt-0.5 flex flex-wrap items-center gap-2">
+            <span>
+              Active operator: <span className="font-semibold text-teal-700">{currentUser.name}</span> ({currentUser.role.toUpperCase()})
+            </span>
+            {currentUser.role === 'support' ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-teal-50 text-teal-700 font-medium rounded text-[11px] border border-teal-200">
+                <span className="material-symbols-outlined text-xs">badge</span>
+                Individual Ledger: Viewing your submitted bills &amp; personal TK volume
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-container text-secondary font-medium rounded text-[11px]">
+                <span className="material-symbols-outlined text-xs">corporate_fare</span>
+                Organization Ledger: Viewing all staff bills &amp; total TK volume
+              </span>
+            )}
           </p>
         </div>
 
@@ -98,75 +119,103 @@ export default function DashboardView({
       </div>
 
       {/* KPI Stats Cards - Minimal with subtle animations */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-secondary uppercase tracking-wider">Total Bills</span>
+            <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
+              {currentUser.role === 'support' ? 'Your Bills' : 'Total Bills'}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">receipt_long</span>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-bold text-on-surface font-data-mono">{stats.totalBills}</span>
-            <span className="text-xs text-secondary block mt-0.5">৳{stats.totalVolumeTk.toLocaleString()}</span>
+            <span className="text-xl sm:text-2xl font-bold text-on-surface font-data-mono">{stats.totalBills}</span>
+            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">৳{stats.totalVolumeTk.toLocaleString()}</span>
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
+          transition={{ delay: 0.04 }}
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Pending</span>
+            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+              {currentUser.role === 'support' ? 'Your Pending' : 'Pending'}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">pending_actions</span>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-bold text-amber-600 font-data-mono">{stats.pendingBills}</span>
-            <span className="text-xs text-secondary block mt-0.5">৳{stats.pendingVolumeTk.toLocaleString()}</span>
+            <span className="text-xl sm:text-2xl font-bold text-amber-600 font-data-mono">{stats.pendingBills}</span>
+            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">৳{stats.pendingVolumeTk.toLocaleString()}</span>
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
+          transition={{ delay: 0.08 }}
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Approved</span>
+            <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
+              {currentUser.role === 'support' ? 'Your Approved' : 'Approved'}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">verified</span>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-bold text-teal-600 font-data-mono">{stats.approvedBills}</span>
-            <span className="text-xs text-secondary block mt-0.5">৳{stats.approvedVolumeTk.toLocaleString()}</span>
+            <span className="text-xl sm:text-2xl font-bold text-teal-600 font-data-mono">{stats.approvedBills}</span>
+            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">৳{stats.approvedVolumeTk.toLocaleString()}</span>
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
+          transition={{ delay: 0.12 }}
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">Rejected</span>
+            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+              {currentUser.role === 'support' ? 'Your Paid' : 'Paid & Cleared'}
+            </span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <span className="material-symbols-outlined text-base">payments</span>
+            </div>
+          </div>
+          <div className="mt-2">
+            <span className="text-xl sm:text-2xl font-bold text-emerald-600 font-data-mono">{stats.paidBills ?? 0}</span>
+            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">৳{(stats.paidVolumeTk ?? 0).toLocaleString()}</span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.16 }}
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between col-span-2 sm:col-span-1"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
+              {currentUser.role === 'support' ? 'Your Rejected' : 'Rejected'}
+            </span>
             <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">cancel</span>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-bold text-rose-600 font-data-mono">{stats.rejectedBills}</span>
-            <span className="text-xs text-secondary block mt-0.5">৳{stats.rejectedVolumeTk.toLocaleString()}</span>
+            <span className="text-xl sm:text-2xl font-bold text-rose-600 font-data-mono">{stats.rejectedBills}</span>
+            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">৳{stats.rejectedVolumeTk.toLocaleString()}</span>
           </div>
         </motion.div>
       </div>
@@ -189,7 +238,7 @@ export default function DashboardView({
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Search Ticket, User ID, or description..."
+              placeholder="Search Ticket, User ID, Support Agent..."
               className="w-full pl-8 pr-3 py-1.5 bg-surface text-on-surface text-xs rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600"
             />
           </div>
@@ -206,6 +255,7 @@ export default function DashboardView({
               <option value="ALL">All Statuses</option>
               <option value="Pending">Pending</option>
               <option value="Approved">Approved</option>
+              <option value="Paid">Paid (Cleared)</option>
               <option value="Rejected">Rejected</option>
             </select>
           </div>
@@ -213,11 +263,12 @@ export default function DashboardView({
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
-              <tr className="bg-surface-container-low text-secondary uppercase tracking-wider h-9">
+              <tr className="bg-surface-container-low text-secondary uppercase tracking-wider h-10">
                 <th className="px-4 font-semibold">Ticket ID</th>
                 <th className="px-3 font-semibold">User ID</th>
+                <th className="px-3 font-semibold">Support Staff</th>
                 <th className="px-3 font-semibold">Date</th>
                 <th className="px-3 font-semibold">Description</th>
                 <th className="px-3 font-semibold">Amount</th>
@@ -228,7 +279,7 @@ export default function DashboardView({
             <tbody className="divide-y divide-outline-variant/20">
               {paginatedBills.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-secondary">
+                  <td colSpan={8} className="py-10 text-center text-secondary">
                     No bills found.
                   </td>
                 </tr>
@@ -240,6 +291,12 @@ export default function DashboardView({
                     </td>
                     <td className="px-3 font-data-mono text-secondary">
                       {bill.user_id}
+                    </td>
+                    <td className="px-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
+                        <span className="material-symbols-outlined text-xs">person</span>
+                        <span className="truncate max-w-[120px]">{bill.created_by || 'Support Staff'}</span>
+                      </span>
                     </td>
                     <td className="px-3 text-secondary font-data-mono">
                       {bill.date}
@@ -259,7 +316,7 @@ export default function DashboardView({
                         onClick={() => onViewDetails(bill)}
                         className="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition-colors cursor-pointer"
                       >
-                        View
+                        Details
                       </button>
                     </td>
                   </tr>

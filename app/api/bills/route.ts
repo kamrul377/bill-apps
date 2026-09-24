@@ -9,15 +9,21 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search') || undefined;
     const role = (searchParams.get('role') as UserRole) || undefined;
     const currentUserId = searchParams.get('userId') || undefined;
+    const currentUserName = searchParams.get('userName') || undefined;
 
     const bills = await getBills({
       status,
       search,
       role,
       currentUserId,
+      currentUserName,
     });
 
-    const stats = await getDashboardStats();
+    const stats = await getDashboardStats({
+      role,
+      currentUserId,
+      currentUserName,
+    });
 
     return NextResponse.json({
       success: true,

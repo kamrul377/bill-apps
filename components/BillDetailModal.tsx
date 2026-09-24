@@ -21,10 +21,17 @@ export default function BillDetailModal({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'Paid':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">check_circle</span>
+            Paid & Cleared
+          </span>
+        );
       case 'Approved':
         return (
           <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
-            Approved
+            Approved (Unpaid)
           </span>
         );
       case 'Rejected':
@@ -97,6 +104,40 @@ export default function BillDetailModal({
               </span>
             </div>
           </div>
+
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-surface border border-outline-variant/30">
+            <span className="text-secondary font-medium">Submitted By (Support):</span>
+            <span className="font-semibold text-teal-800">{bill.created_by || 'Support Staff'}</span>
+          </div>
+
+          {bill.status === 'Paid' && (
+            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between font-semibold text-emerald-800">
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">payments</span>
+                  <span>Payment Disbursed</span>
+                </span>
+                <span className="text-[11px] font-mono">{bill.payment_method || 'Cash'}</span>
+              </div>
+              {bill.paid_by && (
+                <div className="flex justify-between text-emerald-900 text-[11px]">
+                  <span>Disbursed By:</span>
+                  <span className="font-semibold">{bill.paid_by}</span>
+                </div>
+              )}
+              {bill.paid_at && (
+                <div className="flex justify-between text-emerald-900 text-[11px]">
+                  <span>Disbursed At:</span>
+                  <span className="font-mono">{new Date(bill.paid_at).toLocaleString()}</span>
+                </div>
+              )}
+              {bill.payment_note && (
+                <div className="pt-1 border-t border-emerald-200 text-emerald-900 text-[11px]">
+                  <span className="font-medium">Voucher Reference:</span> {bill.payment_note}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col gap-1">
             <span className="text-secondary font-semibold uppercase text-[11px]">

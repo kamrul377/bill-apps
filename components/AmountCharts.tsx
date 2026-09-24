@@ -13,10 +13,12 @@ export default function AmountCharts({ stats }: AmountChartsProps) {
 
   const totalTk = stats.totalVolumeTk || 1;
   const approvedTk = stats.approvedVolumeTk || 0;
+  const paidTk = stats.paidVolumeTk || 0;
   const pendingTk = stats.pendingVolumeTk || 0;
   const rejectedTk = stats.rejectedVolumeTk || 0;
 
   const approvedPct = Math.round((approvedTk / totalTk) * 100) || 0;
+  const paidPct = Math.round((paidTk / totalTk) * 100) || 0;
   const pendingPct = Math.round((pendingTk / totalTk) * 100) || 0;
   const rejectedPct = Math.round((rejectedTk / totalTk) * 100) || 0;
 
@@ -242,6 +244,27 @@ export default function AmountCharts({ stats }: AmountChartsProps) {
             </div>
           </div>
 
+          {/* Paid Bar */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-emerald-800 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-emerald-600">payments</span>
+                <span>Paid & Cleared Volume</span>
+              </span>
+              <span className="font-data-mono font-bold text-on-surface">
+                ৳{paidTk.toLocaleString()} ({paidPct}%)
+              </span>
+            </div>
+            <div className="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${paidPct}%` }}
+                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.05 }}
+                className="h-full bg-emerald-600 rounded-full"
+              />
+            </div>
+          </div>
+
           {/* Pending Bar */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between text-xs">
@@ -286,10 +309,14 @@ export default function AmountCharts({ stats }: AmountChartsProps) {
         </div>
 
         {/* Mini stats summary */}
-        <div className="pt-3 border-t border-outline-variant/30 grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="pt-3 border-t border-outline-variant/30 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
           <div>
             <span className="text-secondary text-[11px] block">Approved Bills</span>
             <span className="font-bold text-teal-700">{stats.approvedBills}</span>
+          </div>
+          <div>
+            <span className="text-secondary text-[11px] block">Paid Bills</span>
+            <span className="font-bold text-emerald-600">{stats.paidBills ?? 0}</span>
           </div>
           <div>
             <span className="text-secondary text-[11px] block">Pending Bills</span>

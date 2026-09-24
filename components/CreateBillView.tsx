@@ -19,7 +19,9 @@ export default function CreateBillView({
   onNavigateToBills,
   onShowToast,
 }: CreateBillViewProps) {
-  const [ticketId, setTicketId] = useState('TCK-1050');
+  const generate6Digit = () => String(Math.floor(100000 + Math.random() * 900000));
+
+  const [ticketId, setTicketId] = useState('454433');
   const [userId, setUserId] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('2026-09-23');
@@ -32,14 +34,37 @@ export default function CreateBillView({
     e.preventDefault();
     setError(null);
 
+    const cleanTicketId = ticketId.trim();
+    const cleanUserId = userId.trim();
+
+    if (!cleanTicketId) {
+      setError('Ticket ID is required.');
+      return;
+    }
+
+    if (!/^\d{6}$/.test(cleanTicketId)) {
+      setError('Ticket ID must be exactly a 6-digit number (e.g. 454433).');
+      return;
+    }
+
+    if (!cleanUserId) {
+      setError('User / Subscriber ID is required.');
+      return;
+    }
+
+    if (!/^\d{6}$/.test(cleanUserId)) {
+      setError('User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).');
+      return;
+    }
+
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
       setError('Amount must be a positive number in TK.');
       return;
     }
 
-    if (!ticketId.trim() || !userId.trim() || !description.trim()) {
-      setError('Please fill in all bill fields.');
+    if (!description.trim()) {
+      setError('Please provide a service description.');
       return;
     }
 
@@ -50,12 +75,12 @@ export default function CreateBillView({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ticket_id: ticketId.trim(),
-          user_id: userId.trim(),
+          ticket_id: cleanTicketId,
+          user_id: cleanUserId,
           amount: numAmount,
           description: description.trim(),
           date,
-          created_by: `${currentUser.name} (${currentUser.user_id})`,
+          created_by: currentUser.name || currentUser.user_id,
         }),
       });
 
@@ -68,11 +93,11 @@ export default function CreateBillView({
 
       onBillCreated(data.bill);
       if (onShowToast) {
-        onShowToast(`Bill ${data.bill.ticket_id} submitted for approval (Pending).`, 'success');
+        onShowToast(`Bill #${data.bill.ticket_id} submitted for approval (Pending).`, 'success');
       }
 
-      // Reset form with new auto-ticket ID
-      setTicketId(`TCK-${Math.floor(1000 + Math.random() * 9000)}`);
+      // Reset form with new auto 6-digit ticket ID
+      setTicketId(generate6Digit());
       setUserId('');
       setAmount('');
       setDescription('');
@@ -96,7 +121,7 @@ export default function CreateBillView({
         <div>
           <h2 className="text-xl font-bold text-on-surface">Create Service Bill</h2>
           <p className="text-xs text-secondary mt-0.5">
-            Bills default to <strong className="text-amber-600 font-semibold">Pending</strong> status for Manager review.
+            Ticket ID and User ID are 6-digit numbers. Bills default to <strong className="text-amber-600 font-semibold">Pending</strong> status.
           </p>
         </div>
 
@@ -110,30 +135,58 @@ export default function CreateBillView({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-secondary uppercase">
-                Ticket ID *
-              </label>
-              <input
-                type="text"
-                required
-                value={ticketId}
-                onChange={(e) => setTicketId(e.target.value)}
-                className="h-9 px-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-data-mono text-xs"
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-secondary uppercase">
+                  Ticket ID (6-digit) *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setTicketId(generate6Digit())}
+                  className="text-[11px] font-medium text-teal-700 hover:text-teal-800 flex items-center gap-0.5 cursor-pointer"
+                  title="Generate random 6-digit ticket number"
+                >
+                  <span className="material-symbols-outlined text-xs">autorenew</span>
+                  <span>Random 6-digit</span>
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  required
+                  placeholder="e.g. 454433"
+                  value={ticketId}
+                  onChange={(e) => setTicketId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full h-9 px-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-data-mono text-xs tracking-wider"
+                />
+                <span className="absolute right-2.5 top-2.5 text-[10px] text-secondary font-data-mono">
+                  {ticketId.length}/6
+                </span>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-secondary uppercase">
-                User / Subscriber ID *
+                Subscriber / User ID (6-digit) *
               </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. USR-DHAKA-102"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                className="h-9 px-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 text-xs"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  required
+                  placeholder="e.g. 454433"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full h-9 px-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-data-mono text-xs tracking-wider"
+                />
+                <span className="absolute right-2.5 top-2.5 text-[10px] text-secondary font-data-mono">
+                  {userId.length}/6
+                </span>
+              </div>
             </div>
           </div>
 

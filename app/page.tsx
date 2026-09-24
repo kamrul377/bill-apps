@@ -68,10 +68,12 @@ export default function Home() {
     totalBills: 0,
     pendingBills: 0,
     approvedBills: 0,
+    paidBills: 0,
     rejectedBills: 0,
     totalVolumeTk: 0,
     pendingVolumeTk: 0,
     approvedVolumeTk: 0,
+    paidVolumeTk: 0,
     rejectedVolumeTk: 0,
   });
 
@@ -93,11 +95,20 @@ export default function Home() {
   // Modals state
   const [detailModalBill, setDetailModalBill] = useState<Bill | null>(null);
   const [voucherModalBill, setVoucherModalBill] = useState<Bill | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Fetch Bills & Stats
-  const loadData = useCallback(async () => {
+  // Fetch Bills & Stats (Support sees only their own bills & TK, Admin/Manager/Accounts see all)
+  const loadData = useCallback(async (userOverride?: User) => {
+    const userToQuery = userOverride || currentUser;
+    if (!userToQuery) return;
+
     try {
-      const res = await fetch('/api/bills');
+      const params = new URLSearchParams();
+      if (userToQuery.role) params.set('role', userToQuery.role);
+      if (userToQuery.user_id) params.set('userId', userToQuery.user_id);
+      if (userToQuery.name) params.set('userName', userToQuery.name);
+
+      const res = await fetch(`/api/bills?${params.toString()}`);
       const data = await res.json();
       if (res.ok && data.bills) {
         setBills(data.bills);
@@ -108,29 +119,11 @@ export default function Home() {
     } catch (err) {
       console.error('Failed to load bills:', err);
     }
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
-    let ignore = false;
-    async function init() {
-      try {
-        const res = await fetch('/api/bills');
-        const data = await res.json();
-        if (!ignore && res.ok && data.bills) {
-          setBills(data.bills);
-          if (data.stats) {
-            setStats(data.stats);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load bills:', err);
-      }
-    }
-    init();
-    return () => {
-      ignore = true;
-    };
-  }, []);
+    loadData();
+  }, [loadData]);
 
   // Status Update Handler (Approve / Reject)
   const handleUpdateStatus = async (
@@ -165,6 +158,42 @@ export default function Home() {
     await loadData();
   };
 
+  // Payment Handler (Accounts)
+  const handlePayBill = async (
+    ticketId: string,
+    paymentDetails: { paymentMethod: string; paymentNote?: string; paidBy?: string }
+  ) => {
+    try {
+      const res = await fetch(`/api/bills/${ticketId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'Paid',
+          paymentMethod: paymentDetails.paymentMethod,
+          paymentNote: paymentDetails.paymentNote,
+          paidBy: paymentDetails.paidBy || `${currentUser.name} (${currentUser.role})`,
+        }),
+      });
+
+      if (res.ok) {
+        await loadData();
+      }
+    } catch (err) {
+      console.error('Payment processing error:', err);
+    }
+  };
+
+  // Batch Pay Handler (Accounts)
+  const handleBatchPayBills = async (
+    ticketIds: string[],
+    paymentDetails: { paymentMethod: string; paymentNote?: string; paidBy?: string }
+  ) => {
+    for (const ticketId of ticketIds) {
+      await handlePayBill(ticketId, paymentDetails);
+    }
+    await loadData();
+  };
+
   // New Bill Created Callback
   const handleBillCreated = (_newBill: Bill) => {
     loadData();
@@ -179,6 +208,7 @@ export default function Home() {
     } catch (e) {
       console.error(e);
     }
+    loadData(user);
 
     if (user.role === 'support') {
       setCurrentPath('create-bill');
@@ -198,6 +228,19 @@ export default function Home() {
     } catch (e) {
       console.error(e);
     }
+    setBills([]);
+    setStats({
+      totalBills: 0,
+      pendingBills: 0,
+      approvedBills: 0,
+      paidBills: 0,
+      rejectedBills: 0,
+      totalVolumeTk: 0,
+      pendingVolumeTk: 0,
+      approvedVolumeTk: 0,
+      paidVolumeTk: 0,
+      rejectedVolumeTk: 0,
+    });
     showToast('Signed out of console.', 'info');
   };
 
@@ -235,19 +278,25 @@ export default function Home() {
       {/* Sidebar Navigation */}
       <Sidebar
         currentPath={currentPath}
-        onNavigate={handleNavigate}
+        onNavigate={(path) => {
+          handleNavigate(path);
+          setIsMobileMenuOpen(false);
+        }}
         userRole={currentUser.role}
         pendingCount={stats.pendingBills}
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Top Header */}
       <Header
         currentUser={currentUser}
         onLogout={handleLogout}
+        onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
       />
 
-      {/* Main Content Area */}
-      <main className="ml-60 mt-16 p-6 min-h-[calc(100vh-4rem)] flex flex-col">
+      {/* Main Content Area - Responsive layout */}
+      <main className="md:ml-60 ml-0 mt-16 p-3 sm:p-5 md:p-6 min-h-[calc(100vh-4rem)] flex flex-col transition-all">
         {currentPath === 'dashboard' && (
           <DashboardView
             bills={bills}
@@ -281,8 +330,11 @@ export default function Home() {
         {currentPath === 'approved-bills' && (
           <ApprovedBillsView
             bills={bills}
+            currentUser={currentUser}
             onViewDetails={(bill) => setDetailModalBill(bill)}
             onPrintSlip={(bill) => setVoucherModalBill(bill)}
+            onPayBill={handlePayBill}
+            onBatchPayBills={handleBatchPayBills}
             onShowToast={showToast}
           />
         )}

@@ -49,8 +49,14 @@ export default function BillVoucherModal({
               </div>
             </div>
             <div className="text-right">
-              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-teal-50 text-teal-700 border border-teal-200">
-                {bill.status} VOUCHER
+              <span
+                className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase border ${
+                  bill.status === 'Paid'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-teal-50 text-teal-700 border-teal-200'
+                }`}
+              >
+                {bill.status === 'Paid' ? 'PAID & CLEARED' : `${bill.status} VOUCHER`}
               </span>
               <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
                 REF #{bill.ticket_id}
@@ -93,6 +99,29 @@ export default function BillVoucherModal({
               </span>
             </div>
           </div>
+
+          {bill.status === 'Paid' && (
+            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs flex flex-col gap-1">
+              <div className="flex items-center justify-between font-bold text-emerald-800">
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">verified</span>
+                  <span>ACCOUNTS PAYMENT RECEIPT</span>
+                </span>
+                <span className="font-mono">{bill.payment_method || 'Cash'}</span>
+              </div>
+              <div className="flex justify-between text-emerald-900 text-[11px]">
+                <span>Disbursed By: <strong>{bill.paid_by || 'Accounts Staff'}</strong></span>
+                {bill.paid_at && (
+                  <span className="font-mono">{new Date(bill.paid_at).toLocaleDateString()}</span>
+                )}
+              </div>
+              {bill.payment_note && (
+                <p className="text-[11px] text-emerald-800 pt-0.5 border-t border-emerald-200">
+                  Ref Note: {bill.payment_note}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Line Item Table */}
           <div className="border border-slate-200 rounded-lg overflow-hidden text-xs">

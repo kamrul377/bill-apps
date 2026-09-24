@@ -11,6 +11,8 @@ interface SidebarProps {
   onNavigate: (path: NavPath) => void;
   userRole: UserRole;
   pendingCount?: number;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export default function Sidebar({
@@ -18,6 +20,8 @@ export default function Sidebar({
   onNavigate,
   userRole,
   pendingCount = 0,
+  isMobileOpen = false,
+  onCloseMobile,
 }: SidebarProps) {
   const getNavItems = () => {
     switch (userRole) {
@@ -53,7 +57,7 @@ export default function Sidebar({
         ];
       case 'accounts':
         return [
-          { id: 'approved-bills' as NavPath, label: 'Approved Bills', icon: 'verified' },
+          { id: 'approved-bills' as NavPath, label: 'Approved & Ledger', icon: 'verified' },
           { id: 'dashboard' as NavPath, label: 'Ledger Summary', icon: 'dashboard' },
         ];
       default:
@@ -63,66 +67,105 @@ export default function Sidebar({
 
   const navItems = getNavItems();
 
+  const handleItemClick = (id: NavPath) => {
+    onNavigate(id);
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
+  };
+
   return (
-    <aside className="fixed left-0 top-0 h-full w-60 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between">
-      <div className="flex flex-col">
-        {/* Brand Header */}
-        <div className="h-16 px-5 flex items-center gap-2.5 border-b border-outline-variant/20">
-          <Logo className="h-7 w-7" />
-          <span className="font-bold text-base text-on-surface tracking-tight">
-            NetBill ISP
-          </span>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isMobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 md:hidden transition-opacity"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar Drawer */}
+      <aside
+        className={`fixed left-0 top-0 h-full w-60 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
+          isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div className="flex flex-col">
+          {/* Brand Header */}
+          <div className="h-16 px-4 sm:px-5 flex items-center justify-between border-b border-outline-variant/20">
+            <div className="flex items-center gap-2.5">
+              <Logo className="h-7 w-7" />
+              <span className="font-bold text-base text-on-surface tracking-tight">
+                NetBill ISP
+              </span>
+            </div>
+
+            {/* Mobile close button */}
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="md:hidden p-1.5 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+              title="Close Menu"
+              aria-label="Close navigation menu"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+
+          {/* Role badge */}
+          <div className="px-4 py-2 flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-secondary">
+            <span>Portal</span>
+            <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-bold border border-teal-200">
+              {userRole}
+            </span>
+          </div>
+
+          {/* Nav Links */}
+          <nav className="flex flex-col gap-1 px-3 py-1">
+            {navItems.map((item) => {
+              const isActive = currentPath === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleItemClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${
+                    isActive
+                      ? 'bg-teal-600 text-white font-semibold shadow-xs'
+                      : 'text-secondary hover:bg-surface-container hover:text-on-surface'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="material-symbols-outlined text-base">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+
+                  {item.badge !== undefined && (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                        isActive ? 'bg-white text-teal-800' : 'bg-amber-100 text-amber-800'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Role badge */}
-        <div className="px-4 py-2 flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-secondary">
-          <span>Portal</span>
-          <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-bold border border-teal-200">
-            {userRole}
-          </span>
+        {/* Minimal Footer */}
+        <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+            <span>Database Node</span>
+          </div>
+          <span className="text-[10px] font-mono text-secondary/80">Active</span>
         </div>
-
-        {/* Nav Links */}
-        <nav className="flex flex-col gap-1 px-3 py-1">
-          {navItems.map((item) => {
-            const isActive = currentPath === item.id;
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onNavigate(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${
-                  isActive
-                    ? 'bg-teal-600 text-white font-semibold shadow-xs'
-                    : 'text-secondary hover:bg-surface-container hover:text-on-surface'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-base">{item.icon}</span>
-                  <span>{item.label}</span>
-                </div>
-
-                {item.badge !== undefined && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                      isActive ? 'bg-white text-teal-800' : 'bg-amber-100 text-amber-800'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Minimal Footer */}
-      <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary flex items-center gap-1.5">
-        <span className="w-2 h-2 rounded-full bg-teal-500" />
-        <span>MySQL ISP Node: Online</span>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

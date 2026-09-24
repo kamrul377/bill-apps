@@ -34,11 +34,11 @@ export async function PATCH(
   try {
     const { ticketId } = await params;
     const body = await req.json();
-    const { status, reason, approverName } = body;
+    const { status, reason, approverName, paidBy, paymentMethod, paymentNote } = body;
 
-    if (!status || !['Pending', 'Approved', 'Rejected'].includes(status)) {
+    if (!status || !['Pending', 'Approved', 'Rejected', 'Paid'].includes(status)) {
       return NextResponse.json(
-        { error: 'Valid status ("Pending", "Approved", "Rejected") is required.' },
+        { error: 'Valid status ("Pending", "Approved", "Rejected", "Paid") is required.' },
         { status: 400 }
       );
     }
@@ -46,6 +46,9 @@ export async function PATCH(
     const result = await updateBillStatus(ticketId, status as BillStatus, {
       reason,
       approverName,
+      paidBy,
+      paymentMethod,
+      paymentNote,
     });
 
     if (!result.success) {
