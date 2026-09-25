@@ -87,9 +87,8 @@ export default function Sidebar({
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed left-0 top-0 h-full w-60 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
-          isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed left-0 top-0 h-full w-60 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+          }`}
       >
         <div className="flex flex-col">
           {/* Brand Header */}
@@ -97,7 +96,7 @@ export default function Sidebar({
             <div className="flex items-center gap-2.5">
               <Logo className="h-7 w-7" />
               <span className="font-bold text-base text-on-surface tracking-tight">
-                NetBill ISP
+                FnF Online
               </span>
             </div>
 
@@ -131,11 +130,10 @@ export default function Sidebar({
                   key={item.id}
                   type="button"
                   onClick={() => handleItemClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${
-                    isActive
-                      ? 'bg-teal-600 text-white font-semibold shadow-xs'
-                      : 'text-secondary hover:bg-surface-container hover:text-on-surface'
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${isActive
+                    ? 'bg-teal-600 text-white font-semibold shadow-xs'
+                    : 'text-secondary hover:bg-surface-container hover:text-on-surface'
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="material-symbols-outlined text-base">{item.icon}</span>
@@ -144,9 +142,8 @@ export default function Sidebar({
 
                   {item.badge !== undefined && (
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                        isActive ? 'bg-white text-teal-800' : 'bg-amber-100 text-amber-800'
-                      }`}
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-white text-teal-800' : 'bg-amber-100 text-amber-800'
+                        }`}
                     >
                       {item.badge}
                     </span>
@@ -158,6 +155,8 @@ export default function Sidebar({
         </div>
 
         {/* Minimal Footer */}
+
+
         <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />

@@ -265,11 +265,10 @@ export default function ApprovedBillsView({
             setStatusTab('ALL');
             setCurrentPage(1);
           }}
-          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
-            statusTab === 'ALL'
+          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${statusTab === 'ALL'
               ? 'bg-surface-container-lowest text-teal-700 border-b-2 border-teal-600 shadow-xs'
               : 'text-secondary hover:text-on-surface'
-          }`}
+            }`}
         >
           <span>All Ledger Bills</span>
           <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-100 text-slate-700 font-bold">
@@ -283,11 +282,10 @@ export default function ApprovedBillsView({
             setStatusTab('UNPAID');
             setCurrentPage(1);
           }}
-          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
-            statusTab === 'UNPAID'
+          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${statusTab === 'UNPAID'
               ? 'bg-surface-container-lowest text-amber-700 border-b-2 border-amber-600 shadow-xs'
               : 'text-secondary hover:text-on-surface'
-          }`}
+            }`}
         >
           <span>Awaiting Payment</span>
           <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">
@@ -301,11 +299,10 @@ export default function ApprovedBillsView({
             setStatusTab('PAID');
             setCurrentPage(1);
           }}
-          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
-            statusTab === 'PAID'
+          className={`px-3 py-1.5 rounded-t-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${statusTab === 'PAID'
               ? 'bg-surface-container-lowest text-emerald-700 border-b-2 border-emerald-600 shadow-xs'
               : 'text-secondary hover:text-on-surface'
-          }`}
+            }`}
         >
           <span>Paid & Cleared</span>
           <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-bold">
@@ -461,9 +458,8 @@ export default function ApprovedBillsView({
                   return (
                     <tr
                       key={bill.id}
-                      className={`hover:bg-surface-container-low/60 transition-colors h-14 ${
-                        selectedTicketIds.includes(bill.ticket_id) ? 'bg-emerald-50/50' : ''
-                      }`}
+                      className={`hover:bg-surface-container-low/60 transition-colors h-14 ${selectedTicketIds.includes(bill.ticket_id) ? 'bg-emerald-50/50' : ''
+                        }`}
                     >
                       {isAccountsOrAdmin && (
                         <td className="px-4">

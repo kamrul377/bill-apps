@@ -282,9 +282,8 @@ export default function PendingApprovalView({
                 filteredPendingBills.map((bill) => (
                   <tr
                     key={bill.id}
-                    className={`hover:bg-surface-container-low/60 transition-colors h-14 ${
-                      selectedTicketIds.includes(bill.ticket_id) ? 'bg-teal-50/50' : ''
-                    }`}
+                    className={`hover:bg-surface-container-low/60 transition-colors h-14 ${selectedTicketIds.includes(bill.ticket_id) ? 'bg-teal-50/50' : ''
+                      }`}
                   >
                     <td className="px-4">
                       <input
@@ -310,7 +309,7 @@ export default function PendingApprovalView({
                     <td className="px-3 text-secondary font-data-mono">
                       {bill.date}
                     </td>
-                    <td className="px-3 max-w-xs truncate text-on-surface">
+                    <td className="px-3 my-5 max-w-xs truncate text-on-surface">
                       {bill.description}
                     </td>
                     <td className="px-3 font-data-mono font-bold text-on-surface">

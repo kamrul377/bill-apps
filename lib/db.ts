@@ -797,6 +797,9 @@ export async function getBillByTicketId(ticketId: string): Promise<Bill | null> 
   );
 }
 
+
+
+
 export async function createBill(data: {
   ticket_id: string;
   user_id: string;
@@ -911,6 +914,115 @@ export async function createBill(data: {
   };
 }
 
+
+
+
+// export async function createBill(data: {
+//   ticket_id: string;
+//   user_id: string;
+//   amount: number | string;
+//   description: string;
+//   date: string;
+//   created_by?: string;
+// }): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+//   const ticket_id = (data.ticket_id || '').trim();
+//   const user_id = (data.user_id || '').trim();
+//   const description = (data.description || '').trim();
+//   const date = (data.date || '').trim();
+//   const numericAmount = Number(data.amount);
+
+//   if (!ticket_id) {
+//     return { success: false, error: 'Ticket ID is required.' };
+//   }
+//   if (!/^\d{6}$/.test(ticket_id)) {
+//     return { success: false, error: 'Ticket ID must be exactly a 6-digit number (e.g. 454433).' };
+//   }
+//   if (!user_id) {
+//     return { success: false, error: 'User ID is required.' };
+//   }
+//   if (!/^\d{6}$/.test(user_id)) {
+//     return { success: false, error: 'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).' };
+//   }
+//   if (isNaN(numericAmount) || numericAmount <= 0) {
+//     return { success: false, error: 'Amount must be a positive number in TK.' };
+//   }
+//   if (!description) {
+//     return { success: false, error: 'Description is required.' };
+//   }
+//   if (!date) {
+//     return { success: false, error: 'Date is required.' };
+//   }
+
+//   const roundedAmount = Math.round(numericAmount * 100) / 100;
+//   const created_by = data.created_by || 'Support';
+
+//   const isUp = await testMySQLConnection();
+//   if (isUp) {
+//     try {
+//       await ensureTables();
+//       const p = getPool();
+
+//       // কোনো SELECT / Exists চেক না করে সরাসরি INSERT হবে
+//       const [res] = await p.query<ResultSetHeader>(
+//         `INSERT INTO bills (ticket_id, user_id, amount, description, date, status, created_by, created_at, updated_at)
+//          VALUES (?, ?, ?, ?, ?, 'Pending', ?, NOW(), NOW())`,
+//         [ticket_id, user_id, roundedAmount, description, date, created_by]
+//       );
+
+//       const nowIso = new Date().toISOString();
+//       return {
+//         success: true,
+//         bill: {
+//           id: res.insertId,
+//           ticket_id,
+//           user_id,
+//           amount: roundedAmount,
+//           description,
+//           date,
+//           status: 'Pending',
+//           created_by,
+//           created_at: nowIso,
+//           updated_at: nowIso,
+//         },
+//       };
+//     } catch (error) {
+//       console.warn('MySQL createBill error, saving to local store:', (error as Error).message);
+//       isMySQLConnected = false;
+//     }
+//   }
+
+//   // Resilient fallback (Local Storage) - কোনো ডুপ্লিকেট চেক ছাড়া
+//   const store = readLocalStorage();
+
+//   const nextId = store.bills.length > 0 ? Math.max(...store.bills.map((b) => Number(b.id) || 0)) + 1 : 1;
+//   const nowIso = new Date().toISOString();
+
+//   const newBill: Bill = {
+//     id: nextId,
+//     ticket_id,
+//     user_id,
+//     amount: roundedAmount,
+//     description,
+//     date,
+//     status: 'Pending',
+//     created_by,
+//     created_at: nowIso,
+//     updated_at: nowIso,
+//   };
+
+//   store.bills.push(newBill);
+//   writeLocalStorage(store);
+
+//   return {
+//     success: true,
+//     bill: newBill,
+//   };
+// }
+
+
+
+//==========================================end create bill ===========================================
+
 export async function updateBillStatus(
   ticketId: string,
   status: BillStatus,
@@ -940,8 +1052,8 @@ export async function updateBillStatus(
         const method = options?.paymentMethod || 'Cash';
         const note = options?.paymentNote || null;
         await p.query(
-          `UPDATE bills 
-           SET status = 'Paid', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?, updated_at = NOW() 
+          `UPDATE bills
+           SET status = 'Paid', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?, updated_at = NOW()
            WHERE LOWER(ticket_id) = LOWER(?)`,
           [paidBy, method, note, ticketId.trim()]
         );

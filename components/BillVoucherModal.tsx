@@ -19,7 +19,8 @@ export default function BillVoucherModal({
   if (!isOpen || !bill) return null;
 
   const baseAmount = bill.amount;
-  const vatAmount = Math.round(baseAmount * 0.05 * 100) / 100;
+  // const vatAmount = Math.round(baseAmount * 0.05 * 100) / 100;
+  const vatAmount = 0;
   const totalWithVat = baseAmount + vatAmount;
 
   return (
@@ -41,7 +42,7 @@ export default function BillVoucherModal({
               <Logo className="h-8 w-8" />
               <div>
                 <h2 className="text-base font-bold text-slate-900 leading-tight">
-                  NetBill ISP Operations
+                  FnF Online Operations
                 </h2>
                 <p className="text-[11px] text-slate-500 font-mono">
                   Official Service Voucher
@@ -50,11 +51,10 @@ export default function BillVoucherModal({
             </div>
             <div className="text-right">
               <span
-                className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase border ${
-                  bill.status === 'Paid'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-teal-50 text-teal-700 border-teal-200'
-                }`}
+                className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase border ${bill.status === 'Paid'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-teal-50 text-teal-700 border-teal-200'
+                  }`}
               >
                 {bill.status === 'Paid' ? 'PAID & CLEARED' : `${bill.status} VOUCHER`}
               </span>
@@ -142,7 +142,7 @@ export default function BillVoucherModal({
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-1.5 px-3 text-slate-500">VAT (5%)</td>
+                  <td className="py-1.5 px-3 text-slate-500">VAT (0%)</td>
                   <td className="py-1.5 px-3 text-right font-mono text-slate-600">
                     ৳{vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </td>

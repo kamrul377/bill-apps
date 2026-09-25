@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import Logo from './Logo';
 import { User } from '@/lib/types';
+import bgImage from '@/src/assets/bg-image.jpg'
+
 
 interface LoginViewProps {
   onLoginSuccess: (user: User) => void;
@@ -51,7 +53,10 @@ export default function LoginView({ onLoginSuccess, onShowToast }: LoginViewProp
   };
 
   return (
-    <div className="min-h-screen w-full bg-surface-container-low flex flex-col justify-center items-center p-4">
+    <div
+      className="min-h-screen w-full bg-surface-container-low flex flex-col justify-center items-center p-4 bg-cover bg-center bg-no-repeat backdrop-blur-md bg-black/30 bg-blend-darken"
+      style={{ backgroundImage: `url(${bgImage.src || bgImage})` }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -62,7 +67,7 @@ export default function LoginView({ onLoginSuccess, onShowToast }: LoginViewProp
         <div className="flex flex-col items-center text-center gap-2">
           <Logo className="h-10 w-10" />
           <div>
-            <h1 className="text-xl font-bold text-on-surface">NetBill ISP</h1>
+            <h1 className="text-xl font-bold text-on-surface"> FnF Online</h1>
             <p className="text-xs text-secondary mt-0.5">Billing Management Console</p>
           </div>
         </div>

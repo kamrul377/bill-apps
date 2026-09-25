@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="NetBill_${status}_Audit_Ledger_${new Date().toISOString().slice(0, 10)}.csv"`,
+        'Content-Disposition': `attachment; filename="FNFOnline_${status}_Audit_Ledger_${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
   } catch (error) {
