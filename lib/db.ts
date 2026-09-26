@@ -3,36 +3,37 @@ import fs from 'fs';
 import path from 'path';
 import { Bill, BillStatus, DashboardStats, User, UserRole } from './types';
 
-// // MySQL connection configuration
-// const MYSQL_CONFIG = {
-//   host: process.env.MYSQL_HOST || '127.0.0.1',
-//   port: parseInt(process.env.MYSQL_PORT || '3306', 10),
-//   user: process.env.MYSQL_USER || 'root',
-//   password: process.env.MYSQL_PASSWORD || '',
-//   database: process.env.MYSQL_DATABASE || 'isp_billing',
-//   connectTimeout: 2000,
-//   waitForConnections: true,
-//   connectionLimit: 10,
-//   queueLimit: 0,
-//   dateStrings: true,
-// };
-// MySQL connection configuration for Aiven Cloud
+// MySQL connection configuration
 const MYSQL_CONFIG = {
-  host: process.env.MYSQL_HOST || 'fnf-billpay-kamrul-98.e.aivencloud.com',
-  port: parseInt(process.env.MYSQL_PORT || '10615', 10),
-  user: process.env.MYSQL_USER || 'avnadmin',
-  password: process.env.MYSQL_PASSWORD || 'AVNS_6YXLtujje1vI9LZtp1M',
+  host: process.env.MYSQL_HOST || '127.0.0.1',
+  port: parseInt(process.env.MYSQL_PORT || '3306', 10),
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'isp_billing',
-  connectTimeout: 10000, // ক্লাউড ডাটাবেজের জন্য ১০ সেকেন্ড টাইমআউট রাখা ভালো
+  connectTimeout: 2000,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true,
-  // Aiven SSL required connection handling
-  ssl: {
-    rejectUnauthorized: false,
-  },
 };
+
+// MySQL connection configuration for Aiven Cloud
+// const MYSQL_CONFIG = {
+//   host: process.env.MYSQL_HOST || 'fnf-billpay-kamrul-98.e.aivencloud.com',
+//   port: parseInt(process.env.MYSQL_PORT || '10615', 10),
+//   user: process.env.MYSQL_USER || 'avnadmin',
+//   password: process.env.MYSQL_PASSWORD || 'AVNS_6YXLtujje1vI9LZtp1M',
+//   database: process.env.MYSQL_DATABASE || 'isp_billing',
+//   connectTimeout: 10000, // ক্লাউড ডাটাবেজের জন্য ১০ সেকেন্ড টাইমআউট রাখা ভালো
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0,
+//   dateStrings: true,
+//   // Aiven SSL required connection handling
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// };
 
 
 // const pool2 = mysql.createPool(MYSQL_CONFIG);
