@@ -93,12 +93,17 @@ export default function Sidebar({
         <div className="flex flex-col">
           {/* Brand Header */}
           <div className="h-16 px-4 sm:px-5 flex items-center justify-between border-b border-outline-variant/20">
-            <div className="flex items-center gap-2.5">
+
+            <div
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2.5 cursor-pointer select-none"
+            >
               <Logo className="h-7 w-7" />
               <span className="font-bold text-base text-on-surface tracking-tight">
                 FnF Online
               </span>
             </div>
+
 
             {/* Mobile close button */}
             <button

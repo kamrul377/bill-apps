@@ -326,7 +326,9 @@ export default function CreateBillView({
   const [ticketId, setTicketId] = useState('');
   const [userId, setUserId] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('2026-09-23');
+  // const [date, setDate] = useState('2026-09-23');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+
   const [description, setDescription] = useState('');
 
   const [loading, setLoading] = useState(false);
