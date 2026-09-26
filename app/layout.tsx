@@ -15,16 +15,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'NetBill ISP Ops - ISP Bill Management',
+  title: 'FnF Online Ops - ISP Bill Management',
   description: 'Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.',
   openGraph: {
-    title: 'NetBill ISP Ops - ISP Bill Management',
+    title: 'FnF Online Ops - ISP Bill Management',
     description: 'Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NetBill ISP Ops - ISP Bill Management',
+    title: 'FnF Online Ops - ISP Bill Management',
     description: 'Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.',
   },
 };

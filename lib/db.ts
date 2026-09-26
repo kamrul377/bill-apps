@@ -3,19 +3,74 @@ import fs from 'fs';
 import path from 'path';
 import { Bill, BillStatus, DashboardStats, User, UserRole } from './types';
 
-// MySQL connection configuration
+// // MySQL connection configuration
+// const MYSQL_CONFIG = {
+//   host: process.env.MYSQL_HOST || '127.0.0.1',
+//   port: parseInt(process.env.MYSQL_PORT || '3306', 10),
+//   user: process.env.MYSQL_USER || 'root',
+//   password: process.env.MYSQL_PASSWORD || '',
+//   database: process.env.MYSQL_DATABASE || 'isp_billing',
+//   connectTimeout: 2000,
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0,
+//   dateStrings: true,
+// };
+// MySQL connection configuration for Aiven Cloud
 const MYSQL_CONFIG = {
-  host: process.env.MYSQL_HOST || '127.0.0.1',
-  port: parseInt(process.env.MYSQL_PORT || '3306', 10),
-  user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || '',
+  host: process.env.MYSQL_HOST || 'fnf-billpay-kamrul-98.e.aivencloud.com',
+  port: parseInt(process.env.MYSQL_PORT || '10615', 10),
+  user: process.env.MYSQL_USER || 'avnadmin',
+  password: process.env.MYSQL_PASSWORD || 'AVNS_6YXLtujje1vI9LZtp1M',
   database: process.env.MYSQL_DATABASE || 'isp_billing',
-  connectTimeout: 2000,
+  connectTimeout: 10000, // ক্লাউড ডাটাবেজের জন্য ১০ সেকেন্ড টাইমআউট রাখা ভালো
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true,
+  // Aiven SSL required connection handling
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
+
+
+// const pool2 = mysql.createPool(MYSQL_CONFIG);
+
+// async function checkAivenConnection() {
+//   try {
+//     const connection = await pool2.getConnection();
+//     console.log('✅ Aiven MySQL Database Connected Successfully!');
+    
+//     // টেস্ট কুয়েরি চালিয়ে ডাটাবেজ নেম দেখা
+//     const [rows] = await connection.query('SELECT DATABASE() as db, VERSION() as ver;');
+//     console.log('Connected DB:', rows);
+    
+//     connection.release(); // কানেকশন ফ্রি করে দেওয়া
+//   } catch (error) {
+//     console.error('❌ Database Connection Failed!');
+//     console.error('Error Details:', (error as Error).message);
+//   }
+// }
+
+
+// চেক ফাংশনটি কল করুন
+// checkAivenConnection();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 let pool: Pool | null = null;
 let isMySQLConnected: boolean | null = null;

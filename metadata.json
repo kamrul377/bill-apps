@@ -1,5 +1,5 @@
 {
-  "name": "NetBill ISP Ops - ISP Bill Management",
+  "name": "FnF Online Ops - ISP Bill Management",
   "description": "Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.",
   "requestFramePermissions": [],
   "majorCapabilities": [
