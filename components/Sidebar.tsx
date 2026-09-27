@@ -162,13 +162,40 @@ export default function Sidebar({
         {/* Minimal Footer */}
 
 
-        <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary flex items-center justify-between">
+        {/* <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
             <span>Database Node</span>
           </div>
           <span className="text-[10px] font-mono text-secondary/80">Active</span>
-        </div>
+        </div> */}
+
+      <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary space-y-1.5">
+  {/* First Row: Database Status */}
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-1.5">
+      <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+      <span>Database Node</span>
+    </div>
+    <span className="text-[10px] font-mono text-secondary/80">Active</span>
+  </div>
+
+  {/* Second Row: Developer Info */}
+  <div className="flex items-center gap-1 text-[10px] font-mono text-secondary/60 pt-1 border-t border-outline-variant/10">
+    <span>Developed by</span>
+    <a
+      href="https://kamrul-info.vercel.app/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-secondary/80 hover:text-teal-400 transition-colors underline-offset-2 hover:underline font-medium"
+    >
+      Kamrul Islam
+    </a>
+  </div>
+</div>
+
+
+
       </aside>
     </>
   );
