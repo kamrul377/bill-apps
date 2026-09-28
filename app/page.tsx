@@ -23,6 +23,12 @@ const INITIAL_ADMIN: User = {
 };
 
 export default function Home() {
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  
+
+
   const [currentUser, setCurrentUser] = useState<User>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -76,6 +82,10 @@ export default function Home() {
     paidVolumeTk: 0,
     rejectedVolumeTk: 0,
   });
+
+
+   
+
 
   // Toasts
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -149,6 +159,17 @@ export default function Home() {
       console.error('Update status error:', err);
     }
   };
+
+
+  //mound issue solved....
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // ব্রাউজারে পুরোপুরি মাউন্ট হওয়ার আগে রেন্ডার প্রতিরোধ করবে
+  if (!isMounted) {
+    return null; // অথবা একটি Simple Loader Component দিতে পারেন
+  }
 
   // Batch Approve Handler
   const handleBatchApprove = async (ticketIds: string[]) => {
@@ -272,7 +293,10 @@ export default function Home() {
       </>
     );
   }
+  
 
+
+ 
   return (
     <div className="min-h-screen bg-surface-container-low text-on-surface">
       {/* Sidebar Navigation */}

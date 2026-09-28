@@ -3,75 +3,64 @@ import fs from 'fs';
 import path from 'path';
 import { Bill, BillStatus, DashboardStats, User, UserRole } from './types';
 
-// MySQL connection configuration
-const MYSQL_CONFIG = {
-  host: process.env.MYSQL_HOST || '127.0.0.1',
-  port: parseInt(process.env.MYSQL_PORT || '3306', 10),
-  user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || '',
-  database: process.env.MYSQL_DATABASE || 'isp_billing',
-  connectTimeout: 2000,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  dateStrings: true,
-};
 
-// MySQL connection configuration for Aiven Cloud
+// MySQL connection configuration (Default)
 // const MYSQL_CONFIG = {
-//   host: process.env.MYSQL_HOST || 'fnf-billpay-kamrul-98.e.aivencloud.com',
-//   port: parseInt(process.env.MYSQL_PORT || '10615', 10),
-//   user: process.env.MYSQL_USER || 'avnadmin',
-//   password: process.env.MYSQL_PASSWORD || 'AVNS_6YXLtujje1vI9LZtp1M',
+//   host: process.env.MYSQL_HOST || '127.0.0.1',
+//   port: parseInt(process.env.MYSQL_PORT || '3306', 10),
+//   user: process.env.MYSQL_USER || 'root',
+//   password: process.env.MYSQL_PASSWORD || '',
 //   database: process.env.MYSQL_DATABASE || 'isp_billing',
-//   connectTimeout: 10000, // ক্লাউড ডাটাবেজের জন্য ১০ সেকেন্ড টাইমআউট রাখা ভালো
+//   connectTimeout: 2000,
 //   waitForConnections: true,
 //   connectionLimit: 10,
 //   queueLimit: 0,
 //   dateStrings: true,
-//   // Aiven SSL required connection handling
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
 // };
 
+// let pool: Pool | null = null;
+// let isMySQLConnected: boolean | null = null;
+// let lastCheckTime = 0;
+// let tablesInitialized = false;
 
-// const pool2 = mysql.createPool(MYSQL_CONFIG);
-
-// async function checkAivenConnection() {
-//   try {
-//     const connection = await pool2.getConnection();
-//     console.log('✅ Aiven MySQL Database Connected Successfully!');
-    
-//     // টেস্ট কুয়েরি চালিয়ে ডাটাবেজ নেম দেখা
-//     const [rows] = await connection.query('SELECT DATABASE() as db, VERSION() as ver;');
-//     console.log('Connected DB:', rows);
-    
-//     connection.release(); // কানেকশন ফ্রি করে দেওয়া
-//   } catch (error) {
-//     console.error('❌ Database Connection Failed!');
-//     console.error('Error Details:', (error as Error).message);
+// function getPool(): Pool {
+//   if (!pool) {
+//     pool = mysql.createPool(MYSQL_CONFIG);
 //   }
+//   return pool;
 // }
 
 
-// চেক ফাংশনটি কল করুন
-// checkAivenConnection();
+// export const dbPool = mysql.createPool({
+//     host: process.env.MYSQL_HOST,
+//     user: process.env.MYSQL_USER,
+//     password: process.env.MYSQL_PASSWORD,
+//     database: process.env.MYSQL_DATABASE,
+//     port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306, // 👈 ক্লাউড পোর্ট হ্যান্ডেল করার জন্য
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0,
+//     ssl: {
+//         rejectUnauthorized: false // 👈 Aiven ক্লাউড কানেকশনের SSL এরর বাইপাস করার জন্য
+//     }
+// });
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+// Aiven Database=====================================================
+const MYSQL_CONFIG = {
+  host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306, // 👈 ক্লাউড পোর্ট হ্যান্ডেল করার জন্য
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    ssl: {
+        rejectUnauthorized: false // 👈 Aiven ক্লাউড কানেকশনের SSL এরর বাইপাস করার জন্য
+    }
+};
 
 let pool: Pool | null = null;
 let isMySQLConnected: boolean | null = null;
@@ -85,7 +74,117 @@ function getPool(): Pool {
   return pool;
 }
 
+getPool().query('SELECT 1')
+  .then(() => {
+    console.log('✅ TiDB Cloud Database connected successfully!');
+  })
+  .catch((err) => {
+    console.error('❌ Database connection failed:', err.message);
+  });
+
+
+
+// MySQL / TiDB Connection Configuration
+
+// const MYSQL_CONFIG = {
+//   host: process.env.MYSQL_HOST || 'gateway01.ap-northeast-1.prod.aws.tidbcloud.com',
+//   port: parseInt(process.env.MYSQL_PORT || '4000', 10),
+//   user: process.env.MYSQL_USER || '2aVVGoJtmFbDMG.root',
+//   password: process.env.MYSQL_PASSWORD || 'JhsRNncbACN69qGx',
+//   database: process.env.MYSQL_DATABASE || 'isp_billing',
+//   connectTimeout: 10000,
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0,
+//   dateStrings: true,
+//   ssl: {
+//     minVersion: 'TLSv1.2',
+//     rejectUnauthorized: false,
+//   },
+// };
+
+// let pool: Pool | null = null;
+
+// export function getPool(): Pool {
+//   if (!pool) {
+//     pool = mysql.createPool(MYSQL_CONFIG);
+//   }
+//   return pool;
+// }
+
+// // ডাটাবেজ কানেকশন টেস্ট করার জন্য
+// getPool().query('SELECT 1')
+//   .then(() => {
+//     console.log('✅ TiDB Cloud Database connected successfully!');
+//   })
+//   .catch((err) => {
+//     console.error('❌ Database connection failed:', err.message);
+//   });
+
+
+
+
+// Aiven
+// ১. Aiven Config
+// const MYSQL_CONFIG = {
+//   host: process.env.MYSQL_HOST || 'fnf-billpay-kamrul-98.e.aivencloud.com',
+//   port: parseInt(process.env.MYSQL_PORT || '10615', 10),
+//   user: process.env.MYSQL_USER || 'avnadmin',
+//   password: process.env.MYSQL_PASSWORD || 'AVNS_6YXLtujje1vI9LZtp1M',
+//   database: process.env.MYSQL_DATABASE || 'isp_billing',
+//   connectTimeout: 10000,
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0,
+//   dateStrings: true,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// };
+
+// // ২. Global Variables Declare
+// let pool: Pool | null = null;
+// let isMySQLConnected: boolean | null = null;
+// let lastCheckTime = 0;
+
+// export function getPool(): Pool {
+//   if (!pool) {
+//     pool = mysql.createPool(MYSQL_CONFIG);
+//   }
+//   return pool;
+// }
+
+// // ৩. Connection Test Function
+// export async function testMySQLConnection(): Promise<boolean> {
+//   const now = Date.now();
+//   if (isMySQLConnected !== null && now - lastCheckTime < 15000) {
+//     return isMySQLConnected;
+//   }
+//   lastCheckTime = now;
+
+//   try {
+//     const db = getPool();
+//     await db.query('SELECT 1');
+//     isMySQLConnected = true;
+//     console.log('✅ Connected to Aiven MySQL successfully!');
+//     return true;
+//   } catch (error: any) {
+//     isMySQLConnected = false;
+//     console.error('❌ Aiven MySQL Connection failed:', error.message);
+//     return false;
+//   }
+// }
+
+
+
+
+
+
+
+
 // Fallback persistent storage file path (mirrors MySQL tables)
+
+
 const DATA_DIR = path.join(process.cwd(), 'data');
 const STORAGE_FILE = path.join(DATA_DIR, 'isp_storage.json');
 
