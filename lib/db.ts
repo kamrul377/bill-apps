@@ -50,16 +50,17 @@ import { Bill, BillStatus, DashboardStats, User, UserRole } from './types';
 // Aiven Database=====================================================
 const MYSQL_CONFIG = {
   host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306, // 👈 ক্লাউড পোর্ট হ্যান্ডেল করার জন্য
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    ssl: {
-        rejectUnauthorized: false // 👈 Aiven ক্লাউড কানেকশনের SSL এরর বাইপাস করার জন্য
-    }
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306, // 👈 ক্লাউড পোর্ট হ্যান্ডেল করার জন্য
+  waitForConnections: true,
+  connectionLimit: 10,
+  charset: 'utf8mb4',
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false // 👈 Aiven ক্লাউড কানেকশনের SSL এরর বাইপাস করার জন্য
+  }
 };
 
 let pool: Pool | null = null;
@@ -388,38 +389,84 @@ export async function ensureTables(): Promise<void> {
 
 // ==================== User Repository ====================
 
-export async function getUsers(): Promise<User[]> {
-  const isUp = await testMySQLConnection();
-  if (isUp) {
-    try {
-      await ensureTables();
-      const p = getPool();
-      const [rows] = await p.query<RowDataPacket[]>(
-        'SELECT id, user_id, name, role, DATE_FORMAT(created_at, "%Y-%m-%dT%H:%i:%s.000Z") as created_at FROM users ORDER BY id ASC'
-      );
-      return rows.map((r) => ({
-        id: Number(r.id),
-        user_id: String(r.user_id),
-        name: String(r.name),
-        role: r.role as UserRole,
-        created_at: String(r.created_at || ''),
-      }));
-    } catch (error) {
-      console.warn('MySQL getUsers failed, switching to local store:', (error as Error).message);
-      isMySQLConnected = false;
-    }
-  }
+// export async function getUsers(): Promise<User[]> {
+//   const isUp = await testMySQLConnection();
+//   if (isUp) {
+//     try {
+//       await ensureTables();
+//       const p = getPool();
+//       const [rows] = await p.query<RowDataPacket[]>(
+//         'SELECT id, user_id, name, role, DATE_FORMAT(created_at, "%Y-%m-%dT%H:%i:%s.000Z") as created_at FROM users ORDER BY id ASC'
+//       );
 
-  // Resilient fallback
-  const store = readLocalStorage();
-  return store.users.map(({ id, user_id, name, role, created_at }) => ({
-    id,
-    user_id,
-    name,
-    role,
-    created_at,
-  }));
+//       console.log(rows)
+//       return rows.map((r) => ({
+//         id: Number(r.id),
+//         user_id: String(r.user_id),
+//         name: String(r.name),
+//         role: r.role as UserRole,
+//         created_at: String(r.created_at || ''),
+//       }));
+//     } catch (error) {
+//       console.warn('MySQL getUsers failed, switching to local store:', (error as Error).message);
+//       isMySQLConnected = false;
+//     }
+//   }
+
+
+//   // Resilient fallback
+//   const store = readLocalStorage();
+//   return store.users.map(({ id, user_id, name, role, created_at }) => ({
+//     id,
+//     user_id,
+//     name,
+//     role,
+//     created_at,
+//   }));
+// }
+
+export async function getUsers(): Promise<User[]> {
+  try {
+    // Direct MySQL Call (Ensure connection works without silent fallback lock)
+    await ensureTables();
+    const p = getPool();
+
+    // Query adjusted to avoid NULL date formatting issues
+    const [rows] = await p.query<RowDataPacket[]>(
+      `SELECT id, user_id, name, role, 
+              COALESCE(DATE_FORMAT(created_at, "%Y-%m-%dT%H:%i:%s.000Z"), '') as created_at 
+       FROM users 
+       ORDER BY id ASC`
+    );
+
+    console.log('--> Fetched users from Aiven MySQL:', rows);
+
+    const formattedUsers: User[] = rows.map((r) => ({
+      id: Number(r.id),
+      user_id: String(r.user_id),
+      name: String(r.name),
+      role: r.role as UserRole,
+      created_at: String(r.created_at || ''),
+    }));
+
+    // Update local storage sync as backup
+    return formattedUsers;
+
+  } catch (error) {
+    console.error('MySQL getUsers failed:', (error as Error).message);
+
+    // Fallback to local storage ONLY if MySQL completely fails
+    const store = readLocalStorage();
+    return store.users.map(({ id, user_id, name, role, created_at }) => ({
+      id,
+      user_id,
+      name,
+      role,
+      created_at,
+    }));
+  }
 }
+
 
 export async function getUserById(id: number): Promise<User | null> {
   const isUp = await testMySQLConnection();
