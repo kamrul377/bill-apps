@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
     const email = body.email || body.user_id;
     const password = body.password || body.pass;
 
+    console.log(email, password)
+
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and Password are required.' },
