@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Logo from './Logo';
 import { UserRole } from '@/lib/types';
 
@@ -73,6 +73,28 @@ export default function Sidebar({
       onCloseMobile();
     }
   };
+
+
+  // const [status, setStatus] = useState<'loading' | 'active' | 'inactive'>('loading');
+
+  // useEffect(() => {
+  //   const checkStatus = async () => {
+  //     try {
+  //       const res = await fetch('/api/db-status');
+  //       const data = await res.json();
+  //       setStatus(data.status === 'active' ? 'active' : 'inactive');
+  //     } catch (error) {
+  //       setStatus('inactive');
+  //     }
+  //   };
+
+  //   checkStatus();
+
+  //   // Proti 15 second por por auto check korbe
+  //   const interval = setInterval(checkStatus, 15000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
 
   return (
     <>
@@ -170,29 +192,65 @@ export default function Sidebar({
           <span className="text-[10px] font-mono text-secondary/80">Active</span>
         </div> */}
 
-      <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary space-y-1.5">
-  {/* First Row: Database Status */}
-  <div className="flex items-center justify-between">
-    <div className="flex items-center gap-1.5">
-      <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-      <span>Database Node</span>
-    </div>
-    <span className="text-[10px] font-mono text-secondary/80">Active</span>
-  </div>
+        <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary space-y-1.5">
+          {/* First Row: Database Status */}
 
-  {/* Second Row: Developer Info */}
-  <div className="flex items-center gap-1 text-[10px] font-mono text-secondary/60 pt-1 border-t border-outline-variant/10">
-    <span>Developed by</span>
-    <a
-      href="https://kamrul-info.vercel.app/"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-secondary/80 hover:text-teal-400 transition-colors underline-offset-2 hover:underline font-medium"
-    >
-      Kamrul Islam
-    </a>
-  </div>
-</div>
+
+
+          {/* active button */}
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+              <span>Database Node</span>
+            </div>
+            <span className="text-[10px] font-mono text-secondary/80">Active</span>
+          </div>
+
+          {/* <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`w-2 h-2 rounded-full ${status === 'active'
+                  ? 'bg-teal-500 animate-pulse'
+                  : status === 'inactive'
+                    ? 'bg-rose-500'
+                    : 'bg-amber-400 animate-ping'
+                  }`}
+              />
+              <span>Database Node</span>
+            </div>
+
+            <span
+              className={`text-[10px] font-mono ${status === 'active'
+                ? 'text-teal-400'
+                : status === 'inactive'
+                  ? 'text-rose-400'
+                  : 'text-amber-400'
+                }`}
+            >
+              {status === 'loading' ? 'Checking...' : status === 'active' ? 'Active' : 'Offline'}
+            </span>
+          </div> */}
+
+
+
+
+
+
+
+          {/* Second Row: Developer Info */}
+          <div className="flex items-center gap-1 text-[10px] font-mono text-secondary/60 pt-1 border-t border-outline-variant/10">
+            <span>Developed by</span>
+            <a
+              href="https://kamrul-info.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-secondary/80 hover:text-teal-400 transition-colors underline-offset-2 hover:underline font-medium"
+            >
+              Kamrul Islam
+            </a>
+          </div>
+        </div>
 
 
 
