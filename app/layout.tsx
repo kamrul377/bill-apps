@@ -17,6 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'FnF Online Ops - ISP Bill Management',
+  icons: {
+    icon: '/payment.png',
+  },
   description: 'Internal ISP bill management system for Support bill creation, Manager approvals, Accounts reconciliation, and Admin governance.',
   openGraph: {
     title: 'FnF Online Ops - ISP Bill Management',
