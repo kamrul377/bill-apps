@@ -49,14 +49,14 @@ interface LocalStorageSchema {
 function getDefaultStorage(): LocalStorageSchema {
   return {
     users: [
-      {
-        id: 1,
-        user_id: 'kamrul.cse9@gmail.com',
-        name: 'Kamrul Islam',
-        password: '66667777ssc',
-        role: 'admin',
-        created_at: new Date().toISOString(),
-      },
+      // {
+      //   id: 1,
+      //   user_id: 'kamrul.cse9@gmail.com',
+      //   name: 'Kamrul Islam',
+      //   password: '66667777ssc',
+      //   role: 'admin',
+      //   created_at: new Date().toISOString(),
+      // },
     ],
     bills: [],
   };
@@ -637,50 +637,150 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
   }
 }
 
-export async function getBillByTicketId(ticketId: string): Promise<Bill | null> {
-  try {
-    await ensureTables();
-    const p = getPool();
-    const [rows] = await p.query<RowDataPacket[]>(
-      `SELECT
-        id, ticket_id, user_id, amount, description, DATE_FORMAT(date, '%Y-%m-%d') as date,
-        status, created_by, rejection_reason, paid_by, paid_at, payment_method, payment_note,
-        created_at, updated_at
-      FROM bills
-      WHERE LOWER(ticket_id) = LOWER(?)
-      LIMIT 1`,
-      [ticketId.trim()]
-    );
 
-    if (rows && rows.length > 0) {
-      const r = rows[0];
-      return {
-        id: Number(r.id),
-        ticket_id: String(r.ticket_id),
-        user_id: String(r.user_id),
-        amount: Number(r.amount),
-        description: String(r.description),
-        date: String(r.date),
-        status: r.status as BillStatus,
-        created_by: r.created_by ? String(r.created_by) : undefined,
-        rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
-        paid_by: r.paid_by ? String(r.paid_by) : undefined,
-        paid_at: safeIsoDate(r.paid_at),
-        payment_method: r.payment_method ? String(r.payment_method) : undefined,
-        payment_note: r.payment_note ? String(r.payment_note) : undefined,
-        created_at: safeIsoDate(r.created_at),
-        updated_at: safeIsoDate(r.updated_at),
-      };
-    }
-    return null;
-  } catch (error) {
-    const store = readLocalStorage();
-    return (
-      store.bills.find((b) => b.ticket_id.toLowerCase() === ticketId.trim().toLowerCase()) || null
-    );
-  }
-}
 
+// temp disable for    ticket.id - id
+// export async function getBillByTicketId(ticketId: string): Promise<Bill | null> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [rows] = await p.query<RowDataPacket[]>(
+//       `SELECT
+//         id, ticket_id, user_id, amount, description, DATE_FORMAT(date, '%Y-%m-%d') as date,
+//         status, created_by, rejection_reason, paid_by, paid_at, payment_method, payment_note,
+//         created_at, updated_at
+//       FROM bills
+//       WHERE LOWER(ticket_id) = LOWER(?)
+//       LIMIT 1`,
+//       [ticketId.trim()]
+//     );
+
+//     if (rows && rows.length > 0) {
+//       const r = rows[0];
+//       return {
+//         id: Number(r.id),
+//         ticket_id: String(r.ticket_id),
+//         user_id: String(r.user_id),
+//         amount: Number(r.amount),
+//         description: String(r.description),
+//         date: String(r.date),
+//         status: r.status as BillStatus,
+//         created_by: r.created_by ? String(r.created_by) : undefined,
+//         rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+//         paid_by: r.paid_by ? String(r.paid_by) : undefined,
+//         paid_at: safeIsoDate(r.paid_at),
+//         payment_method: r.payment_method ? String(r.payment_method) : undefined,
+//         payment_note: r.payment_note ? String(r.payment_note) : undefined,
+//         created_at: safeIsoDate(r.created_at),
+//         updated_at: safeIsoDate(r.updated_at),
+//       };
+//     }
+//     return null;
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     return (
+//       store.bills.find((b) => b.ticket_id.toLowerCase() === ticketId.trim().toLowerCase()) || null
+//     );
+//   }
+// }
+
+
+// create bill restrict ticket id..same ticketid now allowed
+// export async function createBill(data: {
+//   ticket_id: string;
+//   user_id: string;
+//   amount: number | string;
+//   description: string;
+//   date: string;
+//   created_by?: string;
+// }): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+//   const ticket_id = (data.ticket_id || '').trim();
+//   const user_id = (data.user_id || '').trim();
+//   const description = (data.description || '').trim();
+//   const date = (data.date || '').trim();
+//   const numericAmount = Number(data.amount);
+
+//   if (!ticket_id) return { success: false, error: 'Ticket ID is required.' };
+//   if (!/^\d{6}$/.test(ticket_id)) {
+//     return { success: false, error: 'Ticket ID must be exactly a 6-digit number (e.g. 454433).' };
+//   }
+//   if (!user_id) return { success: false, error: 'User ID is required.' };
+//   if (!/^\d{6}$/.test(user_id)) {
+//     return { success: false, error: 'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).' };
+//   }
+//   if (isNaN(numericAmount) || numericAmount <= 0) {
+//     return { success: false, error: 'Amount must be a positive number in TK.' };
+//   }
+//   if (!description) return { success: false, error: 'Description is required.' };
+//   if (!date) return { success: false, error: 'Date is required.' };
+
+//   const roundedAmount = Math.round(numericAmount * 100) / 100;
+//   const created_by = data.created_by || 'Support';
+
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [existing] = await p.query<RowDataPacket[]>(
+//       'SELECT id FROM bills WHERE LOWER(ticket_id) = LOWER(?) LIMIT 1',
+//       [ticket_id]
+//     );
+//     if (existing && existing.length > 0) {
+//       return { success: false, error: `Ticket ID "${ticket_id}" already exists.` };
+//     }
+
+//     const [res] = await p.query<ResultSetHeader>(
+//       `INSERT INTO bills (ticket_id, user_id, amount, description, date, status, created_by, created_at, updated_at)
+//        VALUES (?, ?, ?, ?, ?, 'Pending', ?, NOW(), NOW())`,
+//       [ticket_id, user_id, roundedAmount, description, date, created_by]
+//     );
+
+//     const nowIso = new Date().toISOString();
+//     return {
+//       success: true,
+//       bill: {
+//         id: res.insertId,
+//         ticket_id,
+//         user_id,
+//         amount: roundedAmount,
+//         description,
+//         date,
+//         status: 'Pending',
+//         created_by,
+//         created_at: nowIso,
+//         updated_at: nowIso,
+//       },
+//     };
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     const exists = store.bills.some(
+//       (b) => b.ticket_id.toLowerCase() === ticket_id.toLowerCase()
+//     );
+//     if (exists) {
+//       return { success: false, error: `Ticket ID "${ticket_id}" already exists.` };
+//     }
+
+//     const nextId = store.bills.length > 0 ? Math.max(...store.bills.map((b) => b.id)) + 1 : 1;
+//     const nowIso = new Date().toISOString();
+
+//     const newBill: Bill = {
+//       id: nextId,
+//       ticket_id,
+//       user_id,
+//       amount: roundedAmount,
+//       description,
+//       date,
+//       status: 'Pending',
+//       created_by,
+//       created_at: nowIso,
+//       updated_at: nowIso,
+//     };
+
+//     store.bills.push(newBill);
+//     writeLocalStorage(store);
+
+//     return { success: true, bill: newBill };
+//   }
+// }
 export async function createBill(data: {
   ticket_id: string;
   user_id: string;
@@ -695,43 +795,125 @@ export async function createBill(data: {
   const date = (data.date || '').trim();
   const numericAmount = Number(data.amount);
 
-  if (!ticket_id) return { success: false, error: 'Ticket ID is required.' };
-  if (!/^\d{6}$/.test(ticket_id)) {
-    return { success: false, error: 'Ticket ID must be exactly a 6-digit number (e.g. 454433).' };
+  // Validate Ticket ID
+  if (!ticket_id) {
+    return {
+      success: false,
+      error: 'Ticket ID is required.',
+    };
   }
-  if (!user_id) return { success: false, error: 'User ID is required.' };
-  if (!/^\d{6}$/.test(user_id)) {
-    return { success: false, error: 'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).' };
-  }
-  if (isNaN(numericAmount) || numericAmount <= 0) {
-    return { success: false, error: 'Amount must be a positive number in TK.' };
-  }
-  if (!description) return { success: false, error: 'Description is required.' };
-  if (!date) return { success: false, error: 'Date is required.' };
 
-  const roundedAmount = Math.round(numericAmount * 100) / 100;
-  const created_by = data.created_by || 'Support';
+  if (!/^\d{6}$/.test(ticket_id)) {
+    return {
+      success: false,
+      error:
+        'Ticket ID must be exactly a 6-digit number (e.g. 454433).',
+    };
+  }
+
+  // Validate User ID
+  if (!user_id) {
+    return {
+      success: false,
+      error: 'User ID is required.',
+    };
+  }
+
+  if (!/^\d{6}$/.test(user_id)) {
+    return {
+      success: false,
+      error:
+        'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).',
+    };
+  }
+
+  // Validate Amount
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return {
+      success: false,
+      error: 'Amount must be a positive number in TK.',
+    };
+  }
+
+  // Validate Description
+  if (!description) {
+    return {
+      success: false,
+      error: 'Description is required.',
+    };
+  }
+
+  // Validate Date
+  if (!date) {
+    return {
+      success: false,
+      error: 'Date is required.',
+    };
+  }
+
+  const roundedAmount =
+    Math.round(numericAmount * 100) / 100;
+
+  const created_by =
+    data.created_by || 'Support';
 
   try {
     await ensureTables();
+
     const p = getPool();
-    const [existing] = await p.query<RowDataPacket[]>(
-      'SELECT id FROM bills WHERE LOWER(ticket_id) = LOWER(?) LIMIT 1',
-      [ticket_id]
-    );
-    if (existing && existing.length > 0) {
-      return { success: false, error: `Ticket ID "${ticket_id}" already exists.` };
-    }
+
+    /*
+     * IMPORTANT:
+     * We intentionally DO NOT check whether ticket_id already exists.
+     *
+     * Multiple bills can have the same ticket_id.
+     *
+     * Example:
+     * Bill ID 101 -> Ticket ID 454433 -> 500 TK
+     * Bill ID 102 -> Ticket ID 454433 -> 800 TK
+     * Bill ID 103 -> Ticket ID 454433 -> 1200 TK
+     *
+     * Each bill gets its own unique auto-increment ID.
+     */
 
     const [res] = await p.query<ResultSetHeader>(
-      `INSERT INTO bills (ticket_id, user_id, amount, description, date, status, created_by, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 'Pending', ?, NOW(), NOW())`,
-      [ticket_id, user_id, roundedAmount, description, date, created_by]
+      `INSERT INTO bills (
+        ticket_id,
+        user_id,
+        amount,
+        description,
+        date,
+        status,
+        created_by,
+        created_at,
+        updated_at
+      )
+      VALUES (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        'Pending',
+        ?,
+        NOW(),
+        NOW()
+      )`,
+      [
+        ticket_id,
+        user_id,
+        roundedAmount,
+        description,
+        date,
+        created_by,
+      ]
     );
 
     const nowIso = new Date().toISOString();
+
     return {
       success: true,
+
       bill: {
         id: res.insertId,
         ticket_id,
@@ -746,39 +928,207 @@ export async function createBill(data: {
       },
     };
   } catch (error) {
-    const store = readLocalStorage();
-    const exists = store.bills.some(
-      (b) => b.ticket_id.toLowerCase() === ticket_id.toLowerCase()
-    );
-    if (exists) {
-      return { success: false, error: `Ticket ID "${ticket_id}" already exists.` };
+    console.error('Create bill MySQL error:', error);
+
+    /*
+     * Local storage fallback
+     *
+     * IMPORTANT:
+     * Do NOT check duplicate ticket_id here either.
+     * Multiple bills with the same ticket_id are allowed.
+     */
+
+    try {
+      const store = readLocalStorage();
+
+      const nextId =
+        store.bills.length > 0
+          ? Math.max(
+            ...store.bills.map((b) => Number(b.id))
+          ) + 1
+          : 1;
+
+      const nowIso = new Date().toISOString();
+
+      const newBill: Bill = {
+        id: nextId,
+        ticket_id,
+        user_id,
+        amount: roundedAmount,
+        description,
+        date,
+        status: 'Pending',
+        created_by,
+        created_at: nowIso,
+        updated_at: nowIso,
+      };
+
+      store.bills.push(newBill);
+
+      writeLocalStorage(store);
+
+      return {
+        success: true,
+        bill: newBill,
+      };
+    } catch (fallbackError) {
+      console.error(
+        'Create bill local storage error:',
+        fallbackError
+      );
+
+      return {
+        success: false,
+        error: 'Failed to create bill.',
+      };
     }
-
-    const nextId = store.bills.length > 0 ? Math.max(...store.bills.map((b) => b.id)) + 1 : 1;
-    const nowIso = new Date().toISOString();
-
-    const newBill: Bill = {
-      id: nextId,
-      ticket_id,
-      user_id,
-      amount: roundedAmount,
-      description,
-      date,
-      status: 'Pending',
-      created_by,
-      created_at: nowIso,
-      updated_at: nowIso,
-    };
-
-    store.bills.push(newBill);
-    writeLocalStorage(store);
-
-    return { success: true, bill: newBill };
   }
 }
 
-export async function updateBillStatus(
-  ticketId: string,
+
+// temp disable for    ticket.id - id
+// export async function updateBillStatus(
+//   ticketId: string,
+//   status: BillStatus,
+//   options?: {
+//     reason?: string;
+//     approverName?: string;
+//     paidBy?: string;
+//     paymentMethod?: string;
+//     paymentNote?: string;
+//   }
+// ): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [rows] = await p.query<RowDataPacket[]>(
+//       'SELECT id FROM bills WHERE LOWER(ticket_id) = LOWER(?) LIMIT 1',
+//       [ticketId.trim()]
+//     );
+//     if (!rows || rows.length === 0) {
+//       return { success: false, error: `Bill with Ticket ID "${ticketId}" not found.` };
+//     }
+
+//     if (status === 'Paid') {
+//       const paidBy = options?.paidBy || options?.approverName || 'Accounts Staff';
+//       const method = options?.paymentMethod || 'Cash';
+//       const note = options?.paymentNote || null;
+//       await p.query(
+//         `UPDATE bills
+//          SET status = 'Paid', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?, updated_at = NOW()
+//          WHERE LOWER(ticket_id) = LOWER(?)`,
+//         [paidBy, method, note, ticketId.trim()]
+//       );
+//     } else if (status === 'Rejected' && options?.reason) {
+//       await p.query(
+//         'UPDATE bills SET status = ?, rejection_reason = ?, updated_at = NOW() WHERE LOWER(ticket_id) = LOWER(?)',
+//         [status, options.reason.trim(), ticketId.trim()]
+//       );
+//     } else {
+//       await p.query(
+//         'UPDATE bills SET status = ?, updated_at = NOW() WHERE LOWER(ticket_id) = LOWER(?)',
+//         [status, ticketId.trim()]
+//       );
+//     }
+
+//     const updatedBill = await getBillByTicketId(ticketId);
+//     return { success: true, bill: updatedBill || undefined };
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     const idx = store.bills.findIndex(
+//       (b) => b.ticket_id.toLowerCase() === ticketId.trim().toLowerCase()
+//     );
+//     if (idx === -1) {
+//       return { success: false, error: `Bill with Ticket ID "${ticketId}" not found.` };
+//     }
+
+//     store.bills[idx].status = status;
+//     store.bills[idx].updated_at = new Date().toISOString();
+//     if (status === 'Paid') {
+//       store.bills[idx].paid_by = options?.paidBy || options?.approverName || 'Accounts Staff';
+//       store.bills[idx].paid_at = new Date().toISOString();
+//       store.bills[idx].payment_method = options?.paymentMethod || 'Cash';
+//       if (options?.paymentNote) store.bills[idx].payment_note = options.paymentNote.trim();
+//     } else if (status === 'Rejected' && options?.reason) {
+//       store.bills[idx].rejection_reason = options.reason.trim();
+//     }
+
+//     writeLocalStorage(store);
+//     return { success: true, bill: store.bills[idx] };
+//   }
+// }
+
+
+export async function getBillById(id: number): Promise<Bill | null> {
+  try {
+    await ensureTables();
+    const p = getPool();
+
+    const [rows] = await p.query<RowDataPacket[]>(
+      `SELECT
+        id,
+        ticket_id,
+        user_id,
+        amount,
+        description,
+        DATE_FORMAT(date, '%Y-%m-%d') as date,
+        status,
+        created_by,
+        rejection_reason,
+        paid_by,
+        paid_at,
+        payment_method,
+        payment_note,
+        created_at,
+        updated_at
+      FROM bills
+      WHERE id = ?
+      LIMIT 1`,
+      [id]
+    );
+
+    if (rows && rows.length > 0) {
+      const r = rows[0];
+
+      return {
+        id: Number(r.id),
+        ticket_id: String(r.ticket_id),
+        user_id: String(r.user_id),
+        amount: Number(r.amount),
+        description: String(r.description),
+        date: String(r.date),
+        status: r.status as BillStatus,
+        created_by: r.created_by ? String(r.created_by) : undefined,
+        rejection_reason: r.rejection_reason
+          ? String(r.rejection_reason)
+          : undefined,
+        paid_by: r.paid_by ? String(r.paid_by) : undefined,
+        paid_at: safeIsoDate(r.paid_at),
+        payment_method: r.payment_method
+          ? String(r.payment_method)
+          : undefined,
+        payment_note: r.payment_note
+          ? String(r.payment_note)
+          : undefined,
+        created_at: safeIsoDate(r.created_at),
+        updated_at: safeIsoDate(r.updated_at),
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error('getBillById error:', error);
+
+    const store = readLocalStorage();
+
+    return (
+      store.bills.find((b) => Number(b.id) === id) || null
+    );
+  }
+}
+
+export async function updateBillStatusById(
+  id: number,
   status: BillStatus,
   options?: {
     reason?: string;
@@ -791,62 +1141,130 @@ export async function updateBillStatus(
   try {
     await ensureTables();
     const p = getPool();
+
+    // First make sure this exact bill exists
     const [rows] = await p.query<RowDataPacket[]>(
-      'SELECT id FROM bills WHERE LOWER(ticket_id) = LOWER(?) LIMIT 1',
-      [ticketId.trim()]
+      'SELECT id FROM bills WHERE id = ? LIMIT 1',
+      [id]
     );
+
     if (!rows || rows.length === 0) {
-      return { success: false, error: `Bill with Ticket ID "${ticketId}" not found.` };
+      return {
+        success: false,
+        error: `Bill with ID "${id}" not found.`,
+      };
     }
 
     if (status === 'Paid') {
-      const paidBy = options?.paidBy || options?.approverName || 'Accounts Staff';
-      const method = options?.paymentMethod || 'Cash';
-      const note = options?.paymentNote || null;
+      const paidBy =
+        options?.paidBy ||
+        options?.approverName ||
+        'Accounts Staff';
+
+      const method =
+        options?.paymentMethod || 'Cash';
+
+      const note =
+        options?.paymentNote || null;
+
       await p.query(
         `UPDATE bills
-         SET status = 'Paid', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?, updated_at = NOW()
-         WHERE LOWER(ticket_id) = LOWER(?)`,
-        [paidBy, method, note, ticketId.trim()]
+         SET
+           status = 'Paid',
+           paid_by = ?,
+           paid_at = NOW(),
+           payment_method = ?,
+           payment_note = ?,
+           updated_at = NOW()
+         WHERE id = ?`,
+        [paidBy, method, note, id]
       );
     } else if (status === 'Rejected' && options?.reason) {
       await p.query(
-        'UPDATE bills SET status = ?, rejection_reason = ?, updated_at = NOW() WHERE LOWER(ticket_id) = LOWER(?)',
-        [status, options.reason.trim(), ticketId.trim()]
+        `UPDATE bills
+         SET
+           status = ?,
+           rejection_reason = ?,
+           updated_at = NOW()
+         WHERE id = ?`,
+        [status, options.reason.trim(), id]
       );
     } else {
       await p.query(
-        'UPDATE bills SET status = ?, updated_at = NOW() WHERE LOWER(ticket_id) = LOWER(?)',
-        [status, ticketId.trim()]
+        `UPDATE bills
+         SET
+           status = ?,
+           updated_at = NOW()
+         WHERE id = ?`,
+        [status, id]
       );
     }
 
-    const updatedBill = await getBillByTicketId(ticketId);
-    return { success: true, bill: updatedBill || undefined };
+    const updatedBill = await getBillById(id);
+
+    return {
+      success: true,
+      bill: updatedBill || undefined,
+    };
   } catch (error) {
+    console.error('updateBillStatusById error:', error);
+
+    // Local storage fallback
     const store = readLocalStorage();
+
     const idx = store.bills.findIndex(
-      (b) => b.ticket_id.toLowerCase() === ticketId.trim().toLowerCase()
+      (b) => Number(b.id) === id
     );
+
     if (idx === -1) {
-      return { success: false, error: `Bill with Ticket ID "${ticketId}" not found.` };
+      return {
+        success: false,
+        error: `Bill with ID "${id}" not found.`,
+      };
     }
 
     store.bills[idx].status = status;
-    store.bills[idx].updated_at = new Date().toISOString();
+    store.bills[idx].updated_at =
+      new Date().toISOString();
+
     if (status === 'Paid') {
-      store.bills[idx].paid_by = options?.paidBy || options?.approverName || 'Accounts Staff';
-      store.bills[idx].paid_at = new Date().toISOString();
-      store.bills[idx].payment_method = options?.paymentMethod || 'Cash';
-      if (options?.paymentNote) store.bills[idx].payment_note = options.paymentNote.trim();
-    } else if (status === 'Rejected' && options?.reason) {
-      store.bills[idx].rejection_reason = options.reason.trim();
+      store.bills[idx].paid_by =
+        options?.paidBy ||
+        options?.approverName ||
+        'Accounts Staff';
+
+      store.bills[idx].paid_at =
+        new Date().toISOString();
+
+      store.bills[idx].payment_method =
+        options?.paymentMethod || 'Cash';
+
+      if (options?.paymentNote) {
+        store.bills[idx].payment_note =
+          options.paymentNote.trim();
+      }
+    } else if (
+      status === 'Rejected' &&
+      options?.reason
+    ) {
+      store.bills[idx].rejection_reason =
+        options.reason.trim();
     }
 
     writeLocalStorage(store);
-    return { success: true, bill: store.bills[idx] };
+
+    return {
+      success: true,
+      bill: store.bills[idx],
+    };
   }
 }
+
+
+
+// =====updating get bill by ticket to by id=============
+
+
 
 export async function getDashboardStats(filter?: {
   role?: UserRole;

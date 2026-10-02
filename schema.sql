@@ -140,9 +140,9 @@ CREATE TABLE IF NOT EXISTS `bills` (
 -- Email: kamrul.cse9@gmail.com
 -- Password: 66667777ssc
 -- -----------------------------------------------------
-INSERT INTO `users` (`id`, `user_id`, `name`, `password`, `role`, `created_at`) 
-VALUES (1, 'kamrul.cse9@gmail.com', 'Kamrul Islam', '66667777ssc', 'admin', NOW())
-ON DUPLICATE KEY UPDATE 
-  `name`=VALUES(`name`),
-  `password`=VALUES(`password`),
-  `role`=VALUES(`role`);
+-- INSERT INTO `users` (`id`, `user_id`, `name`, `password`, `role`, `created_at`) 
+-- VALUES (1, 'kamrul.cse9@gmail.com', 'Kamrul Islam', '66667777ssc', 'admin', NOW())
+-- ON DUPLICATE KEY UPDATE 
+--   `name`=VALUES(`name`),
+--   `password`=VALUES(`password`),
+--   `role`=VALUES(`role`);
