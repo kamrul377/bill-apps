@@ -15,8 +15,8 @@ export interface ClientInfo {
     secondaryIp: string;
     secondaryOnu: string;
     location: string;
-    pocId: string;
-    pocName?: string;
+    pocId?: number | string | null;
+    pocName?: string | null;
     status: 'Connected' | 'Disconnected';
     description: string;
     createdAt: string;
