@@ -3505,43 +3505,34 @@ POC : ${pocText}`;
         useMemo(() => {
             return clients
                 .filter((client) => {
-                    const q =
-                        searchQuery
-                            .toLowerCase()
-                            .trim();
+                    const q = searchQuery.toLowerCase().trim();
+
+                    const searchableText = [
+                        client.clientId,
+                        client.clientName,
+                        client.clientPhone,
+                        client.pocName,
+                        client.primaryOnu,
+                        client.primaryIp,
+                        client.secondaryOnu,
+                        client.secondaryIp,
+                        client.location,
+                        client.description,
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
 
                     const matchesSearch =
-                        !q ||
-                        client.clientId
-                            ?.toLowerCase()
-                            .includes(q) ||
-                        client.clientName
-                            ?.toLowerCase()
-                            .includes(q) ||
-                        client.clientPhone
-                            ?.toLowerCase()
-                            .includes(q) ||
-                        client.primaryIp
-                            ?.toLowerCase()
-                            .includes(q) ||
-                        client.location
-                            ?.toLowerCase()
-                            .includes(q) ||
-                        client.pocName
-                            ?.toLowerCase()
-                            .includes(q);
+                        !q || searchableText.includes(q);
 
                     const matchesStatus =
-                        statusFilter ===
-                        'All' ||
-                        client.status ===
-                        statusFilter;
+                        statusFilter === 'All' ||
+                        client.status === statusFilter;
 
                     const matchesPoc =
-                        pocFilter ===
-                        'All' ||
-                        client.pocId?.toString() ===
-                        pocFilter;
+                        pocFilter === 'All' ||
+                        client.pocId?.toString() === pocFilter;
 
                     return (
                         matchesSearch &&
@@ -3550,49 +3541,23 @@ POC : ${pocText}`;
                     );
                 })
                 .sort((a, b) => {
-                    if (
-                        sortBy ===
-                        'newest'
-                    ) {
-                        return (
-                            Number(b.id) -
-                            Number(a.id)
+                    if (sortBy === 'newest') {
+                        return Number(b.id) - Number(a.id);
+                    }
+
+                    if (sortBy === 'oldest') {
+                        return Number(a.id) - Number(b.id);
+                    }
+
+                    if (sortBy === 'name') {
+                        return (a.clientName || '').localeCompare(
+                            b.clientName || ''
                         );
                     }
 
-                    if (
-                        sortBy ===
-                        'oldest'
-                    ) {
-                        return (
-                            Number(a.id) -
-                            Number(b.id)
-                        );
-                    }
-
-                    if (
-                        sortBy ===
-                        'name'
-                    ) {
-                        return (
-                            a.clientName ||
-                            ''
-                        ).localeCompare(
-                            b.clientName ||
-                            ''
-                        );
-                    }
-
-                    if (
-                        sortBy ===
-                        'clientId'
-                    ) {
-                        return (
-                            a.clientId ||
-                            ''
-                        ).localeCompare(
-                            b.clientId ||
-                            ''
+                    if (sortBy === 'clientId') {
+                        return (a.clientId || '').localeCompare(
+                            b.clientId || ''
                         );
                     }
 

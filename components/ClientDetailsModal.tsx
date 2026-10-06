@@ -225,7 +225,18 @@ POC : ${client.pocName || '-'}`;
                         </div>
                         <div>
                             <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Created Date</div>
-                            <div className="font-semibold text-slate-700 mt-1">{client.createdAt || 'N/A'}</div>
+                            <div className="font-semibold text-slate-700 mt-1">
+                                {client.createdAt
+                                    ? new Date(client.createdAt).toLocaleString('en-GB', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                    })
+                                    : 'N/A'}
+                            </div>
                         </div>
                     </div>
 
