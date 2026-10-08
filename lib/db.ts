@@ -524,6 +524,105 @@ export async function deleteUser(id: number): Promise<{ success: boolean; error?
   }
 }
 
+
+// for categroy............
+
+export interface Category {
+  id: number;
+  name: string;
+}
+// 1. Ensure Table and 'Others' Category exists
+export async function ensureCategoriesTable(): Promise<void> {
+  const p = getPool();
+
+  await p.query(`
+    CREATE TABLE IF NOT EXISTS bill_categories (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL UNIQUE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `);
+
+  // খালি থাকলে 'Others' ক্যাটাগরি অবশ্যই ইনসার্ট করবে
+  const [rows] = await p.query<RowDataPacket[]>('SELECT COUNT(*) as count FROM bill_categories');
+  if (rows[0].count === 0) {
+    await p.query('INSERT IGNORE INTO bill_categories (name) VALUES (?)', ['Others']);
+  }
+}
+
+// 2. Get All Categories
+export async function getCategories(): Promise<Category[]> {
+  try {
+    await ensureTables();
+    await ensureCategoriesTable();
+
+    const p = getPool();
+    const [rows] = await p.query<RowDataPacket[]>(
+      'SELECT id, name FROM bill_categories ORDER BY id ASC'
+    );
+
+    return rows.map((r) => ({
+      id: Number(r.id),
+      name: String(r.name),
+    }));
+  } catch (error) {
+    console.warn('MySQL getCategories failed:', (error as Error).message);
+    return [{ id: 1, name: "Others" }];
+  }
+}
+
+// 3. Add New Category from UI
+export async function createCategory(name: string): Promise<Category> {
+  await ensureTables();
+  await ensureCategoriesTable();
+
+  const p = getPool();
+  const trimmedName = name.trim();
+
+  // 'Others' বা Duplicate Check
+  const [existing] = await p.query<RowDataPacket[]>(
+    'SELECT id, name FROM bill_categories WHERE LOWER(name) = LOWER(?)',
+    [trimmedName]
+  );
+
+  if (existing.length > 0) {
+    return { id: Number(existing[0].id), name: String(existing[0].name) };
+  }
+
+  const [result] = await p.query<ResultSetHeader>(
+    'INSERT INTO bill_categories (name) VALUES (?)',
+    [trimmedName]
+  );
+
+  return {
+    id: result.insertId,
+    name: trimmedName,
+  };
+}
+
+// Update Category
+export async function updateCategory(id: number, name: string): Promise<void> {
+  await ensureTables();
+  const p = getPool();
+  await p.query('UPDATE bill_categories SET name = ? WHERE id = ?', [
+    name.trim(),
+    id,
+  ]);
+}
+
+// Delete Category
+export async function deleteCategory(id: number): Promise<void> {
+  await ensureTables();
+  const p = getPool();
+
+  // Bills টেবিল থেকে এই ক্যাটাগরির রেফারেন্স ফাকা করা
+  await p.query('UPDATE bills SET category_id = NULL WHERE category_id = ?', [
+    id,
+  ]);
+
+  // bill_categories টেবিল থেকে ক্যাটাগরি ডিলিট করা
+  await p.query('DELETE FROM bill_categories WHERE id = ?', [id]);
+}
+
 // ==================== Bill Repository ====================
 
 export interface BillFilterOptions {
@@ -535,107 +634,111 @@ export interface BillFilterOptions {
   currentUserName?: string;
 }
 
-export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
-  try {
-    await ensureTables();
-    const p = getPool();
 
-    let sql = `
-      SELECT
-        id,
-        ticket_id,
-        user_id,
-        amount,
-        description,
-        DATE_FORMAT(date, '%Y-%m-%d') as date,
-        status,
-        created_by,
-        rejection_reason,
-        paid_by,
-        paid_at,
-        payment_method,
-        payment_note,
-        created_at,
-        updated_at
-      FROM bills
-      WHERE 1=1
-    `;
-    const params: (string | number)[] = [];
 
-    if (filter?.role === 'support') {
-      if (!filter.currentUserId) return [];
-      sql += ' AND (LOWER(created_by) LIKE LOWER(?) OR LOWER(created_by) LIKE LOWER(?))';
-      const uid = `%${filter.currentUserId.trim()}%`;
-      const uname = `%${filter.currentUserName ? filter.currentUserName.trim() : filter.currentUserId.trim()}%`;
-      params.push(uid, uname);
-    }
+// export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
 
-    if (filter?.status && filter.status !== 'ALL') {
-      sql += ' AND UPPER(status) = UPPER(?)';
-      params.push(filter.status);
-    }
+//     let sql = `
+//       SELECT
+//         id,
+//         ticket_id,
+//         user_id,
+//         amount,
+//         description,
+//         DATE_FORMAT(date, '%Y-%m-%d') as date,
+//         status,
+//         created_by,
+//         rejection_reason,
+//         paid_by,
+//         paid_at,
+//         payment_method,
+//         payment_note,
+//         created_at,
+//         updated_at
+//       FROM bills
+//       WHERE 1=1
+//     `;
+//     const params: (string | number)[] = [];
 
-    if (filter?.search) {
-      const q = `%${filter.search.trim()}%`;
-      sql += ' AND (ticket_id LIKE ? OR user_id LIKE ? OR description LIKE ? OR created_by LIKE ?)';
-      params.push(q, q, q, q);
-    }
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       sql += ' AND (LOWER(created_by) LIKE LOWER(?) OR LOWER(created_by) LIKE LOWER(?))';
+//       const uid = `%${filter.currentUserId.trim()}%`;
+//       const uname = `%${filter.currentUserName ? filter.currentUserName.trim() : filter.currentUserId.trim()}%`;
+//       params.push(uid, uname);
+//     }
 
-    sql += ' ORDER BY date DESC, id DESC';
+//     if (filter?.status && filter.status !== 'ALL') {
+//       sql += ' AND UPPER(status) = UPPER(?)';
+//       params.push(filter.status);
+//     }
 
-    const [rows] = await p.query<RowDataPacket[]>(sql, params);
+//     if (filter?.search) {
+//       const q = `%${filter.search.trim()}%`;
+//       sql += ' AND (ticket_id LIKE ? OR user_id LIKE ? OR description LIKE ? OR created_by LIKE ?)';
+//       params.push(q, q, q, q);
+//     }
 
-    return rows.map((r) => ({
-      id: Number(r.id),
-      ticket_id: String(r.ticket_id),
-      user_id: String(r.user_id),
-      amount: Number(r.amount),
-      description: String(r.description),
-      date: String(r.date),
-      status: r.status as BillStatus,
-      created_by: r.created_by ? String(r.created_by) : undefined,
-      rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
-      paid_by: r.paid_by ? String(r.paid_by) : undefined,
-      paid_at: safeIsoDate(r.paid_at),
-      payment_method: r.payment_method ? String(r.payment_method) : undefined,
-      payment_note: r.payment_note ? String(r.payment_note) : undefined,
-      created_at: safeIsoDate(r.created_at),
-      updated_at: safeIsoDate(r.updated_at),
-    }));
-  } catch (error) {
-    const store = readLocalStorage();
-    let list = [...store.bills];
+//     sql += ' ORDER BY date DESC, id DESC';
 
-    if (filter?.role === 'support') {
-      if (!filter.currentUserId) return [];
-      const uid = filter.currentUserId.trim().toLowerCase();
-      const uname = (filter.currentUserName || '').trim().toLowerCase();
-      list = list.filter((b) => {
-        if (!b.created_by) return false;
-        const cb = b.created_by.toLowerCase();
-        return cb.includes(uid) || (uname && cb.includes(uname));
-      });
-    }
+//     const [rows] = await p.query<RowDataPacket[]>(sql, params);
 
-    if (filter?.status && filter.status !== 'ALL') {
-      list = list.filter((b) => b.status.toUpperCase() === filter.status!.toUpperCase());
-    }
+//     return rows.map((r) => ({
+//       id: Number(r.id),
+//       ticket_id: String(r.ticket_id),
+//       user_id: String(r.user_id),
+//       amount: Number(r.amount),
+//       description: String(r.description),
+//       date: String(r.date),
+//       status: r.status as BillStatus,
+//       created_by: r.created_by ? String(r.created_by) : undefined,
+//       rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+//       paid_by: r.paid_by ? String(r.paid_by) : undefined,
+//       paid_at: safeIsoDate(r.paid_at),
+//       payment_method: r.payment_method ? String(r.payment_method) : undefined,
+//       payment_note: r.payment_note ? String(r.payment_note) : undefined,
+//       created_at: safeIsoDate(r.created_at),
+//       updated_at: safeIsoDate(r.updated_at),
+//     }));
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     let list = [...store.bills];
 
-    if (filter?.search) {
-      const q = filter.search.toLowerCase();
-      list = list.filter(
-        (b) =>
-          b.ticket_id.toLowerCase().includes(q) ||
-          b.user_id.toLowerCase().includes(q) ||
-          b.description.toLowerCase().includes(q) ||
-          (b.created_by && b.created_by.toLowerCase().includes(q))
-      );
-    }
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       const uid = filter.currentUserId.trim().toLowerCase();
+//       const uname = (filter.currentUserName || '').trim().toLowerCase();
+//       list = list.filter((b) => {
+//         if (!b.created_by) return false;
+//         const cb = b.created_by.toLowerCase();
+//         return cb.includes(uid) || (uname && cb.includes(uname));
+//       });
+//     }
 
-    list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    return list;
-  }
-}
+//     if (filter?.status && filter.status !== 'ALL') {
+//       list = list.filter((b) => b.status.toUpperCase() === filter.status!.toUpperCase());
+//     }
+
+//     if (filter?.search) {
+//       const q = filter.search.toLowerCase();
+//       list = list.filter(
+//         (b) =>
+//           b.ticket_id.toLowerCase().includes(q) ||
+//           b.user_id.toLowerCase().includes(q) ||
+//           b.description.toLowerCase().includes(q) ||
+//           (b.created_by && b.created_by.toLowerCase().includes(q))
+//       );
+//     }
+
+//     list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+//     return list;
+//   }
+// }
+
+
 
 
 
@@ -781,10 +884,325 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
 //     return { success: true, bill: newBill };
 //   }
 // }
+// export async function createBill(data: {
+//   ticket_id: string;
+//   user_id: string;
+//   amount: number | string;
+//   description: string;
+//   date: string;
+//   created_by?: string;
+// }): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+//   const ticket_id = (data.ticket_id || '').trim();
+//   const user_id = (data.user_id || '').trim();
+//   const description = (data.description || '').trim();
+//   const date = (data.date || '').trim();
+//   const numericAmount = Number(data.amount);
+
+//   // Validate Ticket ID
+//   if (!ticket_id) {
+//     return {
+//       success: false,
+//       error: 'Ticket ID is required.',
+//     };
+//   }
+
+//   if (!/^\d{6}$/.test(ticket_id)) {
+//     return {
+//       success: false,
+//       error:
+//         'Ticket ID must be exactly a 6-digit number (e.g. 454433).',
+//     };
+//   }
+
+//   // Validate User ID
+//   if (!user_id) {
+//     return {
+//       success: false,
+//       error: 'User ID is required.',
+//     };
+//   }
+
+//   if (!/^\d{6}$/.test(user_id)) {
+//     return {
+//       success: false,
+//       error:
+//         'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).',
+//     };
+//   }
+
+//   // Validate Amount
+//   if (isNaN(numericAmount) || numericAmount <= 0) {
+//     return {
+//       success: false,
+//       error: 'Amount must be a positive number in TK.',
+//     };
+//   }
+
+//   // Validate Description
+//   if (!description) {
+//     return {
+//       success: false,
+//       error: 'Description is required.',
+//     };
+//   }
+
+//   // Validate Date
+//   if (!date) {
+//     return {
+//       success: false,
+//       error: 'Date is required.',
+//     };
+//   }
+
+//   const roundedAmount =
+//     Math.round(numericAmount * 100) / 100;
+
+//   const created_by =
+//     data.created_by || 'Support';
+
+//   try {
+//     await ensureTables();
+
+//     const p = getPool();
+
+//     /*
+//      * IMPORTANT:
+//      * We intentionally DO NOT check whether ticket_id already exists.
+//      *
+//      * Multiple bills can have the same ticket_id.
+//      *
+//      * Example:
+//      * Bill ID 101 -> Ticket ID 454433 -> 500 TK
+//      * Bill ID 102 -> Ticket ID 454433 -> 800 TK
+//      * Bill ID 103 -> Ticket ID 454433 -> 1200 TK
+//      *
+//      * Each bill gets its own unique auto-increment ID.
+//      */
+
+//     const [res] = await p.query<ResultSetHeader>(
+//       `INSERT INTO bills (
+//         ticket_id,
+//         user_id,
+//         amount,
+//         description,
+//         date,
+//         status,
+//         created_by,
+//         created_at,
+//         updated_at
+//       )
+//       VALUES (
+//         ?,
+//         ?,
+//         ?,
+//         ?,
+//         ?,
+//         'Pending',
+//         ?,
+//         NOW(),
+//         NOW()
+//       )`,
+//       [
+//         ticket_id,
+//         user_id,
+//         roundedAmount,
+//         description,
+//         date,
+//         created_by,
+//       ]
+//     );
+
+//     const nowIso = new Date().toISOString();
+
+//     return {
+//       success: true,
+
+//       bill: {
+//         id: res.insertId,
+//         ticket_id,
+//         user_id,
+//         amount: roundedAmount,
+//         description,
+//         date,
+//         status: 'Pending',
+//         created_by,
+//         created_at: nowIso,
+//         updated_at: nowIso,
+//       },
+//     };
+//   } catch (error) {
+//     console.error('Create bill MySQL error:', error);
+
+//     /*
+//      * Local storage fallback
+//      *
+//      * IMPORTANT:
+//      * Do NOT check duplicate ticket_id here either.
+//      * Multiple bills with the same ticket_id are allowed.
+//      */
+
+//     try {
+//       const store = readLocalStorage();
+
+//       const nextId =
+//         store.bills.length > 0
+//           ? Math.max(
+//             ...store.bills.map((b) => Number(b.id))
+//           ) + 1
+//           : 1;
+
+//       const nowIso = new Date().toISOString();
+
+//       const newBill: Bill = {
+//         id: nextId,
+//         ticket_id,
+//         user_id,
+//         amount: roundedAmount,
+//         description,
+//         date,
+//         status: 'Pending',
+//         created_by,
+//         created_at: nowIso,
+//         updated_at: nowIso,
+//       };
+
+//       store.bills.push(newBill);
+
+//       writeLocalStorage(store);
+
+//       return {
+//         success: true,
+//         bill: newBill,
+//       };
+//     } catch (fallbackError) {
+//       console.error(
+//         'Create bill local storage error:',
+//         fallbackError
+//       );
+
+//       return {
+//         success: false,
+//         error: 'Failed to create bill.',
+//       };
+//     }
+//   }
+// }
+
+export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
+  try {
+    await ensureTables();
+    await ensureCategoriesTable(); // Categories table ensure
+
+    const p = getPool();
+
+    let sql = `
+      SELECT
+        b.id,
+        b.ticket_id,
+        b.user_id,
+        b.category_id,
+        c.name AS category_name,
+        b.amount,
+        b.description,
+        DATE_FORMAT(b.date, '%Y-%m-%d') as date,
+        b.status,
+        b.created_by,
+        b.rejection_reason,
+        b.paid_by,
+        b.paid_at,
+        b.payment_method,
+        b.payment_note,
+        b.created_at,
+        b.updated_at
+      FROM bills b
+      LEFT JOIN bill_categories c ON b.category_id = c.id
+      WHERE 1=1
+    `;
+    const params: (string | number)[] = [];
+
+    if (filter?.role === 'support') {
+      if (!filter.currentUserId) return [];
+      sql += ' AND (LOWER(b.created_by) LIKE LOWER(?) OR LOWER(b.created_by) LIKE LOWER(?))';
+      const uid = `%${filter.currentUserId.trim()}%`;
+      const uname = `%${filter.currentUserName ? filter.currentUserName.trim() : filter.currentUserId.trim()}%`;
+      params.push(uid, uname);
+    }
+
+    if (filter?.status && filter.status !== 'ALL') {
+      sql += ' AND UPPER(b.status) = UPPER(?)';
+      params.push(filter.status);
+    }
+
+    if (filter?.search) {
+      const q = `%${filter.search.trim()}%`;
+      sql += ' AND (b.ticket_id LIKE ? OR b.user_id LIKE ? OR b.description LIKE ? OR b.created_by LIKE ?)';
+      params.push(q, q, q, q);
+    }
+
+    sql += ' ORDER BY b.date DESC, b.id DESC';
+
+    const [rows] = await p.query<RowDataPacket[]>(sql, params);
+
+    return rows.map((r) => ({
+      id: Number(r.id),
+      ticket_id: String(r.ticket_id),
+      user_id: String(r.user_id),
+      category_id: r.category_id ? Number(r.category_id) : undefined,
+      category_name: r.category_name ? String(r.category_name) : 'General',
+      amount: Number(r.amount),
+      description: String(r.description),
+      date: String(r.date),
+      status: r.status as BillStatus,
+      created_by: r.created_by ? String(r.created_by) : undefined,
+      rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+      paid_by: r.paid_by ? String(r.paid_by) : undefined,
+      paid_at: safeIsoDate(r.paid_at),
+      payment_method: r.payment_method ? String(r.payment_method) : undefined,
+      payment_note: r.payment_note ? String(r.payment_note) : undefined,
+      created_at: safeIsoDate(r.created_at),
+      updated_at: safeIsoDate(r.updated_at),
+    }));
+  } catch (error) {
+    const store = readLocalStorage();
+    let list = [...store.bills];
+
+    if (filter?.role === 'support') {
+      if (!filter.currentUserId) return [];
+      const uid = filter.currentUserId.trim().toLowerCase();
+      const uname = (filter.currentUserName || '').trim().toLowerCase();
+      list = list.filter((b) => {
+        if (!b.created_by) return false;
+        const cb = b.created_by.toLowerCase();
+        return cb.includes(uid) || (uname && cb.includes(uname));
+      });
+    }
+
+    if (filter?.status && filter.status !== 'ALL') {
+      list = list.filter((b) => b.status.toUpperCase() === filter.status!.toUpperCase());
+    }
+
+    if (filter?.search) {
+      const q = filter.search.toLowerCase();
+      list = list.filter(
+        (b) =>
+          b.ticket_id.toLowerCase().includes(q) ||
+          b.user_id.toLowerCase().includes(q) ||
+          b.description.toLowerCase().includes(q) ||
+          (b.created_by && b.created_by.toLowerCase().includes(q))
+      );
+    }
+
+    list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return list;
+  }
+}
+
+
 export async function createBill(data: {
   ticket_id: string;
   user_id: string;
   amount: number | string;
+  category_id?: number | string; // <--- Category ID add kora hoilo
   description: string;
   date: string;
   created_by?: string;
@@ -794,6 +1212,9 @@ export async function createBill(data: {
   const description = (data.description || '').trim();
   const date = (data.date || '').trim();
   const numericAmount = Number(data.amount);
+
+  // Category ID parsing (Default 1)
+  const category_id = data.category_id ? Number(data.category_id) : 1;
 
   // Validate Ticket ID
   if (!ticket_id) {
@@ -806,8 +1227,7 @@ export async function createBill(data: {
   if (!/^\d{6}$/.test(ticket_id)) {
     return {
       success: false,
-      error:
-        'Ticket ID must be exactly a 6-digit number (e.g. 454433).',
+      error: 'Ticket ID must be exactly a 6-digit number (e.g. 454433).',
     };
   }
 
@@ -822,8 +1242,7 @@ export async function createBill(data: {
   if (!/^\d{6}$/.test(user_id)) {
     return {
       success: false,
-      error:
-        'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).',
+      error: 'User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).',
     };
   }
 
@@ -851,36 +1270,21 @@ export async function createBill(data: {
     };
   }
 
-  const roundedAmount =
-    Math.round(numericAmount * 100) / 100;
-
-  const created_by =
-    data.created_by || 'Support';
+  const roundedAmount = Math.round(numericAmount * 100) / 100;
+  const created_by = data.created_by || 'Support';
 
   try {
     await ensureTables();
 
     const p = getPool();
 
-    /*
-     * IMPORTANT:
-     * We intentionally DO NOT check whether ticket_id already exists.
-     *
-     * Multiple bills can have the same ticket_id.
-     *
-     * Example:
-     * Bill ID 101 -> Ticket ID 454433 -> 500 TK
-     * Bill ID 102 -> Ticket ID 454433 -> 800 TK
-     * Bill ID 103 -> Ticket ID 454433 -> 1200 TK
-     *
-     * Each bill gets its own unique auto-increment ID.
-     */
-
+    // SQL INSERT Query-te category_id add kora hoilo
     const [res] = await p.query<ResultSetHeader>(
       `INSERT INTO bills (
         ticket_id,
         user_id,
         amount,
+        category_id,
         description,
         date,
         status,
@@ -889,6 +1293,7 @@ export async function createBill(data: {
         updated_at
       )
       VALUES (
+        ?,
         ?,
         ?,
         ?,
@@ -903,6 +1308,7 @@ export async function createBill(data: {
         ticket_id,
         user_id,
         roundedAmount,
+        category_id, // <--- Category ID Value Pass Kora Hoilo
         description,
         date,
         created_by,
@@ -913,12 +1319,12 @@ export async function createBill(data: {
 
     return {
       success: true,
-
       bill: {
         id: res.insertId,
         ticket_id,
         user_id,
         amount: roundedAmount,
+        category_id, // <--- Bill Object-eo Category ID
         description,
         date,
         status: 'Pending',
@@ -930,22 +1336,12 @@ export async function createBill(data: {
   } catch (error) {
     console.error('Create bill MySQL error:', error);
 
-    /*
-     * Local storage fallback
-     *
-     * IMPORTANT:
-     * Do NOT check duplicate ticket_id here either.
-     * Multiple bills with the same ticket_id are allowed.
-     */
-
     try {
       const store = readLocalStorage();
 
       const nextId =
         store.bills.length > 0
-          ? Math.max(
-            ...store.bills.map((b) => Number(b.id))
-          ) + 1
+          ? Math.max(...store.bills.map((b) => Number(b.id))) + 1
           : 1;
 
       const nowIso = new Date().toISOString();
@@ -955,6 +1351,7 @@ export async function createBill(data: {
         ticket_id,
         user_id,
         amount: roundedAmount,
+        category_id, // <--- Fallback Storage-eo Category ID
         description,
         date,
         status: 'Pending',
@@ -964,7 +1361,6 @@ export async function createBill(data: {
       };
 
       store.bills.push(newBill);
-
       writeLocalStorage(store);
 
       return {
@@ -972,10 +1368,7 @@ export async function createBill(data: {
         bill: newBill,
       };
     } catch (fallbackError) {
-      console.error(
-        'Create bill local storage error:',
-        fallbackError
-      );
+      console.error('Create bill local storage error:', fallbackError);
 
       return {
         success: false,

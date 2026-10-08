@@ -433,7 +433,7 @@ export default function Sidebar({
             <span className="text-[10px] font-mono text-secondary/80">Active</span>
           </div>
 
-          <div className="flex items-center gap-1 text-[10px] font-mono text-secondary/60 pt-1 border-t border-outline-variant/10">
+          {/* <div className="flex items-center gap-1 text-[10px] font-mono text-secondary/60 pt-1 border-t border-outline-variant/10">
             <span>Developed by</span>
             <a
               href="https://kamrul-info.vercel.app/"
@@ -443,7 +443,7 @@ export default function Sidebar({
             >
               Kamrul Islam
             </a>
-          </div>
+          </div> */}
         </div>
       </aside>
     </>

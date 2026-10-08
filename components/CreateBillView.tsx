@@ -1,9 +1,7 @@
 // 'use client';
-
 // import React, { useState } from 'react';
 // import { motion } from 'motion/react';
 // import { Bill, User } from '@/lib/types';
-
 // interface CreateBillViewProps {
 //   currentUser: User;
 //   recentBills: Bill[];
@@ -11,7 +9,6 @@
 //   onNavigateToBills: () => void;
 //   onShowToast?: (msg: string, type?: 'success' | 'error' | 'info') => void;
 // }
-
 // export default function CreateBillView({
 //   currentUser,
 //   recentBills,
@@ -19,12 +16,13 @@
 //   onNavigateToBills,
 //   onShowToast,
 // }: CreateBillViewProps) {
-//   const generate6Digit = () => String(Math.floor(100000 + Math.random() * 900000));
-
-//   const [ticketId, setTicketId] = useState('454433');
+//   // ম্যানুয়াল এন্ট্রির জন্য ticketId খালি রাখা হয়েছে
+//   const [ticketId, setTicketId] = useState('');
 //   const [userId, setUserId] = useState('');
 //   const [amount, setAmount] = useState('');
-//   const [date, setDate] = useState('2026-09-23');
+//   // const [date, setDate] = useState('2026-09-23');
+//   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+
 //   const [description, setDescription] = useState('');
 
 //   const [loading, setLoading] = useState(false);
@@ -96,8 +94,8 @@
 //         onShowToast(`Bill #${data.bill.ticket_id} submitted for approval (Pending).`, 'success');
 //       }
 
-//       // Reset form with new auto 6-digit ticket ID
-//       setTicketId(generate6Digit());
+//       // বিল সাবমিট হওয়ার পর ফর্ম রিসেট
+//       setTicketId('');
 //       setUserId('');
 //       setAmount('');
 //       setDescription('');
@@ -135,20 +133,9 @@
 //         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 //           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 //             <div className="flex flex-col gap-1">
-//               <div className="flex items-center justify-between">
-//                 <label className="text-xs font-semibold text-secondary uppercase">
-//                   Ticket ID (6-digit) *
-//                 </label>
-//                 <button
-//                   type="button"
-//                   onClick={() => setTicketId(generate6Digit())}
-//                   className="text-[11px] font-medium text-teal-700 hover:text-teal-800 flex items-center gap-0.5 cursor-pointer"
-//                   title="Generate random 6-digit ticket number"
-//                 >
-//                   <span className="material-symbols-outlined text-xs">autorenew</span>
-//                   <span>Random 6-digit</span>
-//                 </button>
-//               </div>
+//               <label className="text-xs font-semibold text-secondary uppercase">
+//                 Ticket ID (6-digit) *
+//               </label>
 //               <div className="relative">
 //                 <input
 //                   type="text"
@@ -301,11 +288,19 @@
 
 
 
-'use client';
 
-import React, { useState } from 'react';
+// ==========================2nd=========================
+
+
+'use client';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Bill, User } from '@/lib/types';
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 interface CreateBillViewProps {
   currentUser: User;
@@ -322,17 +317,46 @@ export default function CreateBillView({
   onNavigateToBills,
   onShowToast,
 }: CreateBillViewProps) {
-  // ম্যানুয়াল এন্ট্রির জন্য ticketId খালি রাখা হয়েছে
+  // Manual entry-r jonno state
   const [ticketId, setTicketId] = useState('');
   const [userId, setUserId] = useState('');
   const [amount, setAmount] = useState('');
-  // const [date, setDate] = useState('2026-09-23');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const [description, setDescription] = useState('');
 
   const [loading, setLoading] = useState(false);
+  const [fetchingCategories, setFetchingCategories] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Bill categories backend API theke load kora
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setFetchingCategories(true);
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        if (res.ok && Array.isArray(data.categories)) {
+          setCategories(data.categories);
+          // Default category select kora (jodi 'Others' or prothom category thake)
+          if (data.categories.length > 0) {
+            const defaultCat = data.categories.find(
+              (c: Category) => c.name.toLowerCase() === 'others'
+            ) || data.categories[0];
+            setCategoryId(String(defaultCat.id));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      } finally {
+        setFetchingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -367,6 +391,11 @@ export default function CreateBillView({
       return;
     }
 
+    if (!categoryId) {
+      setError('Please select a bill category.');
+      return;
+    }
+
     if (!description.trim()) {
       setError('Please provide a service description.');
       return;
@@ -382,6 +411,7 @@ export default function CreateBillView({
           ticket_id: cleanTicketId,
           user_id: cleanUserId,
           amount: numAmount,
+          category_id: parseInt(categoryId, 10),
           description: description.trim(),
           date,
           created_by: currentUser.name || currentUser.user_id,
@@ -400,7 +430,7 @@ export default function CreateBillView({
         onShowToast(`Bill #${data.bill.ticket_id} submitted for approval (Pending).`, 'success');
       }
 
-      // বিল সাবমিট হওয়ার পর ফর্ম রিসেট
+      // Form reset
       setTicketId('');
       setUserId('');
       setAmount('');
@@ -483,7 +513,7 @@ export default function CreateBillView({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-secondary uppercase">
                 Amount (TK) *
@@ -501,6 +531,26 @@ export default function CreateBillView({
                   className="w-full h-9 pl-8 pr-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-data-mono text-xs"
                 />
               </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-secondary uppercase">
+                Category *
+              </label>
+              <select
+                required
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                disabled={fetchingCategories}
+                className="h-9 px-3 bg-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 text-xs cursor-pointer disabled:opacity-50"
+              >
+                <option value="" disabled>Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -591,3 +641,6 @@ export default function CreateBillView({
     </motion.div>
   );
 }
+
+
+
