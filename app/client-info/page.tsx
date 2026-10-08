@@ -1094,62 +1094,71 @@ POC : ${pocText}`;
                 TOAST
             ================================================== */}
                 {toast.show && (
-                    <div
-                        className={`fixed top-5 right-5 z-[9999] flex items-center gap-3 min-w-[280px] max-w-[400px] px-4 py-3 rounded-2xl shadow-2xl border backdrop-blur-md transition-all duration-300 animate-in slide-in-from-right-5 fade-in ${toast.type ===
-                            'success'
-                            ? 'bg-emerald-50/95 border-emerald-200 text-emerald-700'
-                            : toast.type ===
-                                'warning'
-                                ? 'bg-orange-50/95 border-orange-200 text-orange-700'
-                                : 'bg-red-50/95 border-red-200 text-red-700'
-                            }`}
-                    >
-                        <span
-                            className={`material-symbols-outlined text-xl ${toast.type ===
-                                'success'
-                                ? 'text-emerald-600'
-                                : toast.type ===
-                                    'warning'
-                                    ? 'text-orange-600'
-                                    : 'text-red-600'
-                                }`}
-                        >
-                            {toast.type ===
-                                'success'
-                                ? 'check_circle'
-                                : toast.type ===
-                                    'warning'
-                                    ? 'edit'
-                                    : 'delete'}
-                        </span>
 
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold">
-                                {
-                                    toast.message
-                                }
+                        <div
+                        className={`fixed bottom-5 right-5 z-[9999] w-[360px] flex items-center gap-3.5 px-4 py-3.5 rounded-2xl border shadow-[0_12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-right-5 fade-in ${
+                            toast.type === 'success'
+                                ? 'bg-white/95 border-emerald-200'
+                                : toast.type === 'warning'
+                                    ? 'bg-white/95 border-amber-200'
+                                    : 'bg-white/95 border-red-200'
+                        }`}
+                    >
+                        {/* Icon */}
+                        <div
+                            className={`flex items-center justify-center w-10 h-10 rounded-xl shrink-0 ${
+                                toast.type === 'success'
+                                    ? 'bg-emerald-100 text-emerald-600'
+                                    : toast.type === 'warning'
+                                        ? 'bg-amber-100 text-amber-600'
+                                        : 'bg-red-100 text-red-600'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-[22px]">
+                                {toast.type === 'success'
+                                    ? 'check_circle'
+                                    : toast.type === 'warning'
+                                        ? 'edit'
+                                        : 'error'}
+                            </span>
+                        </div>
+
+                        {/* Message */}
+                        <div className="flex-1 min-w-0">
+                            <p
+                                className={`text-sm font-semibold leading-5 ${
+                                    toast.type === 'success'
+                                        ? 'text-emerald-800'
+                                        : toast.type === 'warning'
+                                            ? 'text-amber-800'
+                                            : 'text-red-800'
+                                }`}
+                            >
+                                {toast.message}
                             </p>
                         </div>
 
+
+                        {/* Close */}
                         <button
                             type="button"
                             onClick={() =>
-                                setToast(
-                                    (
-                                        prev
-                                    ) => ({
-                                        ...prev,
-                                        show: false,
-                                    })
-                                )
+                                setToast((prev) => ({
+                                    ...prev,
+                                    show: false,
+                                }))
                             }
-                            className="text-slate-400 hover:text-slate-700 cursor-pointer transition-colors"
+                            className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer transition-all shrink-0"
+                            aria-label="Close notification"
                         >
-                            <span className="material-symbols-outlined text-lg">
+                            <span className="material-symbols-outlined text-[18px]">
                                 close
                             </span>
                         </button>
                     </div>
+
+                    
+                    
                 )}
 
                 <div className="max-w-7xl mx-auto space-y-6">
@@ -1316,6 +1325,8 @@ POC : ${pocText}`;
                 ================================================== */}
                     <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 transition-all duration-300 hover:shadow-sm">
 
+    
+           
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
 
                             {/* Search */}
@@ -1548,6 +1559,8 @@ POC : ${pocText}`;
                             </div>
 
                         </div>
+                        
+
 
                     </div>
 
@@ -3189,3 +3202,5 @@ POC : ${pocText}`;
         </ProtectedRoute>
     );
 }
+
+
