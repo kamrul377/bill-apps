@@ -1115,6 +1115,37 @@ export default function DashboardView({
   };
 
   // Filter Logic
+  // const filteredBills = bills.filter((b) => {
+  //   const matchesSearch =
+  //     !search ||
+  //     (b.ticket_id || '').toLowerCase().includes(search.toLowerCase()) ||
+  //     (b.user_id || '').toLowerCase().includes(search.toLowerCase()) ||
+  //     (b.description || '').toLowerCase().includes(search.toLowerCase()) ||
+  //     (b.created_by || '').toLowerCase().includes(search.toLowerCase());
+
+  //   const matchesStatus =
+  //     statusFilter === 'ALL' ||
+  //     (b.status || '').toUpperCase() === statusFilter.toUpperCase();
+
+  //   // Category Filter Matching (ID এবং Name উভয়ক্ষেত্রেই ফ্ল্যাক্সিবল চেক)
+  //   let matchesCategory = categoryFilter === 'ALL';
+  //   if (!matchesCategory) {
+  //     const billCatId = getBillCategoryId(b);
+  //     const categoryName = getCategoryName(b).toLowerCase();
+  //     const selectedCategoryObj = categories.find(
+  //       (c) => String(c.id) === String(categoryFilter)
+  //     );
+
+
+  //     billCatId === String(categoryFilter).trim() ||
+  //       (selectedCategoryObj &&
+  //         categoryName === selectedCategoryObj.name.toLowerCase());
+  //   }
+
+  //   return matchesSearch && matchesStatus && matchesCategory;
+  // });
+
+  // Filter Logic
   const filteredBills = bills.filter((b) => {
     const matchesSearch =
       !search ||
@@ -1127,7 +1158,7 @@ export default function DashboardView({
       statusFilter === 'ALL' ||
       (b.status || '').toUpperCase() === statusFilter.toUpperCase();
 
-    // Category Filter Matching (ID এবং Name উভয়ক্ষেত্রেই ফ্ল্যাক্সিবল চেক)
+    // Category Filter Matching
     let matchesCategory = categoryFilter === 'ALL';
     if (!matchesCategory) {
       const billCatId = getBillCategoryId(b);
@@ -1136,14 +1167,19 @@ export default function DashboardView({
         (c) => String(c.id) === String(categoryFilter)
       );
 
-
-      billCatId === String(categoryFilter).trim() ||
-        (selectedCategoryObj &&
-          categoryName === selectedCategoryObj.name.toLowerCase());
+      // ✅ সঠিকভাবে matchesCategory তে মূল্যায়ন করে অ্যাসাইন করা হয়েছে
+      matchesCategory =
+        billCatId === String(categoryFilter).trim() ||
+        Boolean(
+          selectedCategoryObj &&
+          categoryName === selectedCategoryObj.name.toLowerCase()
+        );
     }
 
     return matchesSearch && matchesStatus && matchesCategory;
   });
+
+
 
   const totalPages = Math.max(1, Math.ceil(filteredBills.length / pageSize));
   const paginatedBills = filteredBills.slice(
