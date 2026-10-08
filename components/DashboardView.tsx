@@ -1136,8 +1136,8 @@ export default function DashboardView({
         (c) => String(c.id) === String(categoryFilter)
       );
 
-      matchesCategory =
-        billCatId === String(categoryFilter).trim() ||
+
+      billCatId === String(categoryFilter).trim() ||
         (selectedCategoryObj &&
           categoryName === selectedCategoryObj.name.toLowerCase());
     }
