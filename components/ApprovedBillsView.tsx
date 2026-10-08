@@ -842,11 +842,21 @@ export default function ApprovedBillsView({
                     colSpan={isAccountsOrAdmin ? 9 : 8}
                     className="py-12 text-center text-secondary"
                   >
-                    <span className="material-symbols-outlined text-3xl text-teal-600 mb-1 block">
-                      search_off
-                    </span>
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                        <span className="material-symbols-outlined text-2xl text-slate-400">
+                          search_off
+                        </span>
+                      </div>
 
-                    No bills found matching your current filter criteria.
+                      <p className="text-sm font-semibold text-on-surface">
+                        No bills found
+                      </p>
+
+                      <p className="mt-1 text-xs text-secondary">
+                        No bills match your current filter criteria.
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (

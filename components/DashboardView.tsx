@@ -1545,7 +1545,15 @@ export default function DashboardView({
               {paginatedBills.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-10 text-center text-secondary">
-                    No bills found.
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-4xl text-secondary">
+                        search_off
+                      </span>
+
+                      <span className="text-sm font-medium">
+                        No bills found.
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ) : (

@@ -866,13 +866,23 @@ export default function PendingApprovalView({
                     colSpan={8}
                     className="py-12 text-center text-secondary"
                   >
-                    <span className="material-symbols-outlined text-3xl text-teal-600 mb-1 block">
-                      check_circle
-                    </span>
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                        <span className="material-symbols-outlined text-2xl text-slate-400">
+                          search_off
+                        </span>
+                      </div>
 
-                    {pendingBills.length === 0
-                      ? 'No pending bills awaiting approval.'
-                      : 'No pending bills match the specified support agent or search query.'}
+                      <p className="text-sm font-semibold text-on-surface">
+                        No pending bills found
+                      </p>
+
+                      <p className="mt-1 max-w-md text-xs text-secondary">
+                        {pendingBills.length === 0
+                          ? 'There are currently no pending bills awaiting approval.'
+                          : 'No pending bills match the selected support agent or search query.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
