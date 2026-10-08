@@ -390,20 +390,10 @@ export default function ApprovedBillsView({
   // =========================================================
   // Export CSV
   // =========================================================
+
+  //paid bills
   const handleExportCSV = () => {
-    let status: 'Paid' | 'Approved';
-
-    if (statusTab === 'PAID') {
-      status = 'Paid';
-    } else if (statusTab === 'APPROVED') {
-      status = 'Approved';
-    } else {
-      // যদি অন্য কোনো tab/value থাকে
-      status = 'Paid';
-    }
-
-    console.log('EXPORT TAB:', statusTab);
-    console.log('EXPORT STATUS:', status);
+    const status = 'Paid';
 
     const link = document.createElement('a');
 
@@ -421,6 +411,29 @@ export default function ApprovedBillsView({
       'info'
     );
   };
+
+  //approve bills 
+  //   const handleExportCSV = () => {
+  //   const status = 'Approved';
+
+  //   console.log('EXPORT STATUS:', status);
+
+  //   const link = document.createElement('a');
+
+  //   link.href = `/api/bills/export?status=${encodeURIComponent(status)}`;
+  //   link.download = `FNFOnline_${status}_Audit_Ledger_${new Date()
+  //     .toISOString()
+  //     .slice(0, 10)}.csv`;
+
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+
+  //   onShowToast?.(
+  //     `Downloading ${status} bills CSV...`,
+  //     'info'
+  //   );
+  // };
 
 
 
