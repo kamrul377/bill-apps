@@ -1300,22 +1300,22 @@ export default function DashboardView({
             //   <span>Manage Categories</span>
             // </button>
             <button
-    type="button"
-    onClick={() => setIsCategoryModalOpen(true)}
-    className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 cursor-pointer"
->
-    <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
-        tune
-    </span>
+              type="button"
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
+                tune
+              </span>
 
-    <span className="text-xs font-semibold text-slate-600 group-hover:text-teal-700">
-        Manage Categories
-    </span>
+              <span className="text-xs font-semibold text-slate-600 group-hover:text-teal-700">
+                Manage Categories
+              </span>
 
-    <span className="material-symbols-outlined text-[15px] text-slate-400 group-hover:text-teal-500 transition-colors">
-        chevron_right
-    </span>
-</button>
+              <span className="material-symbols-outlined text-[15px] text-slate-400 group-hover:text-teal-500 transition-colors">
+                chevron_right
+              </span>
+            </button>
 
           )}
 
@@ -1579,7 +1579,7 @@ export default function DashboardView({
   </span>
 </span> */}
 
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg
                         bg-gradient-to-r from-primary/10 via-primary/5 to-transparent
                         text-primary font-semibold text-[11px]
                         border border-primary/15
@@ -1587,7 +1587,7 @@ export default function DashboardView({
                         whitespace-nowrap">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                         {getCategoryName(bill)}
-                  </span>
+                      </span>
 
 
                     </td>
@@ -1669,8 +1669,11 @@ export default function DashboardView({
             >
               <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
                 <h3 className="text-base font-bold text-on-surface flex items-center gap-2">
-                  <span className="material-symbols-outlined text-teal-600">
+                  {/* <span className="material-symbols-outlined text-teal-600">
                     category
+                  </span> */}
+                  <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
+                    tune
                   </span>
                   Manage Categories
                 </h3>
