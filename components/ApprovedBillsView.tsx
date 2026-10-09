@@ -55,7 +55,7 @@ export default function ApprovedBillsView({
   const [statusTab, setStatusTab] = useState<'ALL' | 'UNPAID' | 'PAID'>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const pageSize = 10;
+  const pageSize = 50;
 
   // =========================================================
   // Selection for Batch Payment

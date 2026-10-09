@@ -934,6 +934,28 @@ export default function Home() {
   // BATCH APPROVE
   // =========================================================
 
+  // const handleBatchApprove = async (billIds: number[]): Promise<void> => {
+  //   if (!billIds.length) {
+  //     showToast('No bills selected.', 'info');
+  //     return;
+  //   }
+
+  //   try {
+  //     for (const billId of billIds) {
+  //       await handleUpdateStatus(Number(billId), 'Approved');
+  //     }
+
+  //     await loadData();
+
+  //     showToast(
+  //       `${billIds.length} bill(s) approved successfully.`,
+  //       'success'
+  //     );
+  //   } catch (error) {
+  //     console.error('Batch approve error:', error);
+  //     throw error;
+  //   }
+  // };
   const handleBatchApprove = async (billIds: number[]): Promise<void> => {
     if (!billIds.length) {
       showToast('No bills selected.', 'info');
@@ -941,10 +963,24 @@ export default function Home() {
     }
 
     try {
-      for (const billId of billIds) {
-        await handleUpdateStatus(Number(billId), 'Approved');
+      // Single API call: 50-ta bill aksate 1-ta request-e pathano hocche
+      const res = await fetch('/api/bills', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          billIds,
+          status: 'Approved',
+          actionBy: currentUser?.name || 'Manager',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to approve bills batch');
       }
 
+      // Re-fetch list & stats
       await loadData();
 
       showToast(
@@ -953,6 +989,7 @@ export default function Home() {
       );
     } catch (error) {
       console.error('Batch approve error:', error);
+      showToast('Failed to approve bills in batch.', 'error');
       throw error;
     }
   };
@@ -1012,6 +1049,35 @@ export default function Home() {
   // BATCH PAY
   // =========================================================
 
+  // const handleBatchPayBills = async (
+  //   billIds: number[],
+  //   paymentDetails: {
+  //     paymentMethod: string;
+  //     paymentNote?: string;
+  //     paidBy?: string;
+  //   }
+  // ): Promise<void> => {
+  //   if (!billIds.length) {
+  //     showToast('No bills selected.', 'info');
+  //     return;
+  //   }
+
+  //   try {
+  //     for (const billId of billIds) {
+  //       await handlePayBill(Number(billId), paymentDetails);
+  //     }
+
+  //     await loadData();
+
+  //     showToast(
+  //       `${billIds.length} bill(s) paid successfully.`,
+  //       'success'
+  //     );
+  //   } catch (error) {
+  //     console.error('Batch payment error:', error);
+  //     throw error;
+  //   }
+  // };
   const handleBatchPayBills = async (
     billIds: number[],
     paymentDetails: {
@@ -1026,18 +1092,41 @@ export default function Home() {
     }
 
     try {
-      for (const billId of billIds) {
-        await handlePayBill(Number(billId), paymentDetails);
+      // Single Batch API Request (No Loop)
+      const res = await fetch('/api/bills', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          billIds,
+          status: 'Paid',
+          actionBy: paymentDetails.paidBy || currentUser?.name || 'Accounts Staff',
+          paymentMethod: paymentDetails.paymentMethod || 'Cash',
+          paymentNote: paymentDetails.paymentNote || '',
+        }),
+      });
+
+      const textData = await res.text();
+      let data;
+      try {
+        data = textData ? JSON.parse(textData) : {};
+      } catch (e) {
+        throw new Error(`Server response error (${res.status}): ${textData}`);
       }
 
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to process batch payment.');
+      }
+
+      // Re-fetch list & stats instantly
       await loadData();
 
       showToast(
         `${billIds.length} bill(s) paid successfully.`,
         'success'
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Batch payment error:', error);
+      showToast(error.message || 'Failed to pay bills in batch.', 'error');
       throw error;
     }
   };
