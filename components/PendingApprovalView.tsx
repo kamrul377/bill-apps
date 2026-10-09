@@ -912,9 +912,21 @@ export default function PendingApprovalView({
                       />
                     </td>
 
-                    <td className="px-3 font-data-mono font-bold text-teal-700">
+                    {/* <td className="px-3 font-data-mono font-bold text-teal-700">
                       {bill.ticket_id}
+                    </td> */}
+
+                    <td className="px-4 font-data-mono font-bold text-teal-700">
+                      <a
+                        href={`http://139.162.2.178/tms/dotproject/index.php?m=ticketsmith&a=view&ticket=${bill.ticket_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cursor-pointer hover:text-teal-900 hover:underline"
+                      >
+                        #{bill.ticket_id}
+                      </a>
                     </td>
+
 
                     <td className="px-3 font-data-mono text-secondary">
                       {bill.user_id}
