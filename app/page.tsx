@@ -1309,6 +1309,7 @@ export default function Home() {
             onUpdateStatus={handleUpdateStatus}
             onBatchApprove={handleBatchApprove}
             onShowToast={showToast}
+            categories={categories}
           />
         )}
 
