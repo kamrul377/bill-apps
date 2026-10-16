@@ -105,9 +105,14 @@ export default function Sidebar({
           <div className="h-16 px-4 sm:px-5 flex items-center justify-between border-b border-outline-variant/20">
             <div
               onClick={() => window.location.reload()}
-              className="flex items-center gap-2.5 cursor-pointer select-none"
+              className="flex items-center cursor-pointer select-none"
             >
-              <Logo className="h-7 w-7" />
+              {/* <Logo className="h-7 w-7" /> */}
+              <img
+                src="/fnf-logo.png"
+                alt="FnF Online Logo"
+                className="h-20 w-20 object-contain"
+              />
               <span className="font-bold text-base text-on-surface tracking-tight">
                 FnF Online
               </span>

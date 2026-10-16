@@ -64,8 +64,13 @@ export default function LoginView({ onLoginSuccess, onShowToast }: LoginViewProp
         className="max-w-sm w-full bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/30 p-7 flex flex-col gap-5"
       >
         {/* Brand Header */}
-        <div className="flex flex-col items-center text-center gap-2">
-          <Logo className="h-10 w-10" />
+        <div className="flex flex-col items-center text-center gap-1">
+          {/* <Logo className="h-10 w-10" /> */}
+          <img
+            src="/fnf-logo.png"
+            alt="FnF Online Logo"
+            className="h-20 w-20 object-cover"
+          />
           <div>
             <h1 className="text-xl font-bold text-on-surface"> FnF Online</h1>
             <p className="text-xs text-secondary mt-0.5">Billing Management Console</p>

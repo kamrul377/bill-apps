@@ -39,7 +39,12 @@ export default function BillVoucherModal({
           {/* Header */}
           <div className="flex items-start justify-between border-b pb-3 border-slate-200">
             <div className="flex items-center gap-2.5">
-              <Logo className="h-8 w-8" />
+              {/* <Logo className="h-8 w-8" /> */}
+              <img
+                src="/fnf-logo.png"
+                alt="FnF Online Logo"
+                className="h-16 w-16 object-cover"
+              />
               <div>
                 <h2 className="text-base font-bold text-slate-900 leading-tight">
                   FnF Online Operations
