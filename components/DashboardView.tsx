@@ -329,7 +329,7 @@ export default function DashboardView({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between"
+          className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col justify-between cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-secondary uppercase tracking-wider">

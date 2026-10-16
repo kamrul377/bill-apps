@@ -85,6 +85,32 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
 
 
+-- log table
+-- -----------------------------------------------------
+-- Table: activity_logs (Client & System Activity Tracking)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `activity_logs` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `action` ENUM('CREATE_CLIENT', 'UPDATE_CLIENT', 'DELETE_CLIENT') NOT NULL
+    COMMENT 'Action category performed on client data',
+  `client_id` VARCHAR(100) NOT NULL
+    COMMENT 'Unique client identifier string (e.g., CLI-2001)',
+  `client_name` VARCHAR(150) NOT NULL
+    COMMENT 'Name of the client during action execution',
+  `details` TEXT DEFAULT NULL
+    COMMENT 'Human-readable summary or detailed payload of action',
+  `performed_by` VARCHAR(100) DEFAULT 'Admin'
+    COMMENT 'User/Admin email or ID who triggered the action',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  INDEX `idx_logs_action` (`action`),
+  INDEX `idx_logs_client_id` (`client_id`),
+  INDEX `idx_logs_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
 CREATE TABLE pocs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL UNIQUE,

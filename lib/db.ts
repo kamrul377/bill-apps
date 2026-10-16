@@ -21,6 +21,7 @@ const MYSQL_CONFIG = {
   maxIdle: 20,
   idleTimeout: 60000,
   connectTimeout: 10000,
+  // timezone: '+06:00',
   ssl: process.env.MYSQL_HOST?.includes('aivencloud.com')
     ? { rejectUnauthorized: false }
     : undefined,
@@ -477,6 +478,28 @@ export async function authenticateUser(email: string, password: string): Promise
         };
       }
     }
+    // if (rows && rows.length > 0) {
+    //   const r = rows[0];
+    //   const dbPassword = (r.password as string) || '';
+
+    //   // ১. Bcrypt হ্যাশ চেক
+    //   let isPasswordMatch = await bcrypt.compare(cleanPass, dbPassword);
+
+    //   // ২. যদি ডাটাবেজে প্লেন টেক্সট পাসওয়ার্ড থাকে (Fallback)
+    //   if (!isPasswordMatch && dbPassword === cleanPass) {
+    //     isPasswordMatch = true;
+    //   }
+
+    //   if (isPasswordMatch) {
+    //     return {
+    //       id: Number(r.id),
+    //       user_id: String(r.user_id),
+    //       name: String(r.name),
+    //       role: String(r.role).toLowerCase() as UserRole,
+    //       created_at: safeIsoDate(r.created_at),
+    //     };
+    //   }
+    // }
     return null;
   } catch (error) {
     const store = readLocalStorage();

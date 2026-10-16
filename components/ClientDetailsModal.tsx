@@ -16,13 +16,15 @@ export default function ClientDetailsModal({ client, onClose, onEdit }: ClientDe
     if (!client) return null;
 
     const handleCopyClientInfo = () => {
-        const textToCopy = `Client id : ${client.clientId || '-'}
+        const textToCopy = `Client ID : ${client.clientId || '-'}
 Client Name : ${client.clientName || '-'}
-Phone : ${client.clientPhone || '-'}
-Primary ip & onu : ${client.primaryIp || '-'} / ${client.primaryOnu || '-'}
-Secondary ip & onu : ${client.secondaryIp || '-'} / ${client.secondaryOnu || '-'}
-Location : ${client.location || '-'}
-POC : ${client.pocName || '-'}`;
+Phone Number : ${client.clientPhone || '-'}
+Primary IP : ${client.primaryIp || '-'}
+Primary Onu Mac : ${client.primaryOnu || '-'}
+POC : ${client.pocName || '-'}
+Secondary IP : ${client.secondaryIp || '-'}
+Secodnary Onu Mac : ${client.secondaryOnu || '-'}
+Client Location : ${client.location || '-'}`;
 
         navigator.clipboard.writeText(textToCopy);
         setCopied(true);
