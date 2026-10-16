@@ -4331,7 +4331,7 @@ export default function ClientInfoPage() {
                                     <span className="material-symbols-outlined text-lg">
                                         add_circle
                                     </span>
-                                    New Client Entry
+                                    New Client
                                 </motion.button>
                             </div>
                         </div>
