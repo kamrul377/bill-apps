@@ -1,23 +1,27 @@
+
 // 'use client';
 // import React, { useState, useMemo } from 'react';
 // import { motion } from 'motion/react';
 // import { Bill, User } from '@/lib/types';
 // import ConfirmModal from './ConfirmModal';
 
+// // Category Interface Definition
+// export interface Category {
+//   id: number;
+//   name: string;
+// }
+
 // interface PendingApprovalViewProps {
 //   bills: Bill[];
 //   currentUser: User;
+//   categories?: Category[];
 
-//   // IMPORTANT:
-//   // Use unique Bill ID instead of Ticket ID
 //   onUpdateStatus: (
 //     billId: number,
 //     status: 'Approved' | 'Rejected',
 //     reason?: string
 //   ) => Promise<void>;
 
-//   // IMPORTANT:
-//   // Batch approve also uses unique Bill IDs
 //   onBatchApprove: (billIds: number[]) => Promise<void>;
 
 //   onShowToast?: (
@@ -29,6 +33,7 @@
 // export default function PendingApprovalView({
 //   bills,
 //   currentUser,
+//   categories = [],
 //   onUpdateStatus,
 //   onBatchApprove,
 //   onShowToast,
@@ -47,10 +52,51 @@
 
 //   const [isProcessing, setIsProcessing] = useState(false);
 
-//   // Search & Support Agent Filter
+//   // Search & Filter States
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [selectedSupportAgent, setSelectedSupportAgent] =
 //     useState('ALL');
+//   const [selectedCategory, setSelectedCategory] = useState('ALL');
+
+//   // Helper function to extract Category ID safely
+//   const getBillCategoryId = (bill: Bill): string => {
+//     const rawBill = bill as unknown as Record<string, unknown>;
+//     const catId =
+//       bill.category_id ??
+//       rawBill.categoryId ??
+//       rawBill.category_Id ??
+//       (typeof rawBill.category === 'object' && rawBill.category !== null
+//         ? (rawBill.category as { id?: number | string }).id
+//         : rawBill.category);
+
+//     return catId !== undefined && catId !== null ? String(catId).trim() : '';
+//   };
+
+//   // Helper to get Category Name
+//   const getCategoryName = (bill: Bill) => {
+//     const rawBill = bill as unknown as Record<string, unknown>;
+//     if (rawBill.category_name && typeof rawBill.category_name === 'string') {
+//       return rawBill.category_name;
+//     }
+//     if (typeof rawBill.category === 'object' && rawBill.category !== null) {
+//       const catObj = rawBill.category as { name?: string };
+//       if (catObj.name) return catObj.name;
+//     }
+
+//     const catId = getBillCategoryId(bill);
+//     if (catId) {
+//       const foundCategory = categories.find(
+//         (c) => String(c.id).trim() === catId || c.name.toLowerCase() === catId.toLowerCase()
+//       );
+//       if (foundCategory) return foundCategory.name;
+//     }
+
+//     if (typeof rawBill.category === 'string' && rawBill.category.trim() !== '') {
+//       return rawBill.category;
+//     }
+
+//     return 'General';
+//   };
 
 //   // Filter only Pending bills
 //   const pendingBills = useMemo(
@@ -100,10 +146,10 @@
 //     );
 //   }, [pendingBills]);
 
-//   // Filter bills
+//   // Filter bills logic
 //   const filteredPendingBills = useMemo(() => {
 //     return pendingBills.filter((b) => {
-//       // Support agent filter
+//       // 1. Support agent filter
 //       if (selectedSupportAgent !== 'ALL') {
 //         const creator = (
 //           b.created_by || ''
@@ -118,29 +164,41 @@
 //         }
 //       }
 
-//       // Search
+//       // 2. Category Filter Matching
+//       if (selectedCategory !== 'ALL') {
+//         const billCatId = getBillCategoryId(b);
+//         const categoryName = getCategoryName(b).toLowerCase();
+//         const selectedCatObj = categories.find(
+//           (c) => String(c.id) === String(selectedCategory)
+//         );
+
+//         const isMatch =
+//           billCatId === String(selectedCategory).trim() ||
+//           Boolean(
+//             selectedCatObj &&
+//             categoryName === selectedCatObj.name.toLowerCase()
+//           ) ||
+//           categoryName === selectedCategory.toLowerCase();
+
+//         if (!isMatch) return false;
+//       }
+
+//       // 3. Search query (Ticket, User, Description, Support Agent & Category Name)
 //       if (searchQuery.trim()) {
 //         const q = searchQuery.toLowerCase().trim();
 
-//         const ticketMatch =
-//           b.ticket_id.toLowerCase().includes(q);
-
-//         const userMatch =
-//           b.user_id.toLowerCase().includes(q);
-
-//         const descMatch =
-//           b.description.toLowerCase().includes(q);
-
-//         const supportMatch =
-//           (b.created_by || '')
-//             .toLowerCase()
-//             .includes(q);
+//         const ticketMatch = b.ticket_id.toLowerCase().includes(q);
+//         const userMatch = b.user_id.toLowerCase().includes(q);
+//         const descMatch = b.description.toLowerCase().includes(q);
+//         const supportMatch = (b.created_by || '').toLowerCase().includes(q);
+//         const categoryMatch = getCategoryName(b).toLowerCase().includes(q);
 
 //         return (
 //           ticketMatch ||
 //           userMatch ||
 //           descMatch ||
-//           supportMatch
+//           supportMatch ||
+//           categoryMatch
 //         );
 //       }
 
@@ -149,7 +207,9 @@
 //   }, [
 //     pendingBills,
 //     selectedSupportAgent,
+//     selectedCategory,
 //     searchQuery,
+//     categories,
 //   ]);
 
 //   const filteredTotalTk = useMemo(
@@ -174,7 +234,7 @@
 //     }
 //   };
 
-//   // Toggle using UNIQUE BILL ID
+//   // Toggle select using UNIQUE BILL ID
 //   const handleToggleSelect = (billId: number) => {
 //     setSelectedBillIds((prev) =>
 //       prev.includes(billId)
@@ -192,8 +252,6 @@
 //     setIsProcessing(true);
 
 //     try {
-//       // IMPORTANT:
-//       // Send bill.id, NOT ticket_id
 //       await onUpdateStatus(
 //         Number(activeBillForAction.id),
 //         actionType,
@@ -211,7 +269,6 @@
 //         );
 //       }
 
-//       // Remove using unique bill.id
 //       setSelectedBillIds((prev) =>
 //         prev.filter(
 //           (id) =>
@@ -305,9 +362,10 @@
 //         </div>
 //       </div>
 
-//       {/* Search & Filter */}
+//       {/* Search & Filter Bar */}
 //       <div className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between text-xs">
 //         <div className="flex flex-col sm:flex-row gap-2.5 flex-1">
+//           {/* Search Input */}
 //           <div className="relative flex-1">
 //             <span className="material-symbols-outlined absolute left-2.5 top-2.5 text-secondary text-base pointer-events-none">
 //               search
@@ -319,7 +377,7 @@
 //               onChange={(e) =>
 //                 setSearchQuery(e.target.value)
 //               }
-//               placeholder="Search Support Agent Name, Ticket #, Subscriber ID..."
+//               placeholder="Search Ticket, User, Agent, Category..."
 //               className="w-full pl-8 pr-8 py-2 bg-surface text-on-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-medium placeholder:text-secondary/70"
 //             />
 
@@ -339,11 +397,32 @@
 //             )}
 //           </div>
 
-//           <div className="flex items-center gap-2">
-//             <span className="text-secondary font-medium whitespace-nowrap hidden sm:inline">
-//               Support Staff:
-//             </span>
+//           {/* Category Dropdown Filter */}
+//           <div className="flex items-center gap-1.5">
+//             <select
+//               value={selectedCategory}
+//               onChange={(e) => setSelectedCategory(e.target.value)}
+//               className="bg-surface px-3 py-2 rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-medium text-xs text-on-surface w-full sm:w-auto cursor-pointer"
+//             >
+//               <option value="ALL">All Categories</option>
+//               {categories.length > 0
+//                 ? categories.map((cat) => (
+//                   <option key={cat.id} value={String(cat.id)}>
+//                     {cat.name}
+//                   </option>
+//                 ))
+//                 : Array.from(
+//                   new Set(pendingBills.map((b) => getCategoryName(b)))
+//                 ).map((catName) => (
+//                   <option key={catName} value={catName}>
+//                     {catName}
+//                   </option>
+//                 ))}
+//             </select>
+//           </div>
 
+//           {/* Support Staff Filter */}
+//           <div className="flex items-center gap-1.5">
 //             <select
 //               value={selectedSupportAgent}
 //               onChange={(e) =>
@@ -362,15 +441,16 @@
 //                   key={agent.name}
 //                   value={agent.name}
 //                 >
-//                   {agent.name} ({agent.count} bills · ৳
-//                   {agent.totalTk.toLocaleString()})
+//                   {agent.name} ({agent.count} · ৳{agent.totalTk.toLocaleString()})
 //                 </option>
 //               ))}
 //             </select>
 //           </div>
 //         </div>
 
+//         {/* Reset Button & Match Status */}
 //         {(selectedSupportAgent !== 'ALL' ||
+//           selectedCategory !== 'ALL' ||
 //           searchQuery) && (
 //             <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-outline-variant/20">
 //               <span className="text-teal-700 font-semibold bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200">
@@ -383,6 +463,7 @@
 //                 type="button"
 //                 onClick={() => {
 //                   setSelectedSupportAgent('ALL');
+//                   setSelectedCategory('ALL');
 //                   setSearchQuery('');
 //                 }}
 //                 className="text-secondary hover:text-rose-600 hover:bg-rose-50 px-2 py-1 rounded transition-colors cursor-pointer font-medium"
@@ -396,7 +477,7 @@
 //       {/* Queue Table */}
 //       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-xs overflow-hidden">
 //         <div className="overflow-x-auto">
-//           <table className="w-full text-left text-xs min-w-[700px]">
+//           <table className="w-full text-left text-xs min-w-[750px]">
 //             <thead>
 //               <tr className="bg-surface-container-low text-secondary uppercase tracking-wider h-10">
 //                 <th className="px-4 w-10">
@@ -426,6 +507,10 @@
 //                 </th>
 
 //                 <th className="px-3 font-semibold">
+//                   Category
+//                 </th>
+
+//                 <th className="px-3 font-semibold">
 //                   Support Agent
 //                 </th>
 
@@ -451,7 +536,7 @@
 //               {filteredPendingBills.length === 0 ? (
 //                 <tr>
 //                   <td
-//                     colSpan={8}
+//                     colSpan={9}
 //                     className="py-12 text-center text-secondary"
 //                   >
 //                     <div className="flex flex-col items-center justify-center">
@@ -468,7 +553,7 @@
 //                       <p className="mt-1 max-w-md text-xs text-secondary">
 //                         {pendingBills.length === 0
 //                           ? 'There are currently no pending bills awaiting approval.'
-//                           : 'No pending bills match the selected support agent or search query.'}
+//                           : 'No pending bills match the selected category, support agent or search query.'}
 //                       </p>
 //                     </div>
 //                   </td>
@@ -500,10 +585,6 @@
 //                       />
 //                     </td>
 
-//                     {/* <td className="px-3 font-data-mono font-bold text-teal-700">
-//                       {bill.ticket_id}
-//                     </td> */}
-
 //                     <td className="px-4 font-data-mono font-bold text-teal-700">
 //                       <a
 //                         href={`http://139.162.2.178/tms/dotproject/index.php?m=ticketsmith&a=view&ticket=${bill.ticket_id}`}
@@ -515,9 +596,20 @@
 //                       </a>
 //                     </td>
 
-
 //                     <td className="px-3 font-data-mono text-secondary">
 //                       {bill.user_id}
+//                     </td>
+
+//                     <td className="px-3">
+//                       <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg
+//                         bg-gradient-to-r from-primary/10 via-primary/5 to-transparent
+//                         text-primary font-semibold text-[11px]
+//                         border border-primary/15
+//                         shadow-sm shadow-primary/5
+//                         whitespace-nowrap">
+//                         <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+//                         {getCategoryName(bill)}
+//                       </span>
 //                     </td>
 
 //                     <td className="px-3">
@@ -688,7 +780,23 @@
 //   );
 // }
 
-// ====================2nd======================
+
+
+
+
+
+// ==========================2nd===========================
+
+
+
+
+
+
+
+
+
+
+
 
 
 'use client';
@@ -952,14 +1060,7 @@ export default function PendingApprovalView({
           : undefined
       );
 
-      if (onShowToast) {
-        onShowToast(
-          `Bill ${activeBillForAction.ticket_id} marked as ${actionType}.`,
-          actionType === 'Approved'
-            ? 'success'
-            : 'error'
-        );
-      }
+      // Toast call removed from here to prevent duplicate toast triggers if parent already handles it.
 
       setSelectedBillIds((prev) =>
         prev.filter(
@@ -987,12 +1088,7 @@ export default function PendingApprovalView({
     try {
       await onBatchApprove(selectedBillIds);
 
-      if (onShowToast) {
-        onShowToast(
-          `${selectedBillIds.length} bills approved successfully.`,
-          'success'
-        );
-      }
+      // Toast call removed from here to avoid duplicate triggers.
 
       setSelectedBillIds([]);
       setIsBatchConfirmOpen(false);
