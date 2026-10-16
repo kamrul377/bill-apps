@@ -594,6 +594,7 @@ export default function UserManagementView({
                   Cancel
                 </button>
                 <button
+
                   type="submit"
                   className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold shadow-xs cursor-pointer"
                 >

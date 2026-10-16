@@ -38,14 +38,14 @@ export default function ConfirmModal({
 }: ConfirmModalProps) {
   if (!isOpen) return null;
 
-  const handleClose = onClose || onCancel || (() => {});
+  const handleClose = onClose || onCancel || (() => { });
   const effectiveVariant = confirmVariant || variant;
   const effectiveConfirmText = confirmText || confirmLabel;
   const effectiveCancelText = cancelText || cancelLabel;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 "
       onClick={handleClose}
     >
       <motion.div
@@ -53,17 +53,16 @@ export default function ConfirmModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.15 }}
-        className="bg-surface-container-lowest rounded-xl shadow-xl max-w-sm w-full overflow-hidden border border-outline-variant/30"
+        className="bg-surface-container-lowest rounded-xl shadow-xl max-w-sm w-full overflow-hidden border border-outline-variant/30 "
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-5 flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                effectiveVariant === 'danger'
-                  ? 'bg-rose-50 text-rose-600'
-                  : 'bg-teal-50 text-teal-600'
-              }`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${effectiveVariant === 'danger'
+                ? 'bg-rose-50 text-rose-600'
+                : 'bg-teal-50 text-teal-600'
+                }`}
             >
               <span className="material-symbols-outlined text-lg">
                 {effectiveVariant === 'danger' ? 'warning' : 'check_circle'}
@@ -89,11 +88,10 @@ export default function ConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer ${
-              effectiveVariant === 'danger'
-                ? 'bg-rose-600 hover:bg-rose-700'
-                : 'bg-teal-600 hover:bg-teal-700'
-            }`}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer ${effectiveVariant === 'danger'
+              ? 'bg-rose-600 hover:bg-rose-700'
+              : 'bg-teal-600 hover:bg-teal-700'
+              }`}
           >
             {isLoading ? 'Processing...' : effectiveConfirmText}
           </button>
