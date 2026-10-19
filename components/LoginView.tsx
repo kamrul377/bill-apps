@@ -72,7 +72,7 @@ export default function LoginView({ onLoginSuccess, onShowToast }: LoginViewProp
             className="h-20 w-20 object-cover"
           />
           <div>
-            <h1 className="text-xl font-bold text-on-surface"> FnF Online</h1>
+            <h1 className="text-xl font-bold text-on-surface"> First n Fast IT LTD</h1>
             <p className="text-xs text-secondary mt-0.5">Billing Management Console</p>
           </div>
         </div>
