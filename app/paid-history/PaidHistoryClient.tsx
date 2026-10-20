@@ -116,9 +116,9 @@ export default function PaidHistoryClient({
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
           {/* Support Staff Breakdown */}
-          <div className={`${panelClass} flex flex-col justify-between`}>
+          <div className={`${panelClass} flex flex-col justify-between `}>
             <div>
-              <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="flex items-start justify-between gap-3 mb-4 ">
                 <div>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label-md uppercase tracking-widest bg-secondary-container text-on-secondary-container border border-outline-variant">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
@@ -137,52 +137,70 @@ export default function PaidHistoryClient({
               </div>
             </div>
 
-            <div className="mt-4 max-h-64 flex-1 space-y-3 overflow-y-auto pr-1">
+
+
+            <div className="mt-4 max-h-72 flex-1 space-y-3 overflow-y-auto pr-1.5">
               {supportTodayList.length > 0 ? (
                 supportTodayList
                   .slice()
                   .sort((a, b) => b.amount - a.amount)
                   .map((item) => {
-                    const maxAmount = Math.max(
-                      ...supportTodayList.map((staff) => staff.amount),
-                      1
-                    )
-                    const percentage = (item.amount / maxAmount) * 100
-
                     return (
                       <div
                         key={item.name}
-                        className="rounded-2xl border border-outline-variant bg-surface-container-low p-3.5 transition-all hover:bg-surface-container"
+                        className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                       >
+                        {/* Staff information and total paid */}
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex min-w-0 items-center gap-3">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-inverse-surface font-label-md text-inverse-on-surface shadow-xs">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 text-sm font-bold text-teal-700">
                               {item.name.substring(0, 2).toUpperCase()}
                             </div>
-                            <span className="truncate font-label-lg text-on-surface font-bold">
-                              {item.name}
-                            </span>
+
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-bold text-slate-800">
+                                {item.name}
+                              </p>
+                              <p className="mt-1 text-xs text-slate-500">
+                                Total Paid Today
+                              </p>
+                            </div>
                           </div>
-                          <span className="shrink-0 font-data-mono text-primary font-black tracking-tight">
-                            {money(item.amount)}
-                          </span>
-                        </div>
-                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-container-high">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-primary to-emerald-600 transition-all duration-500"
-                            style={{ width: `${percentage}%` }}
-                          />
+
+                          <div className="shrink-0 text-right">
+                            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
+                              <span className="inline-flex items-center gap-1">
+                                <CheckCircle2 size={12} />
+                                Paid
+                              </span>
+                            </p>
+                            <p className="font-mono text-base font-bold tabular-nums text-slate-800">
+                              {money(item.amount)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )
                   })
               ) : (
-                <div className="flex h-44 flex-col items-center justify-center rounded-2xl border border-dashed border-outline-variant bg-surface-container-low p-4 text-center">
-                  <UserRound size={24} className="text-secondary mb-2" />
-                  <p className="font-body-md text-on-surface font-bold">No collections recorded today</p>
+                <div className="flex min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center">
+                  <div className="mb-3 flex size-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400">
+                    <UserRound size={22} />
+                  </div>
+
+                  <p className="text-sm font-semibold text-slate-700">
+                    No payments recorded today
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Support staff payment records will appear here.
+                  </p>
                 </div>
               )}
             </div>
+
+
+
+
           </div>
 
           {/* Date-wise Chart */}
