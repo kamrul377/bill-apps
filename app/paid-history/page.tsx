@@ -1,1070 +1,3 @@
-// 'use client'
-
-// import { useState, useEffect } from 'react'
-// import Link from 'next/link'
-// import { useRouter } from 'next/navigation'
-// import ProtectedRoute from '@/components/ProtectedRoute'
-// import PaidHistoryClient from './PaidHistoryClient'
-// import {
-//   ShieldCheck,
-//   ArrowLeft,
-//   ReceiptText,
-//   Users,
-//   Wallet,
-//   CalendarDays,
-//   TrendingUp,
-// } from 'lucide-react'
-
-// export default function PaidHistoryPage() {
-//   const router = useRouter()
-//   const [currentUser, setCurrentUser] = useState<any>(null)
-//   const [paidBills, setPaidBills] = useState<any[]>([])
-//   const [allUsers, setAllUsers] = useState<any[]>([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     const savedUser = sessionStorage.getItem('netbill_session_user')
-//     if (savedUser) {
-//       try {
-//         const user = JSON.parse(savedUser)
-//         setCurrentUser(user)
-
-//         const role = user.role?.toLowerCase()
-//         // শুধু admin বা accounts হলে এই পেজে থাকতে পারবে, অন্য রোল হলে ড্যাশবোর্ডে পাঠিয়ে দেবে
-//         if (role !== 'admin' && role !== 'accounts') {
-//           router.replace('/')
-//           return
-//         }
-
-//         fetchData(user)
-//       } catch (e) {
-//         console.error(e)
-//         router.replace('/')
-//       }
-//     } else {
-//       router.replace('/')
-//     }
-//     setLoading(false)
-//   }, [router])
-
-//   const fetchData = async (user: any) => {
-//     try {
-//       const params = new URLSearchParams()
-//       params.set('role', user.role)
-//       params.set('userId', user.user_id)
-//       params.set('userName', user.name)
-
-//       const res = await fetch(`/api/bills?${params.toString()}`)
-//       const data = await res.json()
-
-//       if (res.ok && data.bills) {
-//         const paid = data.bills.filter(
-//           (b: any) => b.status?.toLowerCase() === 'paid'
-//         )
-//         setPaidBills(paid)
-//       }
-
-//       const userRes = await fetch('/api/users')
-//       if (userRes.ok) {
-//         const userData = await userRes.json()
-//         setAllUsers(Array.isArray(userData) ? userData : userData.users || [])
-//       }
-//     } catch (error) {
-//       console.error('Failed to load paid history data:', error)
-//     }
-//   }
-
-//   const formatLocalDate = (date: Date) => {
-//     const year = date.getFullYear()
-//     const month = String(date.getMonth() + 1).padStart(2, '0')
-//     const day = String(date.getDate()).padStart(2, '0')
-//     return `${year}-${month}-${day}`
-//   }
-
-//   const today = new Date()
-//   const todayStr = formatLocalDate(today)
-
-//   const yesterdayDate = new Date(today)
-//   yesterdayDate.setDate(yesterdayDate.getDate() - 1)
-//   const yesterdayStr = formatLocalDate(yesterdayDate)
-
-//   let totalCollected = 0
-//   let todayCollected = 0
-//   let yesterdayCollected = 0
-
-//   const supportTodayMap: Record<string, number> = {}
-//   const dateWiseMap: Record<string, number> = {}
-
-//   paidBills.forEach((bill: any) => {
-//     const amount = Number(bill.amount) || 0
-//     totalCollected += amount
-
-//     let billDateOnly = todayStr
-//     if (bill.paid_at) {
-//       billDateOnly = formatLocalDate(new Date(bill.paid_at))
-//     } else if (bill.date) {
-//       billDateOnly = formatLocalDate(new Date(bill.date))
-//     }
-
-//     if (billDateOnly === todayStr) {
-//       todayCollected += amount
-//       const creator = bill.created_by || 'Unknown Support'
-//       supportTodayMap[creator] = (supportTodayMap[creator] || 0) + amount
-//     }
-
-//     if (billDateOnly === yesterdayStr) {
-//       yesterdayCollected += amount
-//     }
-
-//     dateWiseMap[billDateOnly] = (dateWiseMap[billDateOnly] || 0) + amount
-//   })
-
-//   const supportTodayList = Object.entries(supportTodayMap).map(
-//     ([name, amount]) => ({ name, amount })
-//   )
-
-//   const chartData = Object.keys(dateWiseMap)
-//     .sort()
-//     .map((date) => ({
-//       date,
-//       amount: dateWiseMap[date],
-//     }))
-
-//   const supportUsers = allUsers.filter(
-//     (u: any) =>
-//       u.role === 'support' || u.role === 'admin' || u.role === 'manager'
-//   )
-
-//   const formatMoney = (amount: number) =>
-//     `৳ ${amount.toLocaleString('en-IN', {
-//       minimumFractionDigits: 2,
-//       maximumFractionDigits: 2,
-//     })}`
-
-//   return (
-//     <ProtectedRoute>
-//       <main className="min-h-screen overflow-hidden bg-[#F1F5F9] text-[#0F172A]">
-//         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
-          
-//           {/* Header */}
-//           <header className="relative overflow-hidden rounded-[24px] border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-//             <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-//               <div className="space-y-4">
-//                 <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-teal-800">
-//                   <span className="relative flex h-2 w-2">
-//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-//                     <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-600" />
-//                   </span>
-//                   Logged in as: {currentUser?.name} ({currentUser?.role})
-//                 </div>
-
-//                 <div>
-//                   <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl text-slate-900 ">
-//                     Paid Bill <span className="text-teal-600">History & Ledger</span>
-//                   </h1>
-//                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 font-medium">
-//                     Review and audit all successfully settled subscriber payments, daily collection summaries, and support performance metrics.
-//                   </p>
-//                 </div>
-//               </div>
-
-//               <Link
-//                 href="/"
-//                 className="inline-flex shrink-0 items-center justify-center gap-2.5 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-slate-800 active:scale-95 lg:self-center"
-//               >
-//                 <ArrowLeft size={16} className="text-teal-400" />
-//                 Back to Dashboard
-//               </Link>
-//             </div>
-//           </header>
-
-//           {/* Metric Cards */}
-//           <section className="space-y-4">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-sm">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-600" />
-//                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Paid Collections</p>
-//                 <div className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-//                   {formatMoney(todayCollected)}
-//                 </div>
-//                 <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 font-semibold">
-//                   <span>{todayStr}</span>
-//                   <span className="text-teal-600 font-bold">Paid Records</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-sm">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-slate-700" />
-//                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Yesterday's Paid Collections</p>
-//                 <div className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-//                   {formatMoney(yesterdayCollected)}
-//                 </div>
-//                 <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 font-semibold">
-//                   <span>{yesterdayStr}</span>
-//                   <span className="text-teal-600 font-bold">Paid Records</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-sm">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-teal-600" />
-//                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Lifetime Paid Bills</p>
-//                 <div className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-//                   {formatMoney(totalCollected)}
-//                 </div>
-//                 <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 font-semibold">
-//                   <span>{paidBills.length} total paid records</span>
-//                   <span className="text-teal-600 font-bold">Paid Records</span>
-//                 </div>
-//               </article>
-//             </div>
-//           </section>
-
-//           {/* Main Client Component */}
-//           <section className="rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6">
-//             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-//               <div>
-//                 <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-//                   <ReceiptText size={20} className="text-teal-600" />
-//                   Paid Transactions & Analytics Ledger
-//                 </h2>
-//                 <p className="text-xs text-slate-500 font-medium">
-//                   Detailed listing and graphical summary of all cleared bill payments.
-//                 </p>
-//               </div>
-
-//               <div className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-700 font-bold">
-//                 <Users size={15} className="text-teal-600" />
-//                 {supportUsers.length} Active Support Staff
-//               </div>
-//             </div>
-
-//             <PaidHistoryClient
-//               initialBills={paidBills}
-//               chartData={chartData}
-//               supportTodayList={supportTodayList}
-//               supportUsers={supportUsers}
-//             />
-//           </section>
-
-//         </div>
-//       </main>
-//     </ProtectedRoute>
-//   )
-// }
-
-
-// 'use client'
-
-// import { useState, useEffect } from 'react'
-// import Link from 'next/link'
-// import { useRouter } from 'next/navigation'
-// import ProtectedRoute from '@/components/ProtectedRoute'
-// import PaidHistoryClient from './PaidHistoryClient'
-// import {
-//   ShieldCheck,
-//   ArrowLeft,
-//   ReceiptText,
-//   Users,
-//   Wallet,
-//   CalendarDays,
-//   TrendingUp,
-// } from 'lucide-react'
-
-// export default function PaidHistoryPage() {
-//   const router = useRouter()
-//   const [currentUser, setCurrentUser] = useState<any>(null)
-//   const [paidBills, setPaidBills] = useState<any[]>([])
-//   const [allUsers, setAllUsers] = useState<any[]>([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     const savedUser = sessionStorage.getItem('netbill_session_user')
-//     if (savedUser) {
-//       try {
-//         const user = JSON.parse(savedUser)
-//         setCurrentUser(user)
-
-//         const role = user.role?.toLowerCase()
-//         if (role !== 'admin' && role !== 'accounts') {
-//           router.replace('/')
-//           return
-//         }
-
-//         fetchData(user)
-//       } catch (e) {
-//         console.error(e)
-//         router.replace('/')
-//       }
-//     } else {
-//       router.replace('/')
-//     }
-//     setLoading(false)
-//   }, [router])
-
-//   const fetchData = async (user: any) => {
-//     try {
-//       const params = new URLSearchParams()
-//       params.set('role', user.role)
-//       params.set('userId', user.user_id)
-//       params.set('userName', user.name)
-
-//       const res = await fetch(`/api/bills?${params.toString()}`)
-//       const data = await res.json()
-
-//       if (res.ok && data.bills) {
-//         const paid = data.bills.filter(
-//           (b: any) => b.status?.toLowerCase() === 'paid'
-//         )
-//         setPaidBills(paid)
-//       }
-
-//       const userRes = await fetch('/api/users')
-//       if (userRes.ok) {
-//         const userData = await userRes.json()
-//         setAllUsers(Array.isArray(userData) ? userData : userData.users || [])
-//       }
-//     } catch (error) {
-//       console.error('Failed to load paid history data:', error)
-//     }
-//   }
-
-//   const formatLocalDate = (date: Date) => {
-//     const year = date.getFullYear()
-//     const month = String(date.getMonth() + 1).padStart(2, '0')
-//     const day = String(date.getDate()).padStart(2, '0')
-//     return `${year}-${month}-${day}`
-//   }
-
-//   const today = new Date()
-//   const todayStr = formatLocalDate(today)
-
-//   const yesterdayDate = new Date(today)
-//   yesterdayDate.setDate(yesterdayDate.getDate() - 1)
-//   const yesterdayStr = formatLocalDate(yesterdayDate)
-
-//   let totalCollected = 0
-//   let todayCollected = 0
-//   let yesterdayCollected = 0
-
-//   const supportTodayMap: Record<string, number> = {}
-//   const dateWiseMap: Record<string, number> = {}
-
-//   paidBills.forEach((bill: any) => {
-//     const amount = Number(bill.amount) || 0
-//     totalCollected += amount
-
-//     let billDateOnly = todayStr
-//     if (bill.paid_at) {
-//       billDateOnly = formatLocalDate(new Date(bill.paid_at))
-//     } else if (bill.date) {
-//       billDateOnly = formatLocalDate(new Date(bill.date))
-//     }
-
-//     if (billDateOnly === todayStr) {
-//       todayCollected += amount
-//       const creator = bill.created_by || 'Unknown Support'
-//       supportTodayMap[creator] = (supportTodayMap[creator] || 0) + amount
-//     }
-
-//     if (billDateOnly === yesterdayStr) {
-//       yesterdayCollected += amount
-//     }
-
-//     dateWiseMap[billDateOnly] = (dateWiseMap[billDateOnly] || 0) + amount
-//   })
-
-//   const supportTodayList = Object.entries(supportTodayMap).map(
-//     ([name, amount]) => ({ name, amount })
-//   )
-
-//   const chartData = Object.keys(dateWiseMap)
-//     .sort()
-//     .map((date) => ({
-//       date,
-//       amount: dateWiseMap[date],
-//     }))
-
-//   const supportUsers = allUsers.filter(
-//     (u: any) =>
-//       u.role === 'support' || u.role === 'admin' || u.role === 'manager'
-//   )
-
-//   const formatMoney = (amount: number) =>
-//     `৳ ${amount.toLocaleString('en-IN', {
-//       minimumFractionDigits: 2,
-//       maximumFractionDigits: 2,
-//     })}`
-
-//   return (
-//     <ProtectedRoute>
-//       <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#0F172A] antialiased" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif' }}>
-//         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
-          
-//           {/* Header */}
-//           <header className="relative overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8">
-//             <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-//               <div className="space-y-3">
-//                 <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50/80 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-teal-800">
-//                   <span className="relative flex h-2 w-2">
-//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-//                     <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-600" />
-//                   </span>
-//                   Logged in as: {currentUser?.name} ({currentUser?.role})
-//                 </div>
-
-//                 <div>
-//                   <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl text-slate-900">
-//                     Paid Bill <span className="text-teal-600 font-extrabold">History & Ledger</span>
-//                   </h1>
-//                   <p className="mt-1.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-500 font-normal">
-//                     Review and audit all successfully settled subscriber payments, daily collection summaries, and support performance metrics.
-//                   </p>
-//                 </div>
-//               </div>
-
-//               <Link
-//                 href="/"
-//                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold tracking-wide text-white shadow-xs transition-all hover:bg-slate-800 active:scale-95 lg:self-center"
-//               >
-//                 <ArrowLeft size={16} className="text-teal-400" />
-//                 Back to Dashboard
-//               </Link>
-//             </div>
-//           </header>
-
-//           {/* Metric Cards */}
-//           <section className="space-y-4">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Today's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(todayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{todayStr}</span>
-//                   <span className="text-teal-600 font-bold uppercase tracking-wider text-[10px]">Verified</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-slate-700" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Yesterday's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(yesterdayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{yesterdayStr}</span>
-//                   <span className="text-indigo-600 font-bold uppercase tracking-wider text-[10px]">Settled</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-teal-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Lifetime Paid Bills</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(totalCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{paidBills.length} total records</span>
-//                   <span className="text-blue-600 font-bold uppercase tracking-wider text-[10px]">Lifetime</span>
-//                 </div>
-//               </article>
-//             </div>
-//           </section>
-
-//           {/* Main Client Component */}
-//           <section className="rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-xs sm:p-6">
-//             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-//               <div>
-//                 <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
-//                   <ReceiptText size={20} className="text-teal-600" />
-//                   Paid Transactions & Analytics Ledger
-//                 </h2>
-//                 <p className="text-xs text-slate-500 font-normal mt-0.5">
-//                   Detailed listing and graphical summary of all cleared bill payments.
-//                 </p>
-//               </div>
-
-//               <div className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-700 font-semibold">
-//                 <Users size={15} className="text-teal-600" />
-//                 {supportUsers.length} Active Support Staff
-//               </div>
-//             </div>
-
-//             <PaidHistoryClient
-//               initialBills={paidBills}
-//               chartData={chartData}
-//               supportTodayList={supportTodayList}
-//               supportUsers={supportUsers}
-//             />
-//           </section>
-
-//         </div>
-//       </main>
-//     </ProtectedRoute>
-//   )
-// }
-
-
-
-
-
-
-
-
-
-
-
-// ==========3rd=================
-
-
-
-
-
-
-// 'use client'
-
-// import { useState, useEffect } from 'react'
-// import Link from 'next/link'
-// import { useRouter } from 'next/navigation'
-// import ProtectedRoute from '@/components/ProtectedRoute'
-// import PaidHistoryClient from './PaidHistoryClient'
-// import {
-//   ShieldCheck,
-//   ArrowLeft,
-//   ReceiptText,
-//   Users,
-//   Wallet,
-//   CalendarDays,
-//   TrendingUp,
-// } from 'lucide-react'
-
-// export default function PaidHistoryPage() {
-//   const router = useRouter()
-//   const [currentUser, setCurrentUser] = useState<any>(null)
-//   const [paidBills, setPaidBills] = useState<any[]>([])
-//   const [allUsers, setAllUsers] = useState<any[]>([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     const savedUser = sessionStorage.getItem('netbill_session_user')
-//     if (savedUser) {
-//       try {
-//         const user = JSON.parse(savedUser)
-//         setCurrentUser(user)
-
-//         const role = user.role?.toLowerCase()
-//         if (role !== 'admin' && role !== 'accounts') {
-//           router.replace('/')
-//           return
-//         }
-
-//         fetchData(user)
-//       } catch (e) {
-//         console.error(e)
-//         router.replace('/')
-//       }
-//     } else {
-//       router.replace('/')
-//     }
-//   }, [router])
-
-//   const fetchData = async (user: any) => {
-//     try {
-//       const params = new URLSearchParams()
-//       params.set('role', user.role)
-//       params.set('userId', user.user_id)
-//       params.set('userName', user.name)
-
-//       // ১. একসাথেই বিল এবং ইউজার্স ফেচ করা
-//       const [billsRes, usersRes] = await Promise.all([
-//         fetch(`/api/bills?${params.toString()}`),
-//         fetch('/api/users')
-//       ])
-
-//       const billsData = await billsRes.json()
-//       if (billsRes.ok && billsData.bills) {
-//         const paid = billsData.bills.filter(
-//           (b: any) => b.status?.toLowerCase() === 'paid'
-//         )
-//         setPaidBills(paid)
-//       }
-
-//       if (usersRes.ok) {
-//         const usersData = await usersRes.json()
-//         // API রেসপন্স অ্যারে হোক বা অবজেক্ট, সঠিকভাবে সেট করা
-//         const userList = Array.isArray(usersData) ? usersData : (usersData.users || usersData.data || [])
-//         setAllUsers(userList)
-//       }
-//     } catch (error) {
-//       console.error('Failed to load paid history data:', error)
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
-
-//   const formatLocalDate = (date: Date) => {
-//     const year = date.getFullYear()
-//     const month = String(date.getMonth() + 1).padStart(2, '0')
-//     const day = String(date.getDate()).padStart(2, '0')
-//     return `${year}-${month}-${day}`
-//   }
-
-//   const today = new Date()
-//   const todayStr = formatLocalDate(today)
-
-//   const yesterdayDate = new Date(today)
-//   yesterdayDate.setDate(yesterdayDate.getDate() - 1)
-//   const yesterdayStr = formatLocalDate(yesterdayDate)
-
-//   let totalCollected = 0
-//   let todayCollected = 0
-//   let yesterdayCollected = 0
-
-//   const supportTodayMap: Record<string, number> = {}
-//   const dateWiseMap: Record<string, number> = {}
-
-//   paidBills.forEach((bill: any) => {
-//     const amount = Number(bill.amount) || 0
-//     totalCollected += amount
-
-//     let billDateOnly = todayStr
-//     if (bill.paid_at) {
-//       billDateOnly = formatLocalDate(new Date(bill.paid_at))
-//     } else if (bill.date) {
-//       billDateOnly = formatLocalDate(new Date(bill.date))
-//     }
-
-//     if (billDateOnly === todayStr) {
-//       todayCollected += amount
-//       const creator = bill.created_by || 'Unknown Support'
-//       supportTodayMap[creator] = (supportTodayMap[creator] || 0) + amount
-//     }
-
-//     if (billDateOnly === yesterdayStr) {
-//       yesterdayCollected += amount
-//     }
-
-//     dateWiseMap[billDateOnly] = (dateWiseMap[billDateOnly] || 0) + amount
-//   })
-
-//   const supportTodayList = Object.entries(supportTodayMap).map(
-//     ([name, amount]) => ({ name, amount })
-//   )
-
-//   // এখানে সাপোর্ট বা সিস্টেমের ইউজারদের ফিল্টার করা হচ্ছে যা ড্রপডাউনে দেখাবে
-//   const supportUsers = allUsers.filter(
-//     (u: any) => {
-//       const r = u.role?.toLowerCase()
-//       return r === 'support' || r === 'admin' || r === 'manager' || r === 'accounts'
-//     }
-//   )
-
-//   const formatMoney = (amount: number) =>
-//     `৳ ${amount.toLocaleString('en-IN', {
-//       minimumFractionDigits: 2,
-//       maximumFractionDigits: 2,
-//     })}`
-
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-slate-600 font-semibold text-sm">
-//         Loading Paid History Ledger...
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <ProtectedRoute>
-//       <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#0F172A] antialiased" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif' }}>
-//         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
-          
-//           {/* Header */}
-//           <header className="relative overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8">
-//             <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-//               <div className="space-y-3">
-//                 <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50/80 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-teal-800">
-//                   <span className="relative flex h-2 w-2">
-//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-//                     <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-600" />
-//                   </span>
-//                   Logged in as: {currentUser?.name} ({currentUser?.role})
-//                 </div>
-
-//                 <div>
-//                   <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl text-slate-900">
-//                     Paid Bill <span className="text-teal-600 font-extrabold">History & Ledger</span>
-//                   </h1>
-//                   <p className="mt-1.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-500 font-normal">
-//                     Review and audit all successfully settled subscriber payments, daily collection summaries, and support performance metrics.
-//                   </p>
-//                 </div>
-//               </div>
-
-//               <Link
-//                 href="/"
-//                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold tracking-wide text-white shadow-xs transition-all hover:bg-slate-800 active:scale-95 lg:self-center"
-//               >
-//                 <ArrowLeft size={16} className="text-teal-400" />
-//                 Back to Dashboard
-//               </Link>
-//             </div>
-//           </header>
-
-//           {/* Metric Cards */}
-//           <section className="space-y-4">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Today's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(todayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{todayStr}</span>
-//                   <span className="text-teal-600 font-bold uppercase tracking-wider text-[10px]">Verified</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-slate-700" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Yesterday's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(yesterdayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{yesterdayStr}</span>
-//                   <span className="text-indigo-600 font-bold uppercase tracking-wider text-[10px]">Settled</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-teal-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Lifetime Paid Bills</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(totalCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{paidBills.length} total records</span>
-//                   <span className="text-blue-600 font-bold uppercase tracking-wider text-[10px]">Lifetime</span>
-//                 </div>
-//               </article>
-//             </div>
-//           </section>
-
-//           {/* Main Client Component */}
-//           <section className="rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-xs sm:p-6">
-//             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-//               <div>
-//                 <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
-//                   <ReceiptText size={20} className="text-teal-600" />
-//                   Paid Transactions & Analytics Ledger
-//                 </h2>
-//                 <p className="text-xs text-slate-500 font-normal mt-0.5">
-//                   Detailed listing and graphical summary of all cleared bill payments.
-//                 </p>
-//               </div>
-
-//               <div className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-700 font-semibold">
-//                 <Users size={15} className="text-teal-600" />
-//                 {supportUsers.length} Active System Staff
-//               </div>
-//             </div>
-
-//             <PaidHistoryClient
-//               initialBills={paidBills}
-//               chartData={chartData}
-//               supportTodayList={supportTodayList}
-//               supportUsers={supportUsers}
-//             />
-//           </section>
-
-//         </div>
-//       </main>
-//     </ProtectedRoute>
-//   )
-// }
-
-
-
-
-
-
-// 'use client'
-
-// import { useState, useEffect } from 'react'
-// import Link from 'next/link'
-// import { useRouter } from 'next/navigation'
-// import ProtectedRoute from '@/components/ProtectedRoute'
-// import PaidHistoryClient from './PaidHistoryClient'
-// import {
-//   ShieldCheck,
-//   ArrowLeft,
-//   ReceiptText,
-//   Users,
-// } from 'lucide-react'
-
-// export default function PaidHistoryPage() {
-//   const router = useRouter()
-//   const [currentUser, setCurrentUser] = useState<any>(null)
-//   const [paidBills, setPaidBills] = useState<any[]>([])
-//   const [allUsers, setAllUsers] = useState<any[]>([])
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     const savedUser = sessionStorage.getItem('netbill_session_user')
-//     if (savedUser) {
-//       try {
-//         const user = JSON.parse(savedUser)
-//         setCurrentUser(user)
-
-//         const role = user.role?.toLowerCase()
-//         if (role !== 'admin' && role !== 'accounts') {
-//           router.replace('/')
-//           return
-//         }
-
-//         fetchData(user)
-//       } catch (e) {
-//         console.error(e)
-//         router.replace('/')
-//       }
-//     } else {
-//       router.replace('/')
-//     }
-//   }, [router])
-
-//   const fetchData = async (user: any) => {
-//     try {
-//       const params = new URLSearchParams()
-//       params.set('role', user.role)
-//       params.set('userId', user.user_id)
-//       params.set('userName', user.name)
-
-//       const [billsRes, usersRes] = await Promise.all([
-//         fetch(`/api/bills?${params.toString()}`),
-//         fetch('/api/users')
-//       ])
-
-//       const billsData = await billsRes.json()
-//       if (billsRes.ok && billsData.bills) {
-//         const paid = billsData.bills.filter(
-//           (b: any) => b.status?.toLowerCase() === 'paid'
-//         )
-//         setPaidBills(paid)
-//       }
-
-//       if (usersRes.ok) {
-//         const usersData = await usersRes.json()
-//         // API থেকে ইউজার ডাটা যেকোনো ফরম্যাটেই আসুক না কেন তা রিকভার করা
-//         const userList = Array.isArray(usersData) 
-//           ? usersData 
-//           : (usersData.users || usersData.data || usersData.allUsers || [])
-//         setAllUsers(userList)
-//       }
-//     } catch (error) {
-//       console.error('Failed to load paid history data:', error)
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
-
-//   const formatLocalDate = (date: Date) => {
-//     const year = date.getFullYear()
-//     const month = String(date.getMonth() + 1).padStart(2, '0')
-//     const day = String(date.getDate()).padStart(2, '0')
-//     return `${year}-${month}-${day}`
-//   }
-
-//   const today = new Date()
-//   const todayStr = formatLocalDate(today)
-
-//   const yesterdayDate = new Date(today)
-//   yesterdayDate.setDate(yesterdayDate.getDate() - 1)
-//   const yesterdayStr = formatLocalDate(yesterdayDate)
-
-//   let totalCollected = 0
-//   let todayCollected = 0
-//   let yesterdayCollected = 0
-
-//   const supportTodayMap: Record<string, number> = {}
-//   const dateWiseMap: Record<string, number> = {}
-
-//   paidBills.forEach((bill: any) => {
-//     const amount = Number(bill.amount) || 0
-//     totalCollected += amount
-
-//     let billDateOnly = todayStr
-//     if (bill.paid_at) {
-//       billDateOnly = formatLocalDate(new Date(bill.paid_at))
-//     } else if (bill.date) {
-//       billDateOnly = formatLocalDate(new Date(bill.date))
-//     }
-
-//     if (billDateOnly === todayStr) {
-//       todayCollected += amount
-//       const creator = bill.created_by || 'Unknown Support'
-//       supportTodayMap[creator] = (supportTodayMap[creator] || 0) + amount
-//     }
-
-//     if (billDateOnly === yesterdayStr) {
-//       yesterdayCollected += amount
-//     }
-
-//     dateWiseMap[billDateOnly] = (dateWiseMap[billDateOnly] || 0) + amount
-//   })
-
-//   const supportTodayList: { name: string; amount: number }[] = Object.entries(supportTodayMap).map(
-//     ([name, amount]) => ({ name, amount })
-//   )
-
-//   const chartData: { date: string; amount: number }[] = Object.keys(dateWiseMap)
-//     .sort()
-//     .map((date) => ({
-//       date,
-//       amount: dateWiseMap[date],
-//     }))
-
-//   // 🔥 ফলব্যাক: API থেকে ইউজার না আসলে বিলের মধ্যে থাকা created_by নামগুলো দিয়ে সাপোর্ট লিস্ট বানিয়ে নেওয়া
-//   let supportUsers = allUsers.filter(
-//     (u: any) => {
-//       const r = u.role?.toLowerCase()
-//       return r === 'support' || r === 'admin' || r === 'manager' || r === 'accounts'
-//     }
-//   )
-
-//   if (supportUsers.length === 0) {
-//     const uniqueCreators = Array.from(new Set(paidBills.map((b: any) => b.created_by).filter(Boolean)))
-//     supportUsers = uniqueCreators.map((name, idx) => ({ id: idx + 1, name, role: 'support' }))
-//   }
-
-//   const formatMoney = (amount: number) =>
-//     `৳ ${amount.toLocaleString('en-IN', {
-//       minimumFractionDigits: 2,
-//       maximumFractionDigits: 2,
-//     })}`
-
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-slate-600 font-semibold text-sm">
-//         Loading Paid History Ledger...
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <ProtectedRoute>
-//       <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#0F172A] antialiased" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif' }}>
-//         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
-          
-//           {/* Header */}
-//           <header className="relative overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8">
-//             <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-//               <div className="space-y-3">
-//                 <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50/80 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-teal-800">
-//                   <span className="relative flex h-2 w-2">
-//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-//                     <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-600" />
-//                   </span>
-//                   Logged in as: {currentUser?.name} ({currentUser?.role})
-//                 </div>
-
-//                 <div>
-//                   <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl text-slate-900">
-//                     Paid Bill <span className="text-teal-600 font-extrabold">History & Ledger</span>
-//                   </h1>
-//                   <p className="mt-1.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-500 font-normal">
-//                     Review and audit all successfully settled subscriber payments, daily collection summaries, and support performance metrics.
-//                   </p>
-//                 </div>
-//               </div>
-
-//               <Link
-//                 href="/"
-//                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold tracking-wide text-white shadow-xs transition-all hover:bg-slate-800 active:scale-95 lg:self-center"
-//               >
-//                 <ArrowLeft size={16} className="text-teal-400" />
-//                 Back to Dashboard
-//               </Link>
-//             </div>
-//           </header>
-
-//           {/* Metric Cards */}
-//           <section className="space-y-4">
-//             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Today's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(todayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{todayStr}</span>
-//                   <span className="text-teal-600 font-bold uppercase tracking-wider text-[10px]">Verified</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-slate-700" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Yesterday's Paid Collections</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(yesterdayCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{yesterdayStr}</span>
-//                   <span className="text-indigo-600 font-bold uppercase tracking-wider text-[10px]">Settled</span>
-//                 </div>
-//               </article>
-
-//               <article className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-6 shadow-xs">
-//                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-teal-600" />
-//                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Lifetime Paid Bills</p>
-//                 <div className="mt-3 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl tabular-nums">
-//                   {formatMoney(totalCollected)}
-//                 </div>
-//                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500 font-medium">
-//                   <span className="tracking-wide">{paidBills.length} total records</span>
-//                   <span className="text-blue-600 font-bold uppercase tracking-wider text-[10px]">Lifetime</span>
-//                 </div>
-//               </article>
-//             </div>
-//           </section>
-
-//           {/* Main Client Component */}
-//           <section className="rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-xs sm:p-6">
-//             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
-//               <div>
-//                 <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
-//                   <ReceiptText size={20} className="text-teal-600" />
-//                   Paid Transactions & Analytics Ledger
-//                 </h2>
-//                 <p className="text-xs text-slate-500 font-normal mt-0.5">
-//                   Detailed listing and graphical summary of all cleared bill payments.
-//                 </p>
-//               </div>
-
-//               <div className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-700 font-semibold">
-//                 <Users size={15} className="text-teal-600" />
-//                 {supportUsers.length} Active System Staff
-//               </div>
-//             </div>
-
-//             <PaidHistoryClient
-//               initialBills={paidBills}
-//               chartData={chartData}
-//               supportTodayList={supportTodayList}
-//               supportUsers={supportUsers}
-//             />
-//           </section>
-
-//         </div>
-//       </main>
-//     </ProtectedRoute>
-//   )
-// }
-
-
 
 'use client'
 
@@ -1131,8 +64,8 @@ export default function PaidHistoryPage() {
 
       if (usersRes.ok) {
         const usersData = await usersRes.json()
-        const userList = Array.isArray(usersData) 
-          ? usersData 
+        const userList = Array.isArray(usersData)
+          ? usersData
           : (usersData.users || usersData.data || usersData.allUsers || [])
         setAllUsers(userList)
       }
@@ -1229,9 +162,9 @@ export default function PaidHistoryPage() {
     <ProtectedRoute>
       <main className="min-h-screen overflow-hidden bg-surface text-on-surface">
         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
-          
+
           {/* Header */}
-          <header className="relative overflow-hidden rounded-[24px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs sm:p-8">
+          {/* <header className="relative overflow-hidden rounded-[24px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs sm:p-8">
             <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-secondary-container bg-secondary-container px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-on-secondary-container">
@@ -1260,10 +193,93 @@ export default function PaidHistoryPage() {
                 Back to Dashboard
               </Link>
             </div>
+          </header> */}
+
+
+
+
+
+          <header className="group relative isolate overflow-hidden rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm transition-all duration-300 hover:border-teal-200 sm:px-6">
+
+            {/* Subtle background */}
+            <div
+              className="pointer-events-none absolute inset-0 -z-10"
+              style={{
+                background:
+                  "radial-gradient(ellipse at top left, rgba(20,184,166,0.07), transparent 55%)",
+              }}
+            />
+
+            {/* Minimal snowfall */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+            >
+              {Array.from({ length: 16 }, (_, i) => (
+                <span
+                  key={i}
+                  className={`paid-snowflake ${i < 10
+                    ? "paid-snowflake-default"
+                    : "paid-snowflake-hover"
+                    }`}
+                  style={{
+                    left: `${(i * 43 + 11) % 100}%`,
+                    top: `${-20 - ((i * 19) % 100)}px`,
+                    width: `${2 + (i % 2)}px`,
+                    height: `${2 + (i % 2)}px`,
+                    animationDuration: `${5 + (i % 4)}s`,
+                    animationDelay: `${-((i * 1.17) % 7)}s`,
+                    ["--snow-drift" as string]: `${i % 2 ? 12 : -12}px`,
+                  } as React.CSSProperties}
+                />
+              ))}
+            </div>
+
+            {/* Top border accent */}
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-teal-400 via-emerald-400 to-sky-400" />
+
+            <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
+              <div className="min-w-0">
+
+                {/* User status */}
+                <div className="mb-3 inline-flex max-w-full items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                  <span className="size-2 shrink-0 rounded-full bg-emerald-500" />
+                  <span className="truncate">
+                    {currentUser?.name} ({currentUser?.role})
+                  </span>
+                </div>
+
+                <h1 className="text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
+                  Paid Bill{" "}
+                  <span className="text-teal-600">History &amp; Ledger</span>
+                </h1>
+
+                <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-500">
+                  Review settled payments, daily collections, and support performance.
+                </p>
+              </div>
+
+              <Link
+                href="/"
+                className="group/back inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 active:scale-95 sm:self-center"
+              >
+                <ArrowLeft
+                  size={16}
+                  className="transition-transform group-hover/back:-translate-x-0.5"
+                />
+                Back to Dashboard
+              </Link>
+
+            </div>
           </header>
 
+
+
+
+
           {/* Metric Cards */}
-          <section className="space-y-4">
+          {/* <section className="space-y-4">
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
               <article className="relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs">
                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-primary to-emerald-600" />
@@ -1301,7 +317,173 @@ export default function PaidHistoryPage() {
                 </div>
               </article>
             </div>
+          </section> */}
+
+
+          {/* Metric Cards */}
+          <section className="space-y-4">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+              {/* Today's Collections */}
+              <article
+                className="metric-snow-card group relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                style={{
+                  "--metric-glow": "rgba(16,185,129,0.09)",
+                  "--metric-particle": "#6ee7b7",
+                } as React.CSSProperties}
+              >
+                <div className="metric-snow-layer" aria-hidden="true">
+                  {Array.from({ length: 18 }, (_, i) => (
+                    <span
+                      key={i}
+                      className="metric-snowflake"
+                      style={{
+                        "--x": `${(i * 37 + 11) % 97}%`,
+                        "--size": `${2 + (i % 3)}px`,
+                        "--duration": `${2.5 + (i % 5) * 0.7}s`,
+                        "--delay": `${-((i * 0.73) % 5)}s`,
+                        "--drift": `${(i % 2 ? 1 : -1) * (8 + (i % 4) * 5)}px`,
+                      } as React.CSSProperties}
+                    />
+                  ))}
+                </div>
+
+                <div className="absolute inset-x-0 top-0 z-[1] h-[3px] bg-gradient-to-r from-primary to-emerald-500" />
+
+                <div className="relative z-[1]">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-label-md uppercase tracking-wider text-secondary">
+                      Today's Paid Collections
+                    </p>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-110">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 11h18" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                    {formatMoney(todayCollected)}
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-outline-variant pt-4 font-body-sm text-secondary font-medium">
+                    <span className="tracking-wide">{todayStr}</span>
+                    <span className="text-primary font-bold uppercase tracking-wider text-[10px]">
+                      Verified
+                    </span>
+                  </div>
+                </div>
+              </article>
+
+              {/* Yesterday's Collections */}
+              <article
+                className="metric-snow-card group relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                style={{
+                  "--metric-glow": "rgba(59,130,246,0.09)",
+                  "--metric-particle": "#93c5fd",
+                } as React.CSSProperties}
+              >
+                <div className="metric-snow-layer" aria-hidden="true">
+                  {Array.from({ length: 18 }, (_, i) => (
+                    <span
+                      key={i}
+                      className="metric-snowflake"
+                      style={{
+                        "--x": `${(i * 37 + 11) % 97}%`,
+                        "--size": `${2 + (i % 3)}px`,
+                        "--duration": `${2.5 + (i % 5) * 0.7}s`,
+                        "--delay": `${-((i * 0.73) % 5)}s`,
+                        "--drift": `${(i % 2 ? 1 : -1) * (8 + (i % 4) * 5)}px`,
+                      } as React.CSSProperties}
+                    />
+                  ))}
+                </div>
+
+                <div className="absolute inset-x-0 top-0 z-[1] h-[3px] bg-gradient-to-r from-tertiary to-blue-500" />
+
+                <div className="relative z-[1]">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-label-md uppercase tracking-wider text-secondary">
+                      Yesterday's Paid Collections
+                    </p>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-transform duration-300 group-hover:scale-110">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7v5l3 2" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                    {formatMoney(yesterdayCollected)}
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-outline-variant pt-4 font-body-sm text-secondary font-medium">
+                    <span className="tracking-wide">{yesterdayStr}</span>
+                    <span className="text-tertiary font-bold uppercase tracking-wider text-[10px]">
+                      Settled
+                    </span>
+                  </div>
+                </div>
+              </article>
+
+              {/* Lifetime Collections */}
+              <article
+                className="metric-snow-card group relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg md:col-span-2 xl:col-span-1"
+                style={{
+                  "--metric-glow": "rgba(139,92,246,0.09)",
+                  "--metric-particle": "#c4b5fd",
+                } as React.CSSProperties}
+              >
+                <div className="metric-snow-layer" aria-hidden="true">
+                  {Array.from({ length: 18 }, (_, i) => (
+                    <span
+                      key={i}
+                      className="metric-snowflake"
+                      style={{
+                        "--x": `${(i * 37 + 11) % 97}%`,
+                        "--size": `${2 + (i % 3)}px`,
+                        "--duration": `${2.5 + (i % 5) * 0.7}s`,
+                        "--delay": `${-((i * 0.73) % 5)}s`,
+                        "--drift": `${(i % 2 ? 1 : -1) * (8 + (i % 4) * 5)}px`,
+                      } as React.CSSProperties}
+                    />
+                  ))}
+                </div>
+
+                <div className="absolute inset-x-0 top-0 z-[1] h-[3px] bg-gradient-to-r from-tertiary to-primary" />
+
+                <div className="relative z-[1]">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-label-md uppercase tracking-wider text-secondary">
+                      Total Lifetime Paid Bills
+                    </p>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 transition-transform duration-300 group-hover:scale-110">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <ellipse cx="12" cy="5" rx="8" ry="3" />
+                        <path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+                        <path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                    {formatMoney(totalCollected)}
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-outline-variant pt-4 font-body-sm text-secondary font-medium">
+                    <span className="tracking-wide">{paidBills.length} total records</span>
+                    <span className="text-tertiary font-bold uppercase tracking-wider text-[10px]">
+                      Lifetime
+                    </span>
+                  </div>
+                </div>
+              </article>
+
+            </div>
           </section>
+
 
           {/* Main Client Component */}
           <section className="rounded-[24px] border border-outline-variant bg-surface-container-lowest p-4 shadow-xs sm:p-6">
