@@ -363,7 +363,7 @@ export default function PaidHistoryPage() {
                     </span>
                   </div>
 
-                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono !text-2xl">
                     {formatMoney(todayCollected)}
                   </div>
 
@@ -415,7 +415,7 @@ export default function PaidHistoryPage() {
                     </span>
                   </div>
 
-                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono !text-2xl">
                     {formatMoney(yesterdayCollected)}
                   </div>
 
@@ -468,7 +468,7 @@ export default function PaidHistoryPage() {
                     </span>
                   </div>
 
-                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
+                  <div className="mt-5 font-headline-lg text-on-surface sm:text-3xl font-data-mono !text-2xl">
                     {formatMoney(totalCollected)}
                   </div>
 
