@@ -409,15 +409,64 @@ export default function Sidebar({
           </nav>
         </div>
 
-        <div className="p-3 border-t border-outline-variant/20 text-[11px] text-secondary space-y-1.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-              <span>Database Node</span>
-            </div>
-            <span className="text-[10px] font-mono text-secondary/80">Active</span>
-          </div>
-        </div>
+        
+
+<div className="border-t border-outline-variant/20 p-3">
+  <a
+    href="https://kamrul-info.vercel.app/"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Visit Developer Website"
+    className="group flex items-center gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-low/60 p-3 transition-all duration-300 hover:border-teal-500/60 hover:bg-teal-500/5 hover:shadow-md"
+  >
+    {/* Developer Image */}
+    <div className="relative shrink-0 rounded-full bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-500 p-[2px] shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-teal-500/20">
+      <div className="rounded-full bg-surface p-[2px]">
+        <img
+          src="/kamrul.jpeg"
+          alt="Developer"
+          className="h-11 w-11 rounded-full object-cover"
+        />
+      </div>
+    </div>
+
+    {/* Website Link */}
+    <div className="min-w-0 flex-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="truncate text-xs font-semibold text-on-surface transition-colors group-hover:text-teal-600">
+          kamrul-info.vercel.app
+        </span>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="shrink-0 text-secondary transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-teal-600"
+        >
+          <path d="M7 17 17 7" />
+          <path d="M7 7h10v10" />
+        </svg>
+      </div>
+
+      <div className="mt-1 flex items-center gap-1.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+        <span className="text-[10px] text-secondary">
+          Developer Portfolio
+        </span>
+      </div>
+    </div>
+  </a>
+</div>
+
+
+
+
       </aside>
     </>
   );
