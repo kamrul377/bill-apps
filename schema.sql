@@ -175,3 +175,6 @@ COLLATE=utf8mb4_unicode_ci;
 
 
 
+
+-- DELETE FROM bills
+-- WHERE id > 0;
