@@ -153,13 +153,16 @@ import bgImage2 from '@/src/assets/bg-image-2.jpg';
 import bgImage3 from '@/src/assets/bg-image-3.jpg';
 import bgImage4 from '@/src/assets/bg-image-4.jpg';
 import bgImage5 from '@/src/assets/bg-image-5.jpg';
+import bgImage6 from '@/src/assets/bg-image-6.jpg';
 
 const backgroundImages = [
   bgImage1,
   bgImage2,
   bgImage3,
   bgImage4,
-  bgImage5
+  bgImage5,
+  // bgImage6
+  
 ];
 
 interface LoginViewProps {
