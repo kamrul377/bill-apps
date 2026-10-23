@@ -349,4 +349,355 @@ export default function CreateBillView({
 }
 
 
+// ======================with dark mode ======================
 
+
+// 'use client';
+// import React, { useState, useEffect } from 'react';
+// import { motion } from 'motion/react';
+// import { Bill, User } from '@/lib/types';
+
+// interface Category {
+//   id: number;
+//   name: string;
+// }
+
+// interface CreateBillViewProps {
+//   currentUser: User;
+//   recentBills: Bill[];
+//   onBillCreated: (bill: Bill) => void;
+//   onNavigateToBills: () => void;
+//   onShowToast?: (msg: string, type?: 'success' | 'error' | 'info') => void;
+// }
+
+// export default function CreateBillView({
+//   currentUser,
+//   recentBills,
+//   onBillCreated,
+//   onNavigateToBills,
+//   onShowToast,
+// }: CreateBillViewProps) {
+//   // Manual entry-r jonno state
+//   const [ticketId, setTicketId] = useState('');
+//   const [userId, setUserId] = useState('');
+//   const [amount, setAmount] = useState('');
+//   const [categoryId, setCategoryId] = useState<string>('');
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+
+//   const [description, setDescription] = useState('');
+
+//   const [loading, setLoading] = useState(false);
+//   const [fetchingCategories, setFetchingCategories] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+
+//   // Bill categories backend API theke load kora
+//   useEffect(() => {
+//     const fetchCategories = async () => {
+//       setFetchingCategories(true);
+//       try {
+//         const res = await fetch('/api/categories');
+//         const data = await res.json();
+//         if (res.ok && Array.isArray(data.categories)) {
+//           setCategories(data.categories);
+//           // Default category select kora (jodi 'Others' or prothom category thake)
+//           if (data.categories.length > 0) {
+//             const defaultCat = data.categories.find(
+//               (c: Category) => c.name.toLowerCase() === 'others'
+//             ) || data.categories[0];
+//             setCategoryId(String(defaultCat.id));
+//           }
+//         }
+//       } catch (err) {
+//         console.error('Failed to load categories:', err);
+//       } finally {
+//         setFetchingCategories(false);
+//       }
+//     };
+
+//     fetchCategories();
+//   }, []);
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     const cleanTicketId = ticketId.trim();
+//     const cleanUserId = userId.trim();
+
+//     if (!cleanTicketId) {
+//       setError('Ticket ID is required.');
+//       return;
+//     }
+
+//     if (!/^\d{6}$/.test(cleanTicketId)) {
+//       setError('Ticket ID must be exactly a 6-digit number (e.g. 454433).');
+//       return;
+//     }
+
+//     if (!cleanUserId) {
+//       setError('User / Subscriber ID is required.');
+//       return;
+//     }
+
+//     if (!/^\d{6}$/.test(cleanUserId)) {
+//       setError('User / Subscriber ID must be exactly a 6-digit number (e.g. 454433).');
+//       return;
+//     }
+
+//     const numAmount = parseFloat(amount);
+//     if (isNaN(numAmount) || numAmount <= 0) {
+//       setError('Amount must be a positive number in TK.');
+//       return;
+//     }
+
+//     if (!categoryId) {
+//       setError('Please select a bill category.');
+//       return;
+//     }
+
+//     if (!description.trim()) {
+//       setError('Please provide a service description.');
+//       return;
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const res = await fetch('/api/bills', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           ticket_id: cleanTicketId,
+//           user_id: cleanUserId,
+//           amount: numAmount,
+//           category_id: parseInt(categoryId, 10),
+//           description: description.trim(),
+//           date,
+//           created_by: currentUser.name || currentUser.user_id,
+//         }),
+//       });
+
+//       const data = await res.json();
+//       if (!res.ok) {
+//         setError(data.error || 'Failed to create bill.');
+//         setLoading(false);
+//         return;
+//       }
+
+//       onBillCreated(data.bill);
+//       if (onShowToast) {
+//         onShowToast(`Bill #${data.bill.ticket_id} submitted for approval (Pending).`, 'success');
+//       }
+
+//       // Form reset
+//       setTicketId('');
+//       setUserId('');
+//       setAmount('');
+//       setDescription('');
+//     } catch (err) {
+//       console.error(err);
+//       setError('Connection failure while submitting bill.');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, y: 10 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.2 }}
+//       className="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl w-full"
+//     >
+//       {/* Form Container */}
+//       <div className="lg:col-span-2 bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl border border-outline-variant/30 dark:border-slate-800 shadow-xs flex flex-col gap-4">
+//         <div>
+//           <h2 className="text-xl font-bold text-on-surface dark:text-slate-100">Create Service Bill</h2>
+//           <p className="text-xs text-secondary dark:text-slate-400 mt-0.5">
+//             Ticket ID and User ID are 6-digit numbers. Bills default to <strong className="text-amber-600 dark:text-amber-400 font-semibold">Pending</strong> status.
+//           </p>
+//         </div>
+
+//         {error && (
+//           <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-300 text-xs rounded-lg flex items-center gap-2">
+//             <span className="material-symbols-outlined text-sm">error</span>
+//             <span>{error}</span>
+//           </div>
+//         )}
+
+//         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//             <div className="flex flex-col gap-1">
+//               <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//                 Ticket ID (6-digit) *
+//               </label>
+//               <div className="relative">
+//                 <input
+//                   type="text"
+//                   inputMode="numeric"
+//                   pattern="[0-9]{6}"
+//                   maxLength={6}
+//                   required
+//                   placeholder="e.g. 454433"
+//                   value={ticketId}
+//                   onChange={(e) => setTicketId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+//                   className="w-full h-9 px-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 font-data-mono text-xs tracking-wider"
+//                 />
+//                 <span className="absolute right-2.5 top-2.5 text-[10px] text-secondary dark:text-slate-400 font-data-mono">
+//                   {ticketId.length}/6
+//                 </span>
+//               </div>
+//             </div>
+
+//             <div className="flex flex-col gap-1">
+//               <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//                 Subscriber / User ID (6-digit) *
+//               </label>
+//               <div className="relative">
+//                 <input
+//                   type="text"
+//                   inputMode="numeric"
+//                   pattern="[0-9]{6}"
+//                   maxLength={6}
+//                   required
+//                   placeholder="e.g. 454433"
+//                   value={userId}
+//                   onChange={(e) => setUserId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+//                   className="w-full h-9 px-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 font-data-mono text-xs tracking-wider"
+//                 />
+//                 <span className="absolute right-2.5 top-2.5 text-[10px] text-secondary dark:text-slate-400 font-data-mono">
+//                   {userId.length}/6
+//                 </span>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+//             <div className="flex flex-col gap-1">
+//               <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//                 Amount (TK) *
+//               </label>
+//               <div className="relative">
+//                 <span className="absolute left-3 top-2 text-xs font-bold text-teal-700 dark:text-teal-400">৳</span>
+//                 <input
+//                   type="number"
+//                   step="0.01"
+//                   min="1"
+//                   required
+//                   placeholder="0.00"
+//                   value={amount}
+//                   onChange={(e) => setAmount(e.target.value)}
+//                   className="w-full h-9 pl-8 pr-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 font-data-mono text-xs"
+//                 />
+//               </div>
+//             </div>
+
+//             <div className="flex flex-col gap-1">
+//               <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//                 Category *
+//               </label>
+//               <select
+//                 required
+//                 value={categoryId}
+//                 onChange={(e) => setCategoryId(e.target.value)}
+//                 disabled={fetchingCategories}
+//                 className="h-9 px-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 text-xs cursor-pointer disabled:opacity-50"
+//               >
+//                 <option value="" disabled className="dark:bg-slate-800">Select Category</option>
+//                 {categories.map((cat) => (
+//                   <option key={cat.id} value={cat.id} className="dark:bg-slate-800">
+//                     {cat.name}
+//                   </option>
+//                 ))}
+//               </select>
+//             </div>
+
+//             <div className="flex flex-col gap-1">
+//               <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//                 Date *
+//               </label>
+//               <input
+//                 type="date"
+//                 required
+//                 value={date}
+//                 onChange={(e) => setDate(e.target.value)}
+//                 className="h-9 px-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 font-data-mono text-xs cursor-pointer [color-scheme:light] dark:[color-scheme:dark]"
+//               />
+//             </div>
+//           </div>
+
+//           <div className="flex flex-col gap-1">
+//             <label className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase">
+//               Description *
+//             </label>
+//             <textarea
+//               rows={3}
+//               required
+//               placeholder="Provide clear service notes..."
+//               value={description}
+//               onChange={(e) => setDescription(e.target.value)}
+//               className="p-3 bg-surface dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg border border-outline-variant/40 dark:border-slate-700 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 text-xs resize-none"
+//             />
+//           </div>
+
+//           <div className="flex items-center justify-end gap-3 pt-2">
+//             <button
+//               type="button"
+//               onClick={onNavigateToBills}
+//               className="px-4 py-2 rounded-lg text-xs font-medium text-secondary dark:text-slate-300 hover:bg-surface-container dark:hover:bg-slate-800 transition-colors cursor-pointer"
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="submit"
+//               disabled={loading}
+//               className="px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-medium text-xs shadow-xs transition-colors disabled:opacity-60 flex items-center gap-1.5 cursor-pointer"
+//             >
+//               <span className="material-symbols-outlined text-sm">send</span>
+//               <span>{loading ? 'Submitting...' : 'Submit Bill'}</span>
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+
+//       {/* Recent Submissions Sidebar */}
+//       <div className="bg-surface-container-lowest dark:bg-slate-900 p-5 rounded-xl border border-outline-variant/30 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+//         <div>
+//           <h3 className="text-sm font-bold text-on-surface dark:text-slate-100 mb-3">Recent Submissions</h3>
+//           <div className="flex flex-col gap-2.5">
+//             {recentBills.slice(0, 5).map((b) => (
+//               <div
+//                 key={b.id}
+//                 className="p-2.5 rounded-lg bg-surface-container-low dark:bg-slate-800/60 border border-outline-variant/30 dark:border-slate-700/50 flex items-center justify-between text-xs"
+//               >
+//                 <div>
+//                   <span className="font-data-mono font-bold text-teal-700 dark:text-teal-400 block">{b.ticket_id}</span>
+//                   <span className="text-[11px] text-secondary dark:text-slate-400 truncate max-w-[140px] block">
+//                     {b.user_id}
+//                   </span>
+//                 </div>
+//                 <div className="text-right">
+//                   <span className="font-bold text-on-surface dark:text-slate-200 block font-data-mono">
+//                     ৳{b.amount.toLocaleString()}
+//                   </span>
+//                   <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase">
+//                     {b.status}
+//                   </span>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         <button
+//           type="button"
+//           onClick={onNavigateToBills}
+//           className="w-full mt-4 py-2 text-center text-xs font-medium text-teal-700 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40 rounded-lg transition-colors cursor-pointer"
+//         >
+//           View All Bills →
+//         </button>
+//       </div>
+//     </motion.div>
+//   );
+// }

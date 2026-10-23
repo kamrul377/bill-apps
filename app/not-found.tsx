@@ -5,7 +5,7 @@ import { motion } from 'motion/react'
 
 export default function NotFound() {
   return (
-    <div 
+    <div
       className="min-h-screen flex flex-col items-center justify-center p-6 text-center select-none"
       style={{
         backgroundColor: 'var(--color-on-primary-container, #f0fdfa)',
@@ -13,7 +13,7 @@ export default function NotFound() {
       }}
     >
       <div className="max-w-md w-full flex flex-col items-center">
-        
+
         {/* Animated 404 Illustration / Magnifying Glass Logo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -22,21 +22,21 @@ export default function NotFound() {
           className="relative w-44 h-44 mb-6 flex items-center justify-center"
         >
           {/* Subtle glowing background aura */}
-          <div 
+          <div
             className="absolute inset-0 rounded-full blur-2xl opacity-30"
             style={{ backgroundColor: 'var(--color-primary, #0d9488)' }}
           />
 
           {/* Floating SVG Magnifying Glass Illustration */}
           <motion.svg
-            animate={{ 
+            animate={{
               y: [0, -12, 0],
               rotate: [0, 3, -3, 0]
             }}
-            transition={{ 
-              repeat: Infinity, 
-              duration: 4, 
-              ease: 'easeInOut' 
+            transition={{
+              repeat: Infinity,
+              duration: 4,
+              ease: 'easeInOut'
             }}
             className="w-36 h-36 relative z-10 drop-shadow-md"
             viewBox="0 0 200 200"
@@ -44,47 +44,47 @@ export default function NotFound() {
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Dashed outer orbit ring */}
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="80" 
-              stroke="var(--color-primary, #0d9488)" 
-              strokeWidth="2" 
-              strokeDasharray="6 6" 
-              opacity="0.3" 
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              stroke="var(--color-primary, #0d9488)"
+              strokeWidth="2"
+              strokeDasharray="6 6"
+              opacity="0.3"
             />
-            
+
             {/* Magnifying Glass Frame */}
-            <circle 
-              cx="90" 
-              cy="90" 
-              r="42" 
-              stroke="var(--color-primary, #0d9488)" 
-              strokeWidth="10" 
-              fill="var(--color-on-primary-container, #f0fdfa)" 
+            <circle
+              cx="90"
+              cy="90"
+              r="42"
+              stroke="var(--color-primary, #0d9488)"
+              strokeWidth="10"
+              fill="var(--color-on-primary-container, #f0fdfa)"
             />
-            <circle 
-              cx="90" 
-              cy="90" 
-              r="30" 
-              fill="var(--color-primary, #0d9488)" 
-              opacity="0.1" 
+            <circle
+              cx="90"
+              cy="90"
+              r="30"
+              fill="var(--color-primary, #0d9488)"
+              opacity="0.1"
             />
-            
+
             {/* Handle */}
-            <path 
-              d="M120 120 L155 155" 
-              stroke="var(--color-primary-container, #0f766e)" 
-              strokeWidth="12" 
-              strokeLinecap="round" 
+            <path
+              d="M120 120 L155 155"
+              stroke="var(--color-primary-container, #0f766e)"
+              strokeWidth="12"
+              strokeLinecap="round"
             />
 
             {/* Question Mark Inside Lens */}
-            <path 
-              d="M84 82 C84 76, 96 76, 96 83 C96 88, 90 90, 90 95" 
-              stroke="var(--color-primary-container, #0f766e)" 
-              strokeWidth="4" 
-              strokeLinecap="round" 
+            <path
+              d="M84 82 C84 76, 96 76, 96 83 C96 88, 90 90, 90 95"
+              stroke="var(--color-primary-container, #0f766e)"
+              strokeWidth="4"
+              strokeLinecap="round"
             />
             <circle cx="90" cy="103" r="2.5" fill="var(--color-primary-container, #0f766e)" />
 
