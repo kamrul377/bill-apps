@@ -262,7 +262,7 @@ export default function DashboardView({
             </button>
           )}
 
-          {currentUser?.role !== 'accounts' && (
+          {/* {currentUser?.role !== 'accounts' && (
             <button
               type="button"
               onClick={onOpenCreateBill}
@@ -271,7 +271,15 @@ export default function DashboardView({
               <span className="material-symbols-outlined text-base">add</span>
               <span>Create Bill</span>
             </button>
-          )}
+          )} */}
+          <button
+            type="button"
+            onClick={onOpenCreateBill}
+            className="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium text-xs transition-colors shadow-xs cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-base">add</span>
+            <span>Create Bill</span>
+          </button>
         </div>
       </div>
 

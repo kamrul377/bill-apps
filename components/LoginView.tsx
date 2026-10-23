@@ -153,7 +153,8 @@ import bgImage2 from '@/src/assets/bg-image-2.jpg';
 import bgImage3 from '@/src/assets/bg-image-3.jpg';
 import bgImage4 from '@/src/assets/bg-image-4.jpg';
 import bgImage5 from '@/src/assets/bg-image-5.jpg';
-import bgImage6 from '@/src/assets/bg-image-6.jpg';
+import bgImage7 from '@/src/assets/bg-image-7.jpg';
+
 
 const backgroundImages = [
   bgImage1,
@@ -161,8 +162,8 @@ const backgroundImages = [
   bgImage3,
   bgImage4,
   bgImage5,
-  // bgImage6
-  
+  bgImage7,
+
 ];
 
 interface LoginViewProps {
@@ -223,13 +224,13 @@ export default function LoginView({ onLoginSuccess, onShowToast }: LoginViewProp
   };
 
   const currentBg = backgroundImages[currentImageIndex];
-  const bgSrc = typeof currentBg === 'object' && currentBg !== null && 'src' in currentBg 
-    ? (currentBg as { src: string }).src 
+  const bgSrc = typeof currentBg === 'object' && currentBg !== null && 'src' in currentBg
+    ? (currentBg as { src: string }).src
     : (currentBg as string);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-center items-center p-4 overflow-hidden bg-surface-container-low">
-      
+
       {/* Background Slideshow with Framer Motion */}
       <AnimatePresence mode="popLayout">
         <motion.div
