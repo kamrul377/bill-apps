@@ -4610,79 +4610,91 @@ export default function ClientInfoPage() {
                         </div>
                     </div> */}
 
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-                        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                   <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-                            {/* Left: Page Heading */}
-                            <div className="flex min-w-0 items-center gap-4">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 dark:border-teal-900 dark:bg-teal-950">
-                                    <span className="material-symbols-outlined text-[26px] text-teal-700 dark:text-teal-400">
-                                        hub
-                                    </span>
-                                </div>
+        {/* Left: Page Heading */}
+        <div className="flex min-w-0 items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 dark:border-teal-900 dark:bg-teal-950">
+                <span className="material-symbols-outlined text-[26px] text-teal-700 dark:text-teal-400">
+                    hub
+                </span>
+            </div>
 
-                                <div className="min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2.5">
-                                        <button
-                                            type="button"
-                                            onClick={() => window.location.reload()}
-                                            className="text-left text-xl font-bold tracking-tight text-slate-800 transition-colors hover:text-teal-700 dark:text-white dark:hover:text-teal-400 sm:text-2xl"
-                                        >
-                                            Clients Information
-                                        </button>
+            <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        className="text-left text-xl font-bold tracking-tight text-slate-800 transition-colors hover:text-teal-700 dark:text-white dark:hover:text-teal-400 sm:text-2xl"
+                    >
+                        Clients Information
+                    </button>
 
-                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                            Live
-                                        </span>
-                                    </div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        Live
+                    </span>
+                </div>
 
-                                    <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">
-                                        Manage network connections, client profiles, and active configurations.
-                                    </p>
-                                </div>
-                            </div>
+                <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-slate-400">
+                    Manage network connections, client profiles, and active configurations.
+                </p>
+            </div>
+        </div>
 
-                            {/* Right: Action Buttons */}
-                            <div className="flex flex-wrap items-center gap-2">
-                                <Link
-                                    href="/client-info/system-log"
-                                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                                >
-                                    <span className="material-symbols-outlined text-[19px]">
-                                        history
-                                    </span>
-                                    System Logs
-                                </Link>
+        {/* Right: Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+            
+            {/* Back to Home/Dashboard Button */}
+            <Link
+                href="/"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
+                <span className="material-symbols-outlined text-[19px]">
+                    arrow_back
+                </span>
+                Back
+            </Link>
 
-                                <motion.button
-                                    type="button"
-                                    whileHover={{ y: -1 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => setIsPocManagementOpen(true)}
-                                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-600 transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-teal-950"
-                                >
-                                    <span className="material-symbols-outlined text-[19px]">
-                                        manage_accounts
-                                    </span>
-                                    Manage POC
-                                </motion.button>
+            <Link
+                href="/client-info/system-log"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
+                <span className="material-symbols-outlined text-[19px]">
+                    history
+                </span>
+                System Logs
+            </Link>
 
-                                <motion.button
-                                    type="button"
-                                    whileHover={{ y: -1 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleOpenAddModal}
-                                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-teal-600 dark:hover:bg-teal-500"
-                                >
-                                    <span className="material-symbols-outlined text-[19px]">
-                                        add
-                                    </span>
-                                    New Client
-                                </motion.button>
-                            </div>
-                        </div>
-                    </div>
+            <motion.button
+                type="button"
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsPocManagementOpen(true)}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-600 transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-teal-950"
+            >
+                <span className="material-symbols-outlined text-[19px]">
+                    manage_accounts
+                </span>
+                Manage POC
+            </motion.button>
+
+            <motion.button
+                type="button"
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleOpenAddModal}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:bg-teal-600 dark:hover:bg-teal-500"
+            >
+                <span className="material-symbols-outlined text-[19px]">
+                    add
+                </span>
+                New Client
+            </motion.button>
+        </div>
+    </div>
+</div>
 
 
                     {/* ==================================================
