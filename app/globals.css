@@ -607,3 +607,26 @@
     display: none;
   }
 }
+
+@layer base {
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    -webkit-font-smoothing: antialiased;
+
+    /* Global smooth transition for background and colors */
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  }
+
+  /* All layout containers smooth transition */
+  *,
+  ::before,
+  ::after {
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  }
+}

@@ -163,39 +163,6 @@ export default function PaidHistoryPage() {
       <main className="min-h-screen overflow-hidden bg-surface text-on-surface">
         <div className="relative mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 md:py-8 lg:px-10">
 
-          {/* Header */}
-          {/* <header className="relative overflow-hidden rounded-[24px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs sm:p-8">
-            <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-secondary-container bg-secondary-container px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-on-secondary-container">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                  </span>
-                  Logged in as: {currentUser?.name} ({currentUser?.role})
-                </div>
-
-                <div>
-                  <h1 className="font-headline-lg sm:text-3xl lg:text-4xl text-on-surface">
-                    Paid Bill <span className="text-primary font-extrabold">History & Ledger</span>
-                  </h1>
-                  <p className="mt-1.5 max-w-2xl font-body-md text-on-surface-variant font-normal">
-                    Review and audit all successfully settled subscriber payments, daily collection summaries, and support performance metrics.
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                href="/"
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-inverse-surface px-5 py-2.5 font-label-lg text-inverse-on-surface shadow-xs transition-all hover:opacity-90 active:scale-95 lg:self-center"
-              >
-                <ArrowLeft size={16} className="text-primary-fixed" />
-                Back to Dashboard
-              </Link>
-            </div>
-          </header> */}
-
-
 
 
 
@@ -274,50 +241,7 @@ export default function PaidHistoryPage() {
             </div>
           </header>
 
-
-
-
-
           {/* Metric Cards */}
-          {/* <section className="space-y-4">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              <article className="relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs">
-                <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-primary to-emerald-600" />
-                <p className="font-label-md uppercase tracking-wider text-secondary">Today's Paid Collections</p>
-                <div className="mt-3 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
-                  {formatMoney(todayCollected)}
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3 font-body-sm text-secondary font-medium">
-                  <span className="tracking-wide">{todayStr}</span>
-                  <span className="text-primary font-bold uppercase tracking-wider text-[10px]">Verified</span>
-                </div>
-              </article>
-
-              <article className="relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs">
-                <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-tertiary to-inverse-surface" />
-                <p className="font-label-md uppercase tracking-wider text-secondary">Yesterday's Paid Collections</p>
-                <div className="mt-3 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
-                  {formatMoney(yesterdayCollected)}
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3 font-body-sm text-secondary font-medium">
-                  <span className="tracking-wide">{yesterdayStr}</span>
-                  <span className="text-tertiary font-bold uppercase tracking-wider text-[10px]">Settled</span>
-                </div>
-              </article>
-
-              <article className="relative overflow-hidden rounded-[20px] border border-outline-variant bg-surface-container-lowest p-6 shadow-xs">
-                <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-tertiary to-primary" />
-                <p className="font-label-md uppercase tracking-wider text-secondary">Total Lifetime Paid Bills</p>
-                <div className="mt-3 font-headline-lg text-on-surface sm:text-3xl font-data-mono">
-                  {formatMoney(totalCollected)}
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3 font-body-sm text-secondary font-medium">
-                  <span className="tracking-wide">{paidBills.length} total records</span>
-                  <span className="text-tertiary font-bold uppercase tracking-wider text-[10px]">Lifetime</span>
-                </div>
-              </article>
-            </div>
-          </section> */}
 
 
           {/* Metric Cards */}
