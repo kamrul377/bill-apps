@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -243,10 +241,60 @@ export default function Home() {
   // APPROVE / REJECT
   // =========================================================
 
+  // const handleUpdateStatus = async (
+  //   billId: number,
+  //   status: 'Approved' | 'Rejected',
+  //   reason?: string
+  // ): Promise<void> => {
+  //   try {
+  //     const res = await fetch(`/api/bills/${Number(billId)}`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         status,
+  //         reason,
+  //         approverName: `${currentUser.name} (${currentUser.role})`,
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       throw new Error(data?.error || 'Failed to update bill status.');
+  //     }
+
+  //     await loadData();
+
+  //     showToast(
+  //       status === 'Approved'
+  //         ? 'Bill approved successfully.'
+  //         : 'Bill rejected successfully.',
+  //       'success'
+  //     );
+  //   } catch (error) {
+  //     console.error('Update status error:', error);
+
+  //     showToast(
+  //       error instanceof Error
+  //         ? error.message
+  //         : 'Failed to update bill status.',
+  //       'error'
+  //     );
+
+  //     throw error;
+  //   }
+  // };
+  // =========================================================
+  // APPROVE / REJECT (Updated to support approvedAmount)
+  // =========================================================
+
   const handleUpdateStatus = async (
     billId: number,
     status: 'Approved' | 'Rejected',
-    reason?: string
+    reason?: string,
+    approvedAmount?: number // <--- ১. এখানে approvedAmount প্যারামিটার যোগ করা হলো
   ): Promise<void> => {
     try {
       const res = await fetch(`/api/bills/${Number(billId)}`, {
@@ -258,6 +306,7 @@ export default function Home() {
           status,
           reason,
           approverName: `${currentUser.name} (${currentUser.role})`,
+          approvedAmount, // <--- ২. API-র বডিতে approvedAmount পাঠানো হলো
         }),
       });
 
@@ -271,7 +320,9 @@ export default function Home() {
 
       showToast(
         status === 'Approved'
-          ? 'Bill approved successfully.'
+          ? approvedAmount !== undefined
+            ? `Bill partially approved for ৳${approvedAmount.toLocaleString()} successfully.`
+            : 'Bill approved successfully.'
           : 'Bill rejected successfully.',
         'success'
       );
@@ -288,6 +339,7 @@ export default function Home() {
       throw error;
     }
   };
+
 
   // =========================================================
   // BATCH APPROVE

@@ -1022,7 +1022,7 @@ export default function UserManagementView({
                   <div className="flex items-center gap-1">
                     <span>Email / Login ID</span>
                     <span className="material-symbols-outlined text-[10px] leading-none">
-                      {sortField === 'user_id' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more'}
+                      {sortField === 'user_id' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                   </div>
                 </th>
@@ -1033,7 +1033,7 @@ export default function UserManagementView({
                   <div className="flex items-center gap-1">
                     <span>Name</span>
                     <span className="material-symbols-outlined text-[10px] leading-none">
-                      {sortField === 'name' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more'}
+                      {sortField === 'name' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                   </div>
                 </th>
@@ -1044,7 +1044,7 @@ export default function UserManagementView({
                   <div className="flex items-center gap-1">
                     <span>Role</span>
                     <span className="material-symbols-outlined text-[10px] leading-none">
-                      {sortField === 'role' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more'}
+                      {sortField === 'role' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                   </div>
                 </th>
@@ -1055,7 +1055,7 @@ export default function UserManagementView({
                   <div className="flex items-center gap-1">
                     <span>Created</span>
                     <span className="material-symbols-outlined text-[10px] leading-none">
-                      {sortField === 'created_at' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more'}
+                      {sortField === 'created_at' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more'}
                     </span>
                   </div>
                 </th>

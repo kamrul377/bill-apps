@@ -1023,6 +1023,133 @@ export async function getBillById(id: number): Promise<Bill | null> {
 }
 
 // ==================== FAST BATCH UPDATE FUNCTION ====================
+
+
+
+// export async function updateBillsBatch(
+//   ids: number[],
+//   status: BillStatus,
+//   options?: {
+//     reason?: string;
+//     paidBy?: string;
+//     paymentMethod?: string;
+//     paymentNote?: string;
+//   }
+// ): Promise<{ success: boolean; updatedCount: number; error?: string }> {
+//   if (!ids || ids.length === 0) return { success: true, updatedCount: 0 };
+
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+
+//     let sql = 'UPDATE bills SET status = ?, updated_at = NOW()';
+//     const params: any[] = [status];
+
+//     if (status === 'Paid') {
+//       sql += ', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?';
+//       params.push(
+//         options?.paidBy || 'Accounts Staff',
+//         options?.paymentMethod || 'Cash',
+//         options?.paymentNote || null
+//       );
+//     } else if (status === 'Rejected' && options?.reason) {
+//       sql += ', rejection_reason = ?';
+//       params.push(options.reason.trim());
+//     }
+
+//     sql += ' WHERE id IN (?)';
+//     params.push(ids);
+
+//     const [res] = await p.query<ResultSetHeader>(sql, params);
+
+//     return {
+//       success: true,
+//       updatedCount: res.affectedRows,
+//     };
+//   } catch (error) {
+//     console.error('updateBillsBatch error:', error);
+
+//     // Local storage fallback batch update
+//     const store = readLocalStorage();
+//     let updatedCount = 0;
+//     const nowIso = new Date().toISOString();
+
+//     store.bills = store.bills.map((b) => {
+//       if (ids.includes(Number(b.id))) {
+//         updatedCount++;
+//         const updated = { ...b, status, updated_at: nowIso };
+//         if (status === 'Paid') {
+//           updated.paid_by = options?.paidBy || 'Accounts Staff';
+//           updated.paid_at = nowIso;
+//           updated.payment_method = options?.paymentMethod || 'Cash';
+//           if (options?.paymentNote) updated.payment_note = options.paymentNote.trim();
+//         } else if (status === 'Rejected' && options?.reason) {
+//           updated.rejection_reason = options.reason.trim();
+//         }
+//         return updated;
+//       }
+//       return b;
+//     });
+
+//     writeLocalStorage(store);
+//     return { success: true, updatedCount };
+//   }
+// }
+
+
+// export async function updateBillStatusById(
+//   id: number,
+//   status: BillStatus,
+//   options?: {
+//     reason?: string;
+//     approverName?: string;
+//     paidBy?: string;
+//     paymentMethod?: string;
+//     paymentNote?: string;
+//   }
+// ): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+//   const result = await updateBillsBatch([id], status, {
+//     reason: options?.reason,
+//     paidBy: options?.paidBy || options?.approverName,
+//     paymentMethod: options?.paymentMethod,
+//     paymentNote: options?.paymentNote,
+//   });
+
+//   if (!result.success) {
+//     return { success: false, error: result.error };
+//   }
+
+//   const updatedBill = await getBillById(id);
+//   return { success: true, bill: updatedBill || undefined };
+// }
+
+export async function updateBillStatusById(
+  id: number,
+  status: BillStatus,
+  options?: {
+    reason?: string;
+    approverName?: string;
+    paidBy?: string;
+    paymentMethod?: string;
+    paymentNote?: string;
+    approvedAmount?: number; // <-- ১. আংশিক টাকার পরিমাণ রিসিভ করার জন্য এটি যোগ করুন
+  }
+): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+  const result = await updateBillsBatch([id], status, {
+    reason: options?.reason,
+    paidBy: options?.paidBy || options?.approverName,
+    paymentMethod: options?.paymentMethod,
+    paymentNote: options?.paymentNote,
+    approvedAmount: options?.approvedAmount, // <-- ২. এখানে updateBillsBatch-এ পাস করে দিন
+  });
+
+  if (!result.success) {
+    return { success: false, error: result.error };
+  }
+
+  const updatedBill = await getBillById(id);
+  return { success: true, bill: updatedBill || undefined };
+}
 export async function updateBillsBatch(
   ids: number[],
   status: BillStatus,
@@ -1031,6 +1158,7 @@ export async function updateBillsBatch(
     paidBy?: string;
     paymentMethod?: string;
     paymentNote?: string;
+    approvedAmount?: number; // <-- ১. নতুন approvedAmount অপশন যোগ করা হলো
   }
 ): Promise<{ success: boolean; updatedCount: number; error?: string }> {
   if (!ids || ids.length === 0) return { success: true, updatedCount: 0 };
@@ -1041,6 +1169,12 @@ export async function updateBillsBatch(
 
     let sql = 'UPDATE bills SET status = ?, updated_at = NOW()';
     const params: any[] = [status];
+
+    // ২. যদি Approved হয় এবং approvedAmount পাঠানো হয়, তবে amount কলাম আপডেট হবে
+    if (status === 'Approved' && options?.approvedAmount !== undefined) {
+      sql += ', amount = ?';
+      params.push(options.approvedAmount);
+    }
 
     if (status === 'Paid') {
       sql += ', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?';
@@ -1074,7 +1208,13 @@ export async function updateBillsBatch(
     store.bills = store.bills.map((b) => {
       if (ids.includes(Number(b.id))) {
         updatedCount++;
-        const updated = { ...b, status, updated_at: nowIso };
+        const updated: any = { ...b, status, updated_at: nowIso };
+
+        // Local storage-এ partial amount আপডেট করা
+        if (status === 'Approved' && options?.approvedAmount !== undefined) {
+          updated.amount = options.approvedAmount;
+        }
+
         if (status === 'Paid') {
           updated.paid_by = options?.paidBy || 'Accounts Staff';
           updated.paid_at = nowIso;
@@ -1093,31 +1233,11 @@ export async function updateBillsBatch(
   }
 }
 
-export async function updateBillStatusById(
-  id: number,
-  status: BillStatus,
-  options?: {
-    reason?: string;
-    approverName?: string;
-    paidBy?: string;
-    paymentMethod?: string;
-    paymentNote?: string;
-  }
-): Promise<{ success: boolean; bill?: Bill; error?: string }> {
-  const result = await updateBillsBatch([id], status, {
-    reason: options?.reason,
-    paidBy: options?.paidBy || options?.approverName,
-    paymentMethod: options?.paymentMethod,
-    paymentNote: options?.paymentNote,
-  });
 
-  if (!result.success) {
-    return { success: false, error: result.error };
-  }
 
-  const updatedBill = await getBillById(id);
-  return { success: true, bill: updatedBill || undefined };
-}
+
+
+
 
 export async function getDashboardStats(filter?: {
   role?: UserRole;

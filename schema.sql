@@ -1,4 +1,3 @@
-
 -- 1. Create and select the database
 CREATE DATABASE IF NOT EXISTS `isp_billing` 
   DEFAULT CHARACTER SET utf8mb4 
@@ -84,7 +83,6 @@ CREATE TABLE IF NOT EXISTS `bills` (
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
 
-
 -- log table
 -- -----------------------------------------------------
 -- Table: activity_logs (Client & System Activity Tracking)
@@ -109,8 +107,6 @@ CREATE TABLE IF NOT EXISTS `activity_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-
-
 CREATE TABLE pocs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL UNIQUE,
@@ -118,27 +114,19 @@ CREATE TABLE pocs (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 CREATE TABLE IF NOT EXISTS clients (
     id INT AUTO_INCREMENT PRIMARY KEY,
-
     client_id VARCHAR(100) NOT NULL UNIQUE,
     client_name VARCHAR(150) NOT NULL,
     client_phone VARCHAR(30) DEFAULT NULL,
-
     primary_ip VARCHAR(50) DEFAULT NULL,
     primary_onu VARCHAR(150) DEFAULT NULL,
-
     secondary_ip VARCHAR(50) DEFAULT NULL,
     secondary_onu VARCHAR(150) DEFAULT NULL,
-
     location VARCHAR(255) DEFAULT NULL,
-
     poc_id INT DEFAULT NULL,
-
     status ENUM('Connected', 'Disconnected')
         NOT NULL DEFAULT 'Connected',
-
     description TEXT DEFAULT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
