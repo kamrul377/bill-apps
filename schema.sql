@@ -83,6 +83,21 @@ CREATE TABLE IF NOT EXISTS `bills` (
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
 
+
+
+ALTER TABLE `bills` 
+ADD COLUMN `approved_by_id` INT DEFAULT NULL COMMENT 'Reference to users.id who approved' AFTER `status`,
+ADD COLUMN `approved_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Timestamp when approved' AFTER `approved_by_id`;
+
+ALTER TABLE `bills`
+ADD CONSTRAINT `fk_bills_approver`
+  FOREIGN KEY (`approved_by_id`)
+  REFERENCES `users` (`id`)
+  ON UPDATE CASCADE
+  ON DELETE SET NULL;
+
+
+  
 -- log table
 -- -----------------------------------------------------
 -- Table: activity_logs (Client & System Activity Tracking)

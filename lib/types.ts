@@ -81,6 +81,9 @@ export interface Bill {
   paid_at?: string;
   payment_method?: string;
   payment_note?: string;
+  approved_by_id?: number;     // <--- Eta add korun
+  approved_by?: string;        // <--- Eta add korun
+  approved_at?: string;
 }
 
 export interface DashboardStats {
@@ -95,3 +98,4 @@ export interface DashboardStats {
   rejectedVolumeTk: number;
   paidVolumeTk: number;
 }
+

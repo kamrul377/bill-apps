@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { getPool } from '@/lib/db';
-
+import { getCurrentUser, unauthorized, forbidden } from '@/lib/server-auth';
 interface ClientRow extends RowDataPacket {
     id: number;
     client_id: string;
@@ -72,13 +72,66 @@ function validateStatus(value: unknown) {
         : null;
 }
 
+// // GET /api/clients
+// export async function GET() {
+
+//     try {
+//         const pool = getPool();
+
+//         const [rows] = await pool.query<ClientRow[]>(
+//             `
+//             SELECT
+//                 c.id,
+//                 c.client_id,
+//                 c.client_name,
+//                 c.client_phone,
+//                 c.primary_ip,
+//                 c.primary_onu,
+//                 c.secondary_ip,
+//                 c.secondary_onu,
+//                 c.location,
+//                 c.poc_id,
+//                 p.name AS poc_name,
+//                 c.status,
+//                 c.description,
+//                 c.created_at,
+//                 c.updated_at
+//             FROM clients c
+//             LEFT JOIN pocs p
+//                 ON c.poc_id = p.id
+//             ORDER BY c.id DESC
+//             `
+//         );
+
+//         return NextResponse.json(
+//             rows.map(formatClient)
+//         );
+//     } catch (error) {
+//         console.error('GET /api/clients error:', error);
+
+//         return NextResponse.json(
+//             {
+//                 message: 'Failed to load clients.',
+//             },
+//             { status: 500 }
+//         );
+//     }
+// }
+
+// // POST /api/clients
+
 // GET /api/clients
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const user = await getCurrentUser(request);
+
+    if (!user) {
+        return unauthorized();
+    }
+
     try {
         const pool = getPool();
 
-        const [rows] = await pool.query<ClientRow[]>(
-            `
+        const [rows] = await pool.query<ClientRow[]>(`
             SELECT
                 c.id,
                 c.client_id,
@@ -96,29 +149,34 @@ export async function GET() {
                 c.created_at,
                 c.updated_at
             FROM clients c
-            LEFT JOIN pocs p
-                ON c.poc_id = p.id
+            LEFT JOIN pocs p ON c.poc_id = p.id
             ORDER BY c.id DESC
-            `
-        );
+        `);
 
-        return NextResponse.json(
-            rows.map(formatClient)
-        );
+        return NextResponse.json(rows.map(formatClient));
     } catch (error) {
         console.error('GET /api/clients error:', error);
 
         return NextResponse.json(
-            {
-                message: 'Failed to load clients.',
-            },
+            { message: 'Failed to load clients.' },
             { status: 500 }
         );
     }
 }
 
-// POST /api/clients
+
 export async function POST(request: NextRequest) {
+
+    const user = await getCurrentUser(request);
+
+    if (!user) {
+        return unauthorized();
+    }
+
+    if (user.role !== 'admin') {
+        return forbidden();
+    }
+
     try {
         const body = await request.json();
 

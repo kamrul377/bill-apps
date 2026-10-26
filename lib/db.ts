@@ -794,6 +794,227 @@ export interface BillFilterOptions {
   currentUserName?: string;
 }
 
+
+// get bills
+// export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+
+//     let sql = `
+//       SELECT
+//         b.id,
+//         b.ticket_id,
+//         b.user_id,
+//         b.category_id,
+//         c.name AS category_name,
+//         b.amount,
+//         b.description,
+//         DATE_FORMAT(b.date, '%Y-%m-%d') as date,
+//         b.status,
+//         b.created_by,
+//         b.rejection_reason,
+//         b.paid_by,
+//         b.paid_at,
+//         b.payment_method,
+//         b.payment_note,
+//         b.created_at,
+//         b.updated_at
+//       FROM bills b
+//       LEFT JOIN bill_categories c ON b.category_id = c.id
+//       WHERE 1=1
+//     `;
+//     const params: (string | number)[] = [];
+
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       sql += ' AND (LOWER(b.created_by) LIKE LOWER(?) OR LOWER(b.created_by) LIKE LOWER(?))';
+//       const uid = `%${filter.currentUserId.trim()}%`;
+//       const uname = `%${filter.currentUserName ? filter.currentUserName.trim() : filter.currentUserId.trim()}%`;
+//       params.push(uid, uname);
+//     }
+
+//     if (filter?.status && filter.status !== 'ALL') {
+//       sql += ' AND UPPER(b.status) = UPPER(?)';
+//       params.push(filter.status);
+//     }
+
+//     if (filter?.search) {
+//       const q = `%${filter.search.trim()}%`;
+//       sql += ' AND (b.ticket_id LIKE ? OR b.user_id LIKE ? OR b.description LIKE ? OR b.created_by LIKE ?)';
+//       params.push(q, q, q, q);
+//     }
+
+//     sql += ' ORDER BY b.date DESC, b.id DESC';
+
+//     const [rows] = await p.query<RowDataPacket[]>(sql, params);
+
+//     return rows.map((r) => ({
+//       id: Number(r.id),
+//       ticket_id: String(r.ticket_id),
+//       user_id: String(r.user_id),
+//       category_id: r.category_id ? Number(r.category_id) : undefined,
+//       category_name: r.category_name ? String(r.category_name) : 'General',
+//       amount: Number(r.amount),
+//       description: String(r.description),
+//       date: String(r.date),
+//       status: r.status as BillStatus,
+//       created_by: r.created_by ? String(r.created_by) : undefined,
+//       rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+//       paid_by: r.paid_by ? String(r.paid_by) : undefined,
+//       paid_at: safeIsoDate(r.paid_at),
+//       payment_method: r.payment_method ? String(r.payment_method) : undefined,
+//       payment_note: r.payment_note ? String(r.payment_note) : undefined,
+//       created_at: safeIsoDate(r.created_at),
+//       updated_at: safeIsoDate(r.updated_at),
+//     }));
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     let list = [...store.bills];
+
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       const uid = filter.currentUserId.trim().toLowerCase();
+//       const uname = (filter.currentUserName || '').trim().toLowerCase();
+//       list = list.filter((b) => {
+//         if (!b.created_by) return false;
+//         const cb = b.created_by.toLowerCase();
+//         return cb.includes(uid) || (uname && cb.includes(uname));
+//       });
+//     }
+
+//     if (filter?.status && filter.status !== 'ALL') {
+//       list = list.filter((b) => b.status.toUpperCase() === filter.status!.toUpperCase());
+//     }
+
+//     if (filter?.search) {
+//       const q = filter.search.toLowerCase();
+//       list = list.filter(
+//         (b) =>
+//           b.ticket_id.toLowerCase().includes(q) ||
+//           b.user_id.toLowerCase().includes(q) ||
+//           b.description.toLowerCase().includes(q) ||
+//           (b.created_by && b.created_by.toLowerCase().includes(q))
+//       );
+//     }
+
+//     list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+//     return list;
+//   }
+// }
+// export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+
+//     let sql = `
+//       SELECT
+//         b.id,
+//         b.ticket_id,
+//         b.user_id,
+//         b.category_id,
+//         c.name AS category_name,
+//         b.amount,
+//         b.description,
+//         DATE_FORMAT(b.date, '%Y-%m-%d') as date,
+//         b.status,
+//         b.created_by,
+//         b.approved_by_id,
+//         u.user_id AS approved_by,
+//         b.approved_at,
+//         b.rejection_reason,
+//         b.paid_by,
+//         b.paid_at,
+//         b.payment_method,
+//         b.payment_note,
+//         b.created_at,
+//         b.updated_at
+//       FROM bills b
+//       LEFT JOIN bill_categories c ON b.category_id = c.id
+//       LEFT JOIN users u ON b.approved_by_id = u.id
+//       WHERE 1=1
+//     `;
+//     const params: (string | number)[] = [];
+
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       sql += ' AND (LOWER(b.created_by) LIKE LOWER(?) OR LOWER(b.created_by) LIKE LOWER(?))';
+//       const uid = `%${filter.currentUserId.trim()}%`;
+//       const uname = `%${filter.currentUserName ? filter.currentUserName.trim() : filter.currentUserId.trim()}%`;
+//       params.push(uid, uname);
+//     }
+
+//     if (filter?.status && filter.status !== 'ALL') {
+//       sql += ' AND UPPER(b.status) = UPPER(?)';
+//       params.push(filter.status);
+//     }
+
+//     if (filter?.search) {
+//       const q = `%${filter.search.trim()}%`;
+//       sql += ' AND (b.ticket_id LIKE ? OR b.user_id LIKE ? OR b.description LIKE ? OR b.created_by LIKE ?)';
+//       params.push(q, q, q, q);
+//     }
+
+//     sql += ' ORDER BY b.date DESC, b.id DESC';
+
+//     const [rows] = await p.query<RowDataPacket[]>(sql, params);
+
+//     return rows.map((r) => ({
+//       id: Number(r.id),
+//       ticket_id: String(r.ticket_id),
+//       user_id: String(r.user_id),
+//       category_id: r.category_id ? Number(r.category_id) : undefined,
+//       category_name: r.category_name ? String(r.category_name) : 'General',
+//       amount: Number(r.amount),
+//       description: String(r.description),
+//       date: String(r.date),
+//       status: r.status as BillStatus,
+//       created_by: r.created_by ? String(r.created_by) : undefined,
+//       approved_by_id: r.approved_by_id ? Number(r.approved_by_id) : undefined,
+//       approved_by: r.approved_by ? String(r.approved_by) : undefined,
+//       approved_at: safeIsoDate(r.approved_at),
+//       rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+//       paid_by: r.paid_by ? String(r.paid_by) : undefined,
+//       paid_at: safeIsoDate(r.paid_at),
+//       payment_method: r.payment_method ? String(r.payment_method) : undefined,
+//       payment_note: r.payment_note ? String(r.payment_note) : undefined,
+//       created_at: safeIsoDate(r.created_at),
+//       updated_at: safeIsoDate(r.updated_at),
+//     }));
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     let list = [...store.bills];
+
+//     if (filter?.role === 'support') {
+//       if (!filter.currentUserId) return [];
+//       const uid = filter.currentUserId.trim().toLowerCase();
+//       const uname = (filter.currentUserName || '').trim().toLowerCase();
+//       list = list.filter((b) => {
+//         if (!b.created_by) return false;
+//         const cb = b.created_by.toLowerCase();
+//         return cb.includes(uid) || (uname && cb.includes(uname));
+//       });
+//     }
+
+//     if (filter?.status && filter.status !== 'ALL') {
+//       list = list.filter((b) => b.status.toUpperCase() === filter.status!.toUpperCase());
+//     }
+
+//     if (filter?.search) {
+//       const q = filter.search.toLowerCase();
+//       list = list.filter(
+//         (b) =>
+//           b.ticket_id.toLowerCase().includes(q) ||
+//           b.user_id.toLowerCase().includes(q) ||
+//           b.description.toLowerCase().includes(q) ||
+//           (b.created_by && b.created_by.toLowerCase().includes(q))
+//       );
+//     }
+
+//     list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+//     return list;
+//   }
+// }
 export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
   try {
     await ensureTables();
@@ -811,6 +1032,9 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
         DATE_FORMAT(b.date, '%Y-%m-%d') as date,
         b.status,
         b.created_by,
+        b.approved_by_id,
+        u.name AS approved_by,
+        b.approved_at,
         b.rejection_reason,
         b.paid_by,
         b.paid_at,
@@ -820,6 +1044,7 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
         b.updated_at
       FROM bills b
       LEFT JOIN bill_categories c ON b.category_id = c.id
+      LEFT JOIN users u ON b.approved_by_id = u.id
       WHERE 1=1
     `;
     const params: (string | number)[] = [];
@@ -858,6 +1083,9 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
       date: String(r.date),
       status: r.status as BillStatus,
       created_by: r.created_by ? String(r.created_by) : undefined,
+      approved_by_id: r.approved_by_id ? Number(r.approved_by_id) : undefined,
+      approved_by: r.approved_by ? String(r.approved_by) : undefined,
+      approved_at: safeIsoDate(r.approved_at),
       rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
       paid_by: r.paid_by ? String(r.paid_by) : undefined,
       paid_at: safeIsoDate(r.paid_at),
@@ -900,6 +1128,10 @@ export async function getBills(filter?: BillFilterOptions): Promise<Bill[]> {
     return list;
   }
 }
+
+
+
+
 
 export async function createBill(data: {
   ticket_id: string;
@@ -984,14 +1216,55 @@ export async function createBill(data: {
   }
 }
 
+// export async function getBillById(id: number): Promise<Bill | null> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [rows] = await p.query<RowDataPacket[]>(
+//       `SELECT id, ticket_id, user_id, amount, description, DATE_FORMAT(date, '%Y-%m-%d') as date,
+//               status, created_by, rejection_reason, paid_by, paid_at, payment_method, payment_note, created_at, updated_at
+//        FROM bills WHERE id = ? LIMIT 1`,
+//       [id]
+//     );
+
+//     if (rows && rows.length > 0) {
+//       const r = rows[0];
+//       return {
+//         id: Number(r.id),
+//         ticket_id: String(r.ticket_id),
+//         user_id: String(r.user_id),
+//         amount: Number(r.amount),
+//         description: String(r.description),
+//         date: String(r.date),
+//         status: r.status as BillStatus,
+//         created_by: r.created_by ? String(r.created_by) : undefined,
+//         rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
+//         paid_by: r.paid_by ? String(r.paid_by) : undefined,
+//         paid_at: safeIsoDate(r.paid_at),
+//         payment_method: r.payment_method ? String(r.payment_method) : undefined,
+//         payment_note: r.payment_note ? String(r.payment_note) : undefined,
+//         created_at: safeIsoDate(r.created_at),
+//         updated_at: safeIsoDate(r.updated_at),
+//       };
+//     }
+//     return null;
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     return store.bills.find((b) => Number(b.id) === id) || null;
+//   }
+// }
+
 export async function getBillById(id: number): Promise<Bill | null> {
   try {
     await ensureTables();
     const p = getPool();
     const [rows] = await p.query<RowDataPacket[]>(
-      `SELECT id, ticket_id, user_id, amount, description, DATE_FORMAT(date, '%Y-%m-%d') as date,
-              status, created_by, rejection_reason, paid_by, paid_at, payment_method, payment_note, created_at, updated_at
-       FROM bills WHERE id = ? LIMIT 1`,
+      `SELECT b.id, b.ticket_id, b.user_id, b.amount, b.description, DATE_FORMAT(b.date, '%Y-%m-%d') as date,
+              b.status, b.created_by, b.approved_by_id, u.name AS approved_by, b.approved_at,
+              b.rejection_reason, b.paid_by, b.paid_at, b.payment_method, b.payment_note, b.created_at, b.updated_at
+       FROM bills b
+       LEFT JOIN users u ON b.approved_by_id = u.id
+       WHERE b.id = ? LIMIT 1`,
       [id]
     );
 
@@ -1006,6 +1279,9 @@ export async function getBillById(id: number): Promise<Bill | null> {
         date: String(r.date),
         status: r.status as BillStatus,
         created_by: r.created_by ? String(r.created_by) : undefined,
+        approved_by_id: r.approved_by_id ? Number(r.approved_by_id) : undefined,
+        approved_by: r.approved_by ? String(r.approved_by) : undefined,
+        approved_at: safeIsoDate(r.approved_at),
         rejection_reason: r.rejection_reason ? String(r.rejection_reason) : undefined,
         paid_by: r.paid_by ? String(r.paid_by) : undefined,
         paid_at: safeIsoDate(r.paid_at),
@@ -1022,8 +1298,34 @@ export async function getBillById(id: number): Promise<Bill | null> {
   }
 }
 
-// ==================== FAST BATCH UPDATE FUNCTION ====================
 
+export async function updateBillStatusById(
+  id: number,
+  status: BillStatus,
+  options?: {
+    reason?: string;
+    approverName?: string;
+    paidBy?: string;
+    paymentMethod?: string;
+    paymentNote?: string;
+    approvedAmount?: number; // <-- ১. আংশিক টাকার পরিমাণ রিসিভ করার জন্য এটি যোগ করুন
+  }
+): Promise<{ success: boolean; bill?: Bill; error?: string }> {
+  const result = await updateBillsBatch([id], status, {
+    reason: options?.reason,
+    paidBy: options?.paidBy || options?.approverName,
+    paymentMethod: options?.paymentMethod,
+    paymentNote: options?.paymentNote,
+    approvedAmount: options?.approvedAmount, // <-- ২. এখানে updateBillsBatch-এ পাস করে দিন
+  });
+
+  if (!result.success) {
+    return { success: false, error: result.error };
+  }
+
+  const updatedBill = await getBillById(id);
+  return { success: true, bill: updatedBill || undefined };
+}
 
 
 // export async function updateBillsBatch(
@@ -1034,6 +1336,7 @@ export async function getBillById(id: number): Promise<Bill | null> {
 //     paidBy?: string;
 //     paymentMethod?: string;
 //     paymentNote?: string;
+//     approvedAmount?: number; // <-- ১. নতুন approvedAmount অপশন যোগ করা হলো
 //   }
 // ): Promise<{ success: boolean; updatedCount: number; error?: string }> {
 //   if (!ids || ids.length === 0) return { success: true, updatedCount: 0 };
@@ -1044,6 +1347,12 @@ export async function getBillById(id: number): Promise<Bill | null> {
 
 //     let sql = 'UPDATE bills SET status = ?, updated_at = NOW()';
 //     const params: any[] = [status];
+
+//     // ২. যদি Approved হয় এবং approvedAmount পাঠানো হয়, তবে amount কলাম আপডেট হবে
+//     if (status === 'Approved' && options?.approvedAmount !== undefined) {
+//       sql += ', amount = ?';
+//       params.push(options.approvedAmount);
+//     }
 
 //     if (status === 'Paid') {
 //       sql += ', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?';
@@ -1077,7 +1386,13 @@ export async function getBillById(id: number): Promise<Bill | null> {
 //     store.bills = store.bills.map((b) => {
 //       if (ids.includes(Number(b.id))) {
 //         updatedCount++;
-//         const updated = { ...b, status, updated_at: nowIso };
+//         const updated: any = { ...b, status, updated_at: nowIso };
+
+//         // Local storage-এ partial amount আপডেট করা
+//         if (status === 'Approved' && options?.approvedAmount !== undefined) {
+//           updated.amount = options.approvedAmount;
+//         }
+
 //         if (status === 'Paid') {
 //           updated.paid_by = options?.paidBy || 'Accounts Staff';
 //           updated.paid_at = nowIso;
@@ -1095,61 +1410,6 @@ export async function getBillById(id: number): Promise<Bill | null> {
 //     return { success: true, updatedCount };
 //   }
 // }
-
-
-// export async function updateBillStatusById(
-//   id: number,
-//   status: BillStatus,
-//   options?: {
-//     reason?: string;
-//     approverName?: string;
-//     paidBy?: string;
-//     paymentMethod?: string;
-//     paymentNote?: string;
-//   }
-// ): Promise<{ success: boolean; bill?: Bill; error?: string }> {
-//   const result = await updateBillsBatch([id], status, {
-//     reason: options?.reason,
-//     paidBy: options?.paidBy || options?.approverName,
-//     paymentMethod: options?.paymentMethod,
-//     paymentNote: options?.paymentNote,
-//   });
-
-//   if (!result.success) {
-//     return { success: false, error: result.error };
-//   }
-
-//   const updatedBill = await getBillById(id);
-//   return { success: true, bill: updatedBill || undefined };
-// }
-
-export async function updateBillStatusById(
-  id: number,
-  status: BillStatus,
-  options?: {
-    reason?: string;
-    approverName?: string;
-    paidBy?: string;
-    paymentMethod?: string;
-    paymentNote?: string;
-    approvedAmount?: number; // <-- ১. আংশিক টাকার পরিমাণ রিসিভ করার জন্য এটি যোগ করুন
-  }
-): Promise<{ success: boolean; bill?: Bill; error?: string }> {
-  const result = await updateBillsBatch([id], status, {
-    reason: options?.reason,
-    paidBy: options?.paidBy || options?.approverName,
-    paymentMethod: options?.paymentMethod,
-    paymentNote: options?.paymentNote,
-    approvedAmount: options?.approvedAmount, // <-- ২. এখানে updateBillsBatch-এ পাস করে দিন
-  });
-
-  if (!result.success) {
-    return { success: false, error: result.error };
-  }
-
-  const updatedBill = await getBillById(id);
-  return { success: true, bill: updatedBill || undefined };
-}
 export async function updateBillsBatch(
   ids: number[],
   status: BillStatus,
@@ -1158,7 +1418,8 @@ export async function updateBillsBatch(
     paidBy?: string;
     paymentMethod?: string;
     paymentNote?: string;
-    approvedAmount?: number; // <-- ১. নতুন approvedAmount অপশন যোগ করা হলো
+    approverUserId?: number;
+    approvedAmount?: number;
   }
 ): Promise<{ success: boolean; updatedCount: number; error?: string }> {
   if (!ids || ids.length === 0) return { success: true, updatedCount: 0 };
@@ -1170,13 +1431,15 @@ export async function updateBillsBatch(
     let sql = 'UPDATE bills SET status = ?, updated_at = NOW()';
     const params: any[] = [status];
 
-    // ২. যদি Approved হয় এবং approvedAmount পাঠানো হয়, তবে amount কলাম আপডেট হবে
-    if (status === 'Approved' && options?.approvedAmount !== undefined) {
-      sql += ', amount = ?';
-      params.push(options.approvedAmount);
-    }
+    if (status === 'Approved') {
+      sql += ', approved_by_id = ?, approved_at = NOW()';
+      params.push(options?.approverUserId || null);
 
-    if (status === 'Paid') {
+      if (options?.approvedAmount !== undefined) {
+        sql += ', amount = ?';
+        params.push(options.approvedAmount);
+      }
+    } else if (status === 'Paid') {
       sql += ', paid_by = ?, paid_at = NOW(), payment_method = ?, payment_note = ?';
       params.push(
         options?.paidBy || 'Accounts Staff',
@@ -1205,17 +1468,18 @@ export async function updateBillsBatch(
     let updatedCount = 0;
     const nowIso = new Date().toISOString();
 
-    store.bills = store.bills.map((b) => {
+    store.bills = store.bills.map((b: any) => {
       if (ids.includes(Number(b.id))) {
         updatedCount++;
-        const updated: any = { ...b, status, updated_at: nowIso };
+        const updated = { ...b, status, updated_at: nowIso };
 
-        // Local storage-এ partial amount আপডেট করা
-        if (status === 'Approved' && options?.approvedAmount !== undefined) {
-          updated.amount = options.approvedAmount;
-        }
-
-        if (status === 'Paid') {
+        if (status === 'Approved') {
+          updated.approved_by_id = options?.approverUserId;
+          updated.approved_at = nowIso;
+          if (options?.approvedAmount !== undefined) {
+            updated.amount = options.approvedAmount;
+          }
+        } else if (status === 'Paid') {
           updated.paid_by = options?.paidBy || 'Accounts Staff';
           updated.paid_at = nowIso;
           updated.payment_method = options?.paymentMethod || 'Cash';
@@ -1232,11 +1496,6 @@ export async function updateBillsBatch(
     return { success: true, updatedCount };
   }
 }
-
-
-
-
-
 
 
 export async function getDashboardStats(filter?: {

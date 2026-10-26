@@ -1,6 +1,708 @@
+// 'use client';
+
+// import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
+// import Header from '@/components/Header';
+// import Sidebar, { NavPath } from '@/components/Sidebar';
+// import DashboardView from '@/components/DashboardView';
+// import CreateBillView from '@/components/CreateBillView';
+// import PendingApprovalView from '@/components/PendingApprovalView';
+// import ApprovedBillsView from '@/components/ApprovedBillsView';
+// import UserManagementView from '@/components/UserManagementView';
+// import LoginView from '@/components/LoginView';
+// import BillDetailModal from '@/components/BillDetailModal';
+// import BillVoucherModal from '@/components/BillVoucherModal';
+// import Toast, { ToastMessage } from '@/components/Toast';
+// import { useRouter } from 'next/navigation';
+
+// // Category Type import kora hoyeche
+// import { Bill, DashboardStats, User, Category } from '@/lib/types';
+
+// // const INITIAL_ADMIN: User = {
+// //   id: 1,
+// //   user_id: 'kamrul.cse9@gmail.com',
+// //   name: 'Kamrul Islam',
+// //   role: 'admin',
+// //   created_at: '2026-01-01T00:00:00Z',
+// // };
+
+// const INITIAL_STATS: DashboardStats = {
+//   totalBills: 0,
+//   pendingBills: 0,
+//   approvedBills: 0,
+//   paidBills: 0,
+//   rejectedBills: 0,
+//   totalVolumeTk: 0,
+//   pendingVolumeTk: 0,
+//   approvedVolumeTk: 0,
+//   paidVolumeTk: 0,
+//   rejectedVolumeTk: 0,
+// };
+
+// export default function Home() {
+//   const [isMounted, setIsMounted] = useState(false);
+
+//   const [currentUser, setCurrentUser] = useState<User>(() => {
+//     if (typeof window !== 'undefined') {
+//       try {
+//         const saved = sessionStorage.getItem('netbill_session_user');
+//         if (saved) return JSON.parse(saved);
+//       } catch {
+//         // fallback
+//       }
+//     }
+
+//     return INITIAL_ADMIN;
+//   });
+
+//   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+//     if (typeof window !== 'undefined') {
+//       try {
+//         return !!sessionStorage.getItem('netbill_session_user');
+//       } catch {
+//         return false;
+//       }
+//     }
+
+//     return false;
+//   });
+
+//   const [currentPath, setCurrentPath] = useState<NavPath>(() => {
+//     if (typeof window !== 'undefined') {
+//       try {
+//         const saved = sessionStorage.getItem('netbill_session_user');
+
+//         if (saved) {
+//           const user = JSON.parse(saved);
+
+//           if (user.role === 'support') return 'create-bill';
+//           if (user.role === 'manager') return 'pending-approval';
+//           if (user.role === 'accounts') return 'approved-bills';
+//         }
+//       } catch {
+//         // fallback
+//       }
+//     }
+
+//     return 'dashboard';
+//   });
+
+//   const [bills, setBills] = useState<Bill[]>([]);
+//   // Categories State
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [stats, setStats] = useState<DashboardStats>(INITIAL_STATS);
+
+//   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+//   const [detailModalBill, setDetailModalBill] = useState<Bill | null>(null);
+//   const [voucherModalBill, setVoucherModalBill] = useState<Bill | null>(null);
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+//   // =========================================================
+//   // TOAST
+//   // =========================================================
+
+//   const showToast = useCallback(
+//     (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+//       const id = `${Date.now()}-${Math.random()}`;
+
+//       setToasts((prev) => [...prev, { id, message, type }]);
+
+//       setTimeout(() => {
+//         setToasts((prev) => prev.filter((toast) => toast.id !== id));
+//       }, 4000);
+//     },
+//     []
+//   );
+
+//   const dismissToast = useCallback((id: string) => {
+//     setToasts((prev) => prev.filter((toast) => toast.id !== id));
+//   }, []);
+
+//   // =========================================================
+//   // LOAD DATA (BILLS & CATEGORIES)
+//   // =========================================================
+
+//   const loadCategories = useCallback(async () => {
+//     try {
+//       const res = await fetch('/api/categories', { cache: 'no-store' });
+//       if (res.ok) {
+//         const data = await res.json();
+//         setCategories(Array.isArray(data) ? data : data.categories || []);
+//       }
+//     } catch (error) {
+//       console.error('Failed to load categories:', error);
+//     }
+//   }, []);
+
+//   const loadData = useCallback(
+//     async (userOverride?: User) => {
+//       const userToQuery = userOverride || currentUser;
+
+//       if (!userToQuery) return;
+
+//       try {
+//         // Parallelly load categories as well
+//         loadCategories();
+
+//         const params = new URLSearchParams();
+
+//         if (userToQuery.role) {
+//           params.set('role', userToQuery.role);
+//         }
+
+//         if (userToQuery.user_id) {
+//           params.set('userId', userToQuery.user_id);
+//         }
+
+//         if (userToQuery.name) {
+//           params.set('userName', userToQuery.name);
+//         }
+
+//         const res = await fetch(`/api/bills?${params.toString()}`, {
+//           cache: 'no-store',
+//         });
+
+//         const data = await res.json();
+
+//         if (res.ok && data.bills) {
+//           setBills(data.bills);
+
+//           if (data.stats) {
+//             setStats(data.stats);
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Failed to load bills:', error);
+//       }
+//     },
+//     [currentUser, loadCategories]
+//   );
+
+//   useEffect(() => {
+//     loadData();
+//   }, [loadData]);
+
+//   // =========================================================
+//   // CATEGORY CRUD HANDLERS
+//   // =========================================================
+
+//   const handleCreateCategory = async (name: string) => {
+//     try {
+//       const res = await fetch('/api/categories', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ name }),
+//       });
+//       const data = await res.json();
+//       if (!res.ok) throw new Error(data.error || 'Failed to create category');
+
+//       showToast('Category created successfully', 'success');
+//       await loadCategories();
+//       await loadData();
+//     } catch (error: any) {
+//       showToast(error.message || 'Error creating category', 'error');
+//     }
+//   };
+
+//   const handleUpdateCategory = async (id: number, name: string) => {
+//     try {
+//       const res = await fetch(`/api/categories/${id}`, {
+//         method: 'PUT',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ name }),
+//       });
+//       const data = await res.json();
+//       if (!res.ok) throw new Error(data.error || 'Failed to update category');
+
+//       showToast('Category updated successfully', 'success');
+//       await loadCategories();
+//       await loadData();
+//     } catch (error: any) {
+//       showToast(error.message || 'Error updating category', 'error');
+//     }
+//   };
+
+//   const handleDeleteCategory = async (id: number) => {
+//     try {
+//       const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+//       const data = await res.json();
+//       if (!res.ok) throw new Error(data.error || 'Failed to delete category');
+
+//       showToast('Category deleted successfully', 'success');
+//       await loadCategories();
+//       await loadData();
+//     } catch (error: any) {
+//       showToast(error.message || 'Error deleting category', 'error');
+//     }
+//   };
+
+
+//   const handleUpdateStatus = async (
+//     billId: number,
+//     status: 'Approved' | 'Rejected',
+//     reason?: string,
+//     approvedAmount?: number
+//   ): Promise<void> => {
+//     try {
+//       // যদি আপনার রাউটটি `/api/bills` হয় (অথবা আপনার ডাইনামিক রাউট থাকে তবে পাথ ঠিক রাখবেন)
+//       const res = await fetch(`/api/bills`, {
+//         method: 'PATCH',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           billIds: [Number(billId)], // backend batch update-er sathe match korar jonno array dewa valo
+//           status,
+//           reason,
+//           approverUserId: currentUser.id, // <--- ডাটাবেজে approved_by_id সেভ করার জন্য এটি অত্যন্ত জরুরি
+//           approverName: `${currentUser.name} (${currentUser.role})`,
+//           approvedAmount,
+//         }),
+//       });
+
+//       const data = await res.json();
+
+//       if (!res.ok || !data.success) {
+//         throw new Error(data?.error || 'Failed to update bill status.');
+//       }
+
+//       await loadData();
+
+//       showToast(
+//         status === 'Approved'
+//           ? approvedAmount !== undefined
+//             ? `Bill partially approved for ৳${approvedAmount.toLocaleString()} successfully.`
+//             : 'Bill approved successfully.'
+//           : 'Bill rejected successfully.',
+//         'success'
+//       );
+//     } catch (error) {
+//       console.error('Update status error:', error);
+
+//       showToast(
+//         error instanceof Error
+//           ? error.message
+//           : 'Failed to update bill status.',
+//         'error'
+//       );
+
+//       throw error;
+//     }
+//   };
+
+
+//   const handleBatchApprove = async (billIds: number[]): Promise<void> => {
+//     if (!billIds.length) {
+//       showToast('No bills selected.', 'info');
+//       return;
+//     }
+
+//     try {
+//       // Single API call: 50-ta bill aksate 1-ta request-e pathano hocche
+//       const res = await fetch('/api/bills', {
+//         method: 'PATCH',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           billIds,
+//           status: 'Approved',
+//           approverUserId: currentUser?.id, // <--- ব্যাচ অ্যাপ্রুভালের ক্ষেত্রেও ম্যানেজারের আইডি পাঠানো হলো
+//           actionBy: currentUser?.name || 'Manager',
+//         }),
+//       });
+
+//       const data = await res.json();
+
+//       if (!res.ok || !data.success) {
+//         throw new Error(data.error || 'Failed to approve bills batch');
+//       }
+
+//       // Re-fetch list & stats
+//       await loadData();
+
+//       showToast(
+//         `${billIds.length} bill(s) approved successfully.`,
+//         'success'
+//       );
+//     } catch (error) {
+//       console.error('Batch approve error:', error);
+//       showToast('Failed to approve bills in batch.', 'error');
+//       throw error;
+//     }
+//   };
+
+
+
+//   // =========================================================
+//   // PAY BILL
+//   // =========================================================
+
+//   const handlePayBill = async (
+//     billId: number,
+//     paymentDetails: {
+//       paymentMethod: string;
+//       paymentNote?: string;
+//       paidBy?: string;
+//     }
+//   ): Promise<void> => {
+//     try {
+//       const res = await fetch(`/api/bills/${Number(billId)}`, {
+//         method: 'PATCH',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           status: 'Paid',
+//           paymentMethod: paymentDetails.paymentMethod,
+//           paymentNote: paymentDetails.paymentNote,
+//           paidBy:
+//             paymentDetails.paidBy ||
+//             `${currentUser.name} (${currentUser.role})`,
+//         }),
+//       });
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         throw new Error(data?.error || 'Failed to process payment.');
+//       }
+
+//       await loadData();
+
+//       showToast('Bill payment completed successfully.', 'success');
+//     } catch (error) {
+//       console.error('Payment processing error:', error);
+
+//       showToast(
+//         error instanceof Error
+//           ? error.message
+//           : 'Failed to process payment.',
+//         'error'
+//       );
+
+//       throw error;
+//     }
+//   };
+
+//   const handleBatchPayBills = async (
+//     billIds: number[],
+//     paymentDetails: {
+//       paymentMethod: string;
+//       paymentNote?: string;
+//       paidBy?: string;
+//     }
+//   ): Promise<void> => {
+//     if (!billIds.length) {
+//       showToast('No bills selected.', 'info');
+//       return;
+//     }
+
+//     try {
+//       // Single Batch API Request (No Loop)
+//       const res = await fetch('/api/bills', {
+//         method: 'PATCH',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({
+//           billIds,
+//           status: 'Paid',
+//           actionBy: paymentDetails.paidBy || currentUser?.name || 'Accounts Staff',
+//           paymentMethod: paymentDetails.paymentMethod || 'Cash',
+//           paymentNote: paymentDetails.paymentNote || '',
+//         }),
+//       });
+
+//       const textData = await res.text();
+//       let data;
+//       try {
+//         data = textData ? JSON.parse(textData) : {};
+//       } catch (e) {
+//         throw new Error(`Server response error (${res.status}): ${textData}`);
+//       }
+
+//       if (!res.ok || !data.success) {
+//         throw new Error(data.error || 'Failed to process batch payment.');
+//       }
+
+//       // Re-fetch list & stats instantly
+//       await loadData();
+
+//       showToast(
+//         `${billIds.length} bill(s) paid successfully.`,
+//         'success'
+//       );
+//     } catch (error: any) {
+//       console.error('Batch payment error:', error);
+//       showToast(error.message || 'Failed to pay bills in batch.', 'error');
+//       throw error;
+//     }
+//   };
+
+//   // =========================================================
+//   // BILL CREATED
+//   // =========================================================
+
+//   const handleBillCreated = (_newBill: Bill) => {
+//     loadData();
+//   };
+
+//   // =========================================================
+//   // LOGIN
+//   // =========================================================
+
+//   const handleLoginSuccess = (user: User) => {
+//     setCurrentUser(user);
+//     setIsLoggedIn(true);
+
+//     try {
+//       sessionStorage.setItem('netbill_session_user', JSON.stringify(user));
+//     } catch (error) {
+//       console.error(error);
+//     }
+
+//     loadData(user);
+
+//     if (user.role === 'support') {
+//       setCurrentPath('create-bill');
+//     } else if (user.role === 'manager') {
+//       setCurrentPath('pending-approval');
+//     } else if (user.role === 'accounts') {
+//       setCurrentPath('approved-bills');
+//     } else {
+//       setCurrentPath('dashboard');
+//     }
+//   };
+
+//   // =========================================================
+//   // LOGOUT
+//   // =========================================================
+
+//   // const handleLogout = () => {
+//   //   setIsLoggedIn(false);
+
+//   //   try {
+//   //     sessionStorage.removeItem('netbill_session_user');
+//   //   } catch (error) {
+//   //     console.error(error);
+//   //   }
+
+//   //   setBills([]);
+//   //   setCategories([]);
+//   //   setStats(INITIAL_STATS);
+
+//   //   showToast('Signed out of console.', 'info');
+//   // };
+
+//   const handleLogout = () => {
+//     void fetch('/api/auth/logout', { method: 'POST' });
+
+//     setIsLoggedIn(false);
+
+//     try {
+//       sessionStorage.removeItem('netbill_session_user');
+//     } catch (error) {
+//       console.error(error);
+//     }
+
+//     setBills([]);
+//     setCategories([]);
+//     setStats(INITIAL_STATS);
+
+//     showToast('Signed out of console.', 'info');
+//   };
+
+
+//   // =========================================================
+//   // NAVIGATION
+//   // =========================================================
+
+//   const handleNavigate = (path: NavPath) => {
+//     const role = currentUser.role;
+
+//     if (
+//       role === 'support' &&
+//       (path === 'pending-approval' ||
+//         path === 'approved-bills' ||
+//         path === 'user-management')
+//     ) {
+//       return;
+//     }
+
+//     if (
+//       role === 'accounts' &&
+//       (path === 'create-bill' ||
+//         path === 'pending-approval' ||
+//         path === 'user-management')
+//     ) {
+//       return;
+//     }
+
+//     if (role === 'manager' && path === 'create-bill') {
+//       return;
+//     }
+
+//     setCurrentPath(path);
+//   };
+
+//   // =========================================================
+//   // MOUNT
+//   // =========================================================
+
+//   useEffect(() => {
+//     setIsMounted(true);
+//   }, []);
+
+//   if (!isMounted) {
+//     return null;
+//   }
+
+//   // =========================================================
+//   // LOGIN
+//   // =========================================================
+
+//   if (!isLoggedIn) {
+//     return (
+//       <>
+//         <LoginView
+//           onLoginSuccess={handleLoginSuccess}
+//           onShowToast={showToast}
+//         />
+
+//         <Toast toasts={toasts} onDismiss={dismissToast} />
+//       </>
+//     );
+//   }
+
+//   // =========================================================
+//   // MAIN UI
+//   // =========================================================
+
+//   return (
+//     <div className="min-h-screen bg-surface-container-low text-on-surface">
+//       {/* Sidebar */}
+//       <Sidebar
+//         currentPath={currentPath}
+//         onNavigate={(path) => {
+//           handleNavigate(path);
+//           setIsMobileMenuOpen(false);
+//         }}
+//         userRole={currentUser.role}
+//         pendingCount={stats.pendingBills}
+//         isMobileOpen={isMobileMenuOpen}
+//         onCloseMobile={() => setIsMobileMenuOpen(false)}
+//       />
+
+//       {/* Header */}
+//       <Header
+//         currentUser={currentUser}
+//         onLogout={handleLogout}
+//         onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
+//       />
+
+//       {/* Main Content */}
+//       <main className="md:ml-60 ml-0 mt-16 p-3 sm:p-5 md:p-6 min-h-[calc(100vh-4rem)] flex flex-col transition-all">
+//         {/* Dashboard */}
+//         {currentPath === 'dashboard' && (
+//           <DashboardView
+//             bills={bills}
+//             stats={stats}
+//             currentUser={currentUser}
+//             categories={categories} // <--- Dynamic Categories List
+//             onCreateCategory={handleCreateCategory} // <--- Create Handler
+//             onUpdateCategory={handleUpdateCategory} // <--- Update Handler
+//             onDeleteCategory={handleDeleteCategory} // <--- Delete Handler
+//             onOpenCreateBill={() => setCurrentPath('create-bill')}
+//             onViewDetails={(bill) => setDetailModalBill(bill)}
+//           />
+//         )}
+
+//         {/* Create Bill */}
+//         {currentPath === 'create-bill' && (
+//           <CreateBillView
+//             currentUser={currentUser}
+//             recentBills={bills}
+//             onBillCreated={handleBillCreated}
+//             onNavigateToBills={() => setCurrentPath('dashboard')}
+//             onShowToast={showToast}
+//           />
+//         )}
+
+//         {/* Pending Approval */}
+//         {currentPath === 'pending-approval' && (
+//           <PendingApprovalView
+//             bills={bills}
+//             currentUser={currentUser}
+//             onUpdateStatus={handleUpdateStatus}
+//             onBatchApprove={handleBatchApprove}
+//             onShowToast={showToast}
+//             categories={categories}
+//           />
+//         )}
+
+//         {/* Approved Bills */}
+//         {currentPath === 'approved-bills' && (
+//           <ApprovedBillsView
+//             bills={bills}
+//             currentUser={currentUser}
+//             onViewDetails={(bill) => setDetailModalBill(bill)}
+//             onPrintSlip={(bill) => setVoucherModalBill(bill)}
+//             onPayBill={handlePayBill}
+//             onBatchPayBills={handleBatchPayBills}
+//             onShowToast={showToast}
+//           />
+//         )}
+
+//         {/* User Management */}
+//         {currentPath === 'user-management' && (
+//           <UserManagementView
+//             currentUser={currentUser}
+//             onShowToast={showToast}
+//           />
+//         )}
+//       </main>
+
+//       {/* Detail Modal */}
+//       <BillDetailModal
+//         bill={detailModalBill}
+//         isOpen={!!detailModalBill}
+//         onClose={() => setDetailModalBill(null)}
+//         onPrintVoucher={(bill) => {
+//           setDetailModalBill(null);
+//           setVoucherModalBill(bill);
+//         }}
+//       />
+
+//       {/* Voucher Modal */}
+//       <BillVoucherModal
+//         bill={voucherModalBill}
+//         isOpen={!!voucherModalBill}
+//         onClose={() => setVoucherModalBill(null)}
+//       />
+
+//       {/* Toast */}
+//       <Toast toasts={toasts} onDismiss={dismissToast} />
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+// ===================2nd=============================
+
+
+
+
+
+
+
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Header from '@/components/Header';
 import Sidebar, { NavPath } from '@/components/Sidebar';
@@ -13,18 +715,8 @@ import LoginView from '@/components/LoginView';
 import BillDetailModal from '@/components/BillDetailModal';
 import BillVoucherModal from '@/components/BillVoucherModal';
 import Toast, { ToastMessage } from '@/components/Toast';
-import { useRouter } from 'next/navigation';
 
-// Category Type import kora hoyeche
 import { Bill, DashboardStats, User, Category } from '@/lib/types';
-
-const INITIAL_ADMIN: User = {
-  id: 1,
-  user_id: 'kamrul.cse9@gmail.com',
-  name: 'Kamrul Islam',
-  role: 'admin',
-  created_at: '2026-01-01T00:00:00Z',
-};
 
 const INITIAL_STATS: DashboardStats = {
   totalBills: 0,
@@ -41,99 +733,149 @@ const INITIAL_STATS: DashboardStats = {
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const [currentUser, setCurrentUser] = useState<User>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = sessionStorage.getItem('netbill_session_user');
-        if (saved) return JSON.parse(saved);
-      } catch {
-        // fallback
-      }
-    }
-
-    return INITIAL_ADMIN;
-  });
-
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return !!sessionStorage.getItem('netbill_session_user');
-      } catch {
-        return false;
-      }
-    }
-
-    return false;
-  });
-
-  const [currentPath, setCurrentPath] = useState<NavPath>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = sessionStorage.getItem('netbill_session_user');
-
-        if (saved) {
-          const user = JSON.parse(saved);
-
-          if (user.role === 'support') return 'create-bill';
-          if (user.role === 'manager') return 'pending-approval';
-          if (user.role === 'accounts') return 'approved-bills';
-        }
-      } catch {
-        // fallback
-      }
-    }
-
-    return 'dashboard';
-  });
+  // User is obtained from the server session, not sessionStorage.
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPath, setCurrentPath] =
+    useState<NavPath>('dashboard');
 
   const [bills, setBills] = useState<Bill[]>([]);
-  // Categories State
   const [categories, setCategories] = useState<Category[]>([]);
   const [stats, setStats] = useState<DashboardStats>(INITIAL_STATS);
-
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const [detailModalBill, setDetailModalBill] = useState<Bill | null>(null);
-  const [voucherModalBill, setVoucherModalBill] = useState<Bill | null>(null);
+  const [detailModalBill, setDetailModalBill] =
+    useState<Bill | null>(null);
+  const [voucherModalBill, setVoucherModalBill] =
+    useState<Bill | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // =========================================================
+  // MOUNT
+  // =========================================================
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // =========================================================
+  // VERIFY SESSION FROM SERVER
+  // =========================================================
+
+  useEffect(() => {
+    let active = true;
+
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          if (active) {
+            setCurrentUser(null);
+            setIsLoggedIn(false);
+          }
+          return;
+        }
+
+        const data = await response.json();
+
+        if (active && data.success && data.user) {
+          setCurrentUser(data.user);
+          setIsLoggedIn(true);
+
+          if (data.user.role === 'support') {
+            setCurrentPath('create-bill');
+          } else if (data.user.role === 'manager') {
+            setCurrentPath('pending-approval');
+          } else if (data.user.role === 'accounts') {
+            setCurrentPath('approved-bills');
+          } else {
+            setCurrentPath('dashboard');
+          }
+        } else if (active) {
+          setCurrentUser(null);
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Session verification failed:', error);
+
+        if (active) {
+          setCurrentUser(null);
+          setIsLoggedIn(false);
+        }
+      } finally {
+        if (active) {
+          setAuthLoading(false);
+        }
+      }
+    }
+
+    void checkSession();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // =========================================================
   // TOAST
   // =========================================================
 
   const showToast = useCallback(
-    (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-      const id = `${Date.now()}-${Math.random()}`;
+    (
+      message: string,
+      type: 'success' | 'error' | 'info' = 'info'
+    ) => {
+      const id = `${Date.now()} -${Math.random()} `;
 
       setToasts((prev) => [...prev, { id, message, type }]);
 
       setTimeout(() => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+        setToasts((prev) =>
+          prev.filter((toast) => toast.id !== id)
+        );
       }, 4000);
     },
     []
   );
 
   const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    setToasts((prev) =>
+      prev.filter((toast) => toast.id !== id)
+    );
   }, []);
 
   // =========================================================
-  // LOAD DATA (BILLS & CATEGORIES)
+  // LOAD CATEGORIES
   // =========================================================
 
   const loadCategories = useCallback(async () => {
     try {
-      const res = await fetch('/api/categories', { cache: 'no-store' });
+      const res = await fetch('/api/categories', {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
+
       if (res.ok) {
         const data = await res.json();
-        setCategories(Array.isArray(data) ? data : data.categories || []);
+        setCategories(
+          Array.isArray(data) ? data : data.categories || []
+        );
       }
     } catch (error) {
       console.error('Failed to load categories:', error);
     }
   }, []);
+
+  // =========================================================
+  // LOAD BILLS & STATS
+  // =========================================================
 
   const loadData = useCallback(
     async (userOverride?: User) => {
@@ -142,30 +884,27 @@ export default function Home() {
       if (!userToQuery) return;
 
       try {
-        // Parallelly load categories as well
-        loadCategories();
+        void loadCategories();
 
-        const params = new URLSearchParams();
-
-        if (userToQuery.role) {
-          params.set('role', userToQuery.role);
-        }
-
-        if (userToQuery.user_id) {
-          params.set('userId', userToQuery.user_id);
-        }
-
-        if (userToQuery.name) {
-          params.set('userName', userToQuery.name);
-        }
-
-        const res = await fetch(`/api/bills?${params.toString()}`, {
+        // The API must derive identity and role from its
+        // verified server-side session cookie.
+        const res = await fetch('/api/bills', {
+          method: 'GET',
+          credentials: 'same-origin',
           cache: 'no-store',
         });
 
         const data = await res.json();
 
-        if (res.ok && data.bills) {
+        if (!res.ok) {
+          if (res.status === 401) {
+            setCurrentUser(null);
+            setIsLoggedIn(false);
+          }
+          throw new Error(data?.error || 'Failed to load bills.');
+        }
+
+        if (data.bills) {
           setBills(data.bills);
 
           if (data.stats) {
@@ -180,140 +919,137 @@ export default function Home() {
   );
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (isLoggedIn && currentUser) {
+      void loadData();
+    }
+  }, [isLoggedIn, currentUser, loadData]);
 
   // =========================================================
-  // CATEGORY CRUD HANDLERS
+  // CATEGORY CRUD
   // =========================================================
 
   const handleCreateCategory = async (name: string) => {
     try {
       const res = await fetch('/api/categories', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create category');
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || data.message || 'Failed to create category'
+        );
+      }
 
       showToast('Category created successfully', 'success');
       await loadCategories();
       await loadData();
-    } catch (error: any) {
-      showToast(error.message || 'Error creating category', 'error');
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : 'Error creating category',
+        'error'
+      );
     }
   };
 
-  const handleUpdateCategory = async (id: number, name: string) => {
+  const handleUpdateCategory = async (
+    id: number,
+    name: string
+  ) => {
     try {
-      const res = await fetch(`/api/categories/${id}`, {
+      const res = await fetch(`/ api / categories / ${id} `, {
         method: 'PUT',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update category');
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || data.message || 'Failed to update category'
+        );
+      }
 
       showToast('Category updated successfully', 'success');
       await loadCategories();
       await loadData();
-    } catch (error: any) {
-      showToast(error.message || 'Error updating category', 'error');
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : 'Error updating category',
+        'error'
+      );
     }
   };
 
   const handleDeleteCategory = async (id: number) => {
     try {
-      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/ api / categories / ${id} `, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to delete category');
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || data.message || 'Failed to delete category'
+        );
+      }
 
       showToast('Category deleted successfully', 'success');
       await loadCategories();
       await loadData();
-    } catch (error: any) {
-      showToast(error.message || 'Error deleting category', 'error');
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : 'Error deleting category',
+        'error'
+      );
     }
   };
 
   // =========================================================
-  // APPROVE / REJECT
-  // =========================================================
-
-  // const handleUpdateStatus = async (
-  //   billId: number,
-  //   status: 'Approved' | 'Rejected',
-  //   reason?: string
-  // ): Promise<void> => {
-  //   try {
-  //     const res = await fetch(`/api/bills/${Number(billId)}`, {
-  //       method: 'PATCH',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         status,
-  //         reason,
-  //         approverName: `${currentUser.name} (${currentUser.role})`,
-  //       }),
-  //     });
-
-  //     const data = await res.json();
-
-  //     if (!res.ok) {
-  //       throw new Error(data?.error || 'Failed to update bill status.');
-  //     }
-
-  //     await loadData();
-
-  //     showToast(
-  //       status === 'Approved'
-  //         ? 'Bill approved successfully.'
-  //         : 'Bill rejected successfully.',
-  //       'success'
-  //     );
-  //   } catch (error) {
-  //     console.error('Update status error:', error);
-
-  //     showToast(
-  //       error instanceof Error
-  //         ? error.message
-  //         : 'Failed to update bill status.',
-  //       'error'
-  //     );
-
-  //     throw error;
-  //   }
-  // };
-  // =========================================================
-  // APPROVE / REJECT (Updated to support approvedAmount)
+  // UPDATE BILL STATUS
   // =========================================================
 
   const handleUpdateStatus = async (
     billId: number,
     status: 'Approved' | 'Rejected',
     reason?: string,
-    approvedAmount?: number // <--- ১. এখানে approvedAmount প্যারামিটার যোগ করা হলো
+    approvedAmount?: number
   ): Promise<void> => {
+    if (!currentUser) return;
+
     try {
-      const res = await fetch(`/api/bills/${Number(billId)}`, {
+      const res = await fetch('/api/bills', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          billIds: [Number(billId)],
           status,
           reason,
-          approverName: `${currentUser.name} (${currentUser.role})`,
-          approvedAmount, // <--- ২. API-র বডিতে approvedAmount পাঠানো হলো
+          approvedAmount,
         }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data?.error || 'Failed to update bill status.');
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data?.error || data?.message || 'Failed to update bill status.'
+        );
       }
 
       await loadData();
@@ -340,58 +1076,39 @@ export default function Home() {
     }
   };
 
-
   // =========================================================
   // BATCH APPROVE
   // =========================================================
 
-  // const handleBatchApprove = async (billIds: number[]): Promise<void> => {
-  //   if (!billIds.length) {
-  //     showToast('No bills selected.', 'info');
-  //     return;
-  //   }
+  const handleBatchApprove = async (
+    billIds: number[]
+  ): Promise<void> => {
+    if (!currentUser) return;
 
-  //   try {
-  //     for (const billId of billIds) {
-  //       await handleUpdateStatus(Number(billId), 'Approved');
-  //     }
-
-  //     await loadData();
-
-  //     showToast(
-  //       `${billIds.length} bill(s) approved successfully.`,
-  //       'success'
-  //     );
-  //   } catch (error) {
-  //     console.error('Batch approve error:', error);
-  //     throw error;
-  //   }
-  // };
-  const handleBatchApprove = async (billIds: number[]): Promise<void> => {
     if (!billIds.length) {
       showToast('No bills selected.', 'info');
       return;
     }
 
     try {
-      // Single API call: 50-ta bill aksate 1-ta request-e pathano hocche
       const res = await fetch('/api/bills', {
         method: 'PATCH',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           billIds,
           status: 'Approved',
-          actionBy: currentUser?.name || 'Manager',
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to approve bills batch');
+        throw new Error(
+          data.error || data.message || 'Failed to approve bills batch'
+        );
       }
 
-      // Re-fetch list & stats
       await loadData();
 
       showToast(
@@ -417,26 +1134,26 @@ export default function Home() {
       paidBy?: string;
     }
   ): Promise<void> => {
+    if (!currentUser) return;
+
     try {
-      const res = await fetch(`/api/bills/${Number(billId)}`, {
+      const res = await fetch(`/api/bills/${Number(billId)} `, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: 'Paid',
           paymentMethod: paymentDetails.paymentMethod,
           paymentNote: paymentDetails.paymentNote,
-          paidBy:
-            paymentDetails.paidBy ||
-            `${currentUser.name} (${currentUser.role})`,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || 'Failed to process payment.');
+        throw new Error(
+          data?.error || data?.message || 'Failed to process payment.'
+        );
       }
 
       await loadData();
@@ -460,35 +1177,6 @@ export default function Home() {
   // BATCH PAY
   // =========================================================
 
-  // const handleBatchPayBills = async (
-  //   billIds: number[],
-  //   paymentDetails: {
-  //     paymentMethod: string;
-  //     paymentNote?: string;
-  //     paidBy?: string;
-  //   }
-  // ): Promise<void> => {
-  //   if (!billIds.length) {
-  //     showToast('No bills selected.', 'info');
-  //     return;
-  //   }
-
-  //   try {
-  //     for (const billId of billIds) {
-  //       await handlePayBill(Number(billId), paymentDetails);
-  //     }
-
-  //     await loadData();
-
-  //     showToast(
-  //       `${billIds.length} bill(s) paid successfully.`,
-  //       'success'
-  //     );
-  //   } catch (error) {
-  //     console.error('Batch payment error:', error);
-  //     throw error;
-  //   }
-  // };
   const handleBatchPayBills = async (
     billIds: number[],
     paymentDetails: {
@@ -497,47 +1185,59 @@ export default function Home() {
       paidBy?: string;
     }
   ): Promise<void> => {
+    if (!currentUser) return;
+
     if (!billIds.length) {
       showToast('No bills selected.', 'info');
       return;
     }
 
     try {
-      // Single Batch API Request (No Loop)
       const res = await fetch('/api/bills', {
         method: 'PATCH',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           billIds,
           status: 'Paid',
-          actionBy: paymentDetails.paidBy || currentUser?.name || 'Accounts Staff',
           paymentMethod: paymentDetails.paymentMethod || 'Cash',
           paymentNote: paymentDetails.paymentNote || '',
         }),
       });
 
       const textData = await res.text();
-      let data;
+
+      let data: any;
       try {
         data = textData ? JSON.parse(textData) : {};
-      } catch (e) {
-        throw new Error(`Server response error (${res.status}): ${textData}`);
+      } catch {
+        throw new Error(
+          `Server response error(${res.status}): ${textData} `
+        );
       }
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to process batch payment.');
+        throw new Error(
+          data.error || data.message || 'Failed to process batch payment.'
+        );
       }
 
-      // Re-fetch list & stats instantly
       await loadData();
 
       showToast(
         `${billIds.length} bill(s) paid successfully.`,
         'success'
       );
-    } catch (error: any) {
+    } catch (error) {
       console.error('Batch payment error:', error);
-      showToast(error.message || 'Failed to pay bills in batch.', 'error');
+
+      showToast(
+        error instanceof Error
+          ? error.message
+          : 'Failed to pay bills in batch.',
+        'error'
+      );
+
       throw error;
     }
   };
@@ -547,24 +1247,18 @@ export default function Home() {
   // =========================================================
 
   const handleBillCreated = (_newBill: Bill) => {
-    loadData();
+    void loadData();
   };
 
   // =========================================================
-  // LOGIN
+  // LOGIN SUCCESS
   // =========================================================
 
   const handleLoginSuccess = (user: User) => {
+    // LoginView must call the login API first, and the API
+    // must set the HttpOnly session cookie.
     setCurrentUser(user);
     setIsLoggedIn(true);
-
-    try {
-      sessionStorage.setItem('netbill_session_user', JSON.stringify(user));
-    } catch (error) {
-      console.error(error);
-    }
-
-    loadData(user);
 
     if (user.role === 'support') {
       setCurrentPath('create-bill');
@@ -575,26 +1269,43 @@ export default function Home() {
     } else {
       setCurrentPath('dashboard');
     }
+
+    void loadData(user);
   };
 
   // =========================================================
   // LOGOUT
   // =========================================================
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-
+  const handleLogout = async () => {
     try {
-      sessionStorage.removeItem('netbill_session_user');
+      const res = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+      });
+
+      if (!res.ok) {
+        console.error('Server logout returned:', res.status);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Logout failed:', error);
+    } finally {
+      setCurrentUser(null);
+      setIsLoggedIn(false);
+      setBills([]);
+      setCategories([]);
+      setStats(INITIAL_STATS);
+      setCurrentPath('dashboard');
+
+      // Remove old client-side session data if it exists.
+      try {
+        sessionStorage.removeItem('netbill_session_user');
+      } catch {
+        // Ignore storage errors.
+      }
+
+      showToast('Signed out of console.', 'info');
     }
-
-    setBills([]);
-    setCategories([]);
-    setStats(INITIAL_STATS);
-
-    showToast('Signed out of console.', 'info');
   };
 
   // =========================================================
@@ -602,22 +1313,28 @@ export default function Home() {
   // =========================================================
 
   const handleNavigate = (path: NavPath) => {
+    if (!currentUser) return;
+
     const role = currentUser.role;
 
     if (
       role === 'support' &&
-      (path === 'pending-approval' ||
+      (
+        path === 'pending-approval' ||
         path === 'approved-bills' ||
-        path === 'user-management')
+        path === 'user-management'
+      )
     ) {
       return;
     }
 
     if (
       role === 'accounts' &&
-      (path === 'create-bill' ||
+      (
+        path === 'create-bill' ||
         path === 'pending-approval' ||
-        path === 'user-management')
+        path === 'user-management'
+      )
     ) {
       return;
     }
@@ -630,30 +1347,24 @@ export default function Home() {
   };
 
   // =========================================================
-  // MOUNT
+  // LOADING / AUTH CHECK
   // =========================================================
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
+  if (!isMounted || authLoading) {
     return null;
   }
 
-  // =========================================================
-  // LOGIN
-  // =========================================================
-
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !currentUser) {
     return (
       <>
         <LoginView
           onLoginSuccess={handleLoginSuccess}
           onShowToast={showToast}
         />
-
-        <Toast toasts={toasts} onDismiss={dismissToast} />
+        <Toast
+          toasts={toasts}
+          onDismiss={dismissToast}
+        />
       </>
     );
   }
@@ -664,7 +1375,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-surface-container-low text-on-surface">
-      {/* Sidebar */}
       <Sidebar
         currentPath={currentPath}
         onNavigate={(path) => {
@@ -677,31 +1387,29 @@ export default function Home() {
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* Header */}
       <Header
         currentUser={currentUser}
         onLogout={handleLogout}
-        onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
+        onToggleMobileMenu={() =>
+          setIsMobileMenuOpen((prev) => !prev)
+        }
       />
 
-      {/* Main Content */}
       <main className="md:ml-60 ml-0 mt-16 p-3 sm:p-5 md:p-6 min-h-[calc(100vh-4rem)] flex flex-col transition-all">
-        {/* Dashboard */}
         {currentPath === 'dashboard' && (
           <DashboardView
             bills={bills}
             stats={stats}
             currentUser={currentUser}
-            categories={categories} // <--- Dynamic Categories List
-            onCreateCategory={handleCreateCategory} // <--- Create Handler
-            onUpdateCategory={handleUpdateCategory} // <--- Update Handler
-            onDeleteCategory={handleDeleteCategory} // <--- Delete Handler
+            categories={categories}
+            onCreateCategory={handleCreateCategory}
+            onUpdateCategory={handleUpdateCategory}
+            onDeleteCategory={handleDeleteCategory}
             onOpenCreateBill={() => setCurrentPath('create-bill')}
             onViewDetails={(bill) => setDetailModalBill(bill)}
           />
         )}
 
-        {/* Create Bill */}
         {currentPath === 'create-bill' && (
           <CreateBillView
             currentUser={currentUser}
@@ -712,7 +1420,6 @@ export default function Home() {
           />
         )}
 
-        {/* Pending Approval */}
         {currentPath === 'pending-approval' && (
           <PendingApprovalView
             bills={bills}
@@ -724,7 +1431,6 @@ export default function Home() {
           />
         )}
 
-        {/* Approved Bills */}
         {currentPath === 'approved-bills' && (
           <ApprovedBillsView
             bills={bills}
@@ -737,7 +1443,6 @@ export default function Home() {
           />
         )}
 
-        {/* User Management */}
         {currentPath === 'user-management' && (
           <UserManagementView
             currentUser={currentUser}
@@ -746,7 +1451,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Detail Modal */}
       <BillDetailModal
         bill={detailModalBill}
         isOpen={!!detailModalBill}
@@ -757,15 +1461,16 @@ export default function Home() {
         }}
       />
 
-      {/* Voucher Modal */}
       <BillVoucherModal
         bill={voucherModalBill}
         isOpen={!!voucherModalBill}
         onClose={() => setVoucherModalBill(null)}
       />
 
-      {/* Toast */}
-      <Toast toasts={toasts} onDismiss={dismissToast} />
+      <Toast
+        toasts={toasts}
+        onDismiss={dismissToast}
+      />
     </div>
   );
 }

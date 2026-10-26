@@ -224,90 +224,268 @@
 // =====================create user and send mail==================
 
 
+// import { NextRequest, NextResponse } from 'next/server';
+// import { createUser, getUsers } from '@/lib/db';
+// import { UserRole } from '@/lib/types';
+// import { sendWelcomeEmail } from '@/lib/mailer';
+
+// // GET: Retrieve staff records
+// export async function GET(req: NextRequest) {
+//   try {
+//     const requesterRole = req.headers.get('x-user-role') as UserRole | null;
+
+//     if (
+//       !requesterRole ||
+//       (requesterRole !== 'admin' && requesterRole !== 'manager')
+//     ) {
+//       return NextResponse.json(
+//         {
+//           error: 'Access denied. Only Admin and Manager can view staff records.',
+//         },
+//         { status: 403 }
+//       );
+//     }
+
+//     const allUsers = await getUsers();
+
+//     // Manager can view Support staff only
+//     if (requesterRole === 'manager') {
+//       const supportUsers = allUsers.filter(
+//         (user) => user.role === 'support'
+//       );
+
+//       return NextResponse.json({
+//         success: true,
+//         users: supportUsers,
+//       });
+//     }
+
+//     // Admin can view all users
+//     return NextResponse.json({
+//       success: true,
+//       users: allUsers,
+//     });
+//   } catch (error) {
+//     console.error('Get users error:', error);
+
+//     return NextResponse.json(
+//       { error: 'Failed to retrieve users from MySQL database.' },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+// // POST: Create user and send welcome email
+// export async function POST(req: NextRequest) {
+//   try {
+//     const requesterRole = req.headers.get('x-user-role') as UserRole | null;
+
+//     // Authorization check
+//     if (
+//       !requesterRole ||
+//       (requesterRole !== 'admin' && requesterRole !== 'manager')
+//     ) {
+//       return NextResponse.json(
+//         {
+//           error: 'Unauthorized. Only Admin and Manager can create accounts.',
+//         },
+//         { status: 403 }
+//       );
+//     }
+
+//     // Parse request body
+//     let body;
+
+//     try {
+//       body = await req.json();
+//     } catch {
+//       return NextResponse.json(
+//         { error: 'Invalid JSON payload in request body.' },
+//         { status: 400 }
+//       );
+//     }
+
+//     const { user_id, name, password, role } = body || {};
+
+//     // Required fields validation
+//     if (
+//       typeof user_id !== 'string' ||
+//       typeof name !== 'string' ||
+//       typeof password !== 'string' ||
+//       typeof role !== 'string' ||
+//       !user_id.trim() ||
+//       !name.trim() ||
+//       !password ||
+//       !role.trim()
+//     ) {
+//       return NextResponse.json(
+//         {
+//           error:
+//             'Missing or invalid fields. Please provide user_id, name, password, and role.',
+//         },
+//         { status: 400 }
+//       );
+//     }
+
+//     const username = user_id.trim().toLowerCase();
+//     const userName = name.trim();
+//     const normalizedRole = role.trim().toLowerCase() as UserRole;
+
+//     // Validate role
+//     const validRoles: UserRole[] = [
+//       'admin',
+//       'support',
+//       'manager',
+//       'accounts',
+//     ];
+
+//     if (!validRoles.includes(normalizedRole)) {
+//       return NextResponse.json(
+//         {
+//           error: `Invalid role "${role}". Allowed roles are: ${validRoles.join(', ')}`,
+//         },
+//         { status: 400 }
+//       );
+//     }
+
+//     // Manager can create Support accounts only
+//     if (requesterRole === 'manager' && normalizedRole !== 'support') {
+//       return NextResponse.json(
+//         {
+//           error:
+//             'Access denied. Managers can create Support accounts only.',
+//         },
+//         { status: 403 }
+//       );
+//     }
+
+//     // Create user in database
+//     const result = await createUser({
+//       user_id: username,
+//       name: userName,
+//       password,
+//       role: normalizedRole,
+//     });
+
+//     if (!result.success) {
+//       return NextResponse.json(
+//         {
+//           error: result.error || 'Failed to create user in database.',
+//         },
+//         { status: 400 }
+//       );
+//     }
+
+//     // Send welcome email
+//     // If email fails, the account remains created.
+//     let emailSent = false;
+
+//     try {
+//       await sendWelcomeEmail({
+//         email: username,
+//         name: userName,
+//         username,
+//         password,
+//         role: normalizedRole,
+//       });
+
+//       emailSent = true;
+//     } catch (emailError) {
+//       console.error('Welcome email failed:', emailError);
+//     }
+
+//     // Final response
+//     return NextResponse.json(
+//       {
+//         success: true,
+//         user: result.user,
+//         emailSent,
+//         message: emailSent
+//           ? `Account created successfully. Welcome email sent to ${username}.`
+//           : 'Account created successfully, but the welcome email could not be sent. Please check your SMTP configuration.',
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error: unknown) {
+//     console.error('Create user error:', error);
+
+//     return NextResponse.json(
+//       {
+//         error:
+//           error instanceof Error
+//             ? error.message
+//             : 'Internal server error while creating user.',
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+// ========================3rd============
+
+
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser, getUsers } from '@/lib/db';
-import { UserRole } from '@/lib/types';
+import { getCurrentUser } from '@/lib/server-auth';
+import type { UserRole } from '@/lib/types';
 import { sendWelcomeEmail } from '@/lib/mailer';
 
-// GET: Retrieve staff records
+const allowedRoles: UserRole[] = [
+  'admin',
+  'manager',
+  'support',
+  'accounts',
+];
+
 export async function GET(req: NextRequest) {
+  const requester = await getCurrentUser(req);
+
+  if (!requester) {
+    return NextResponse.json({ error: 'Please log in.' }, { status: 401 });
+  }
+
+  if (!['admin', 'manager'].includes(requester.role)) {
+    return NextResponse.json({ error: 'Permission denied.' }, { status: 403 });
+  }
+
   try {
-    const requesterRole = req.headers.get('x-user-role') as UserRole | null;
+    const users = await getUsers();
 
-    if (
-      !requesterRole ||
-      (requesterRole !== 'admin' && requesterRole !== 'manager')
-    ) {
-      return NextResponse.json(
-        {
-          error: 'Access denied. Only Admin and Manager can view staff records.',
-        },
-        { status: 403 }
-      );
-    }
-
-    const allUsers = await getUsers();
-
-    // Manager can view Support staff only
-    if (requesterRole === 'manager') {
-      const supportUsers = allUsers.filter(
-        (user) => user.role === 'support'
-      );
-
-      return NextResponse.json({
-        success: true,
-        users: supportUsers,
-      });
-    }
-
-    // Admin can view all users
     return NextResponse.json({
       success: true,
-      users: allUsers,
+      users: requester.role === 'manager'
+        ? users.filter(user => user.role === 'support')
+        : users,
     });
   } catch (error) {
     console.error('Get users error:', error);
-
-    return NextResponse.json(
-      { error: 'Failed to retrieve users from MySQL database.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to retrieve users.' }, { status: 500 });
   }
 }
 
-// POST: Create user and send welcome email
 export async function POST(req: NextRequest) {
+  const requester = await getCurrentUser(req);
+
+  if (!requester) {
+    return NextResponse.json({ error: 'Please log in.' }, { status: 401 });
+  }
+
+  if (!['admin', 'manager'].includes(requester.role)) {
+    return NextResponse.json({ error: 'Permission denied.' }, { status: 403 });
+  }
+
   try {
-    const requesterRole = req.headers.get('x-user-role') as UserRole | null;
+    const body = await req.json();
+    const { user_id, name, password, role } = body ?? {};
 
-    // Authorization check
-    if (
-      !requesterRole ||
-      (requesterRole !== 'admin' && requesterRole !== 'manager')
-    ) {
-      return NextResponse.json(
-        {
-          error: 'Unauthorized. Only Admin and Manager can create accounts.',
-        },
-        { status: 403 }
-      );
-    }
-
-    // Parse request body
-    let body;
-
-    try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON payload in request body.' },
-        { status: 400 }
-      );
-    }
-
-    const { user_id, name, password, role } = body || {};
-
-    // Required fields validation
     if (
       typeof user_id !== 'string' ||
       typeof name !== 'string' ||
@@ -315,51 +493,23 @@ export async function POST(req: NextRequest) {
       typeof role !== 'string' ||
       !user_id.trim() ||
       !name.trim() ||
-      !password ||
-      !role.trim()
+      !password
     ) {
-      return NextResponse.json(
-        {
-          error:
-            'Missing or invalid fields. Please provide user_id, name, password, and role.',
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Valid user ID, name, password and role are required.' }, { status: 400 });
     }
 
     const username = user_id.trim().toLowerCase();
     const userName = name.trim();
     const normalizedRole = role.trim().toLowerCase() as UserRole;
 
-    // Validate role
-    const validRoles: UserRole[] = [
-      'admin',
-      'support',
-      'manager',
-      'accounts',
-    ];
-
-    if (!validRoles.includes(normalizedRole)) {
-      return NextResponse.json(
-        {
-          error: `Invalid role "${role}". Allowed roles are: ${validRoles.join(', ')}`,
-        },
-        { status: 400 }
-      );
+    if (!allowedRoles.includes(normalizedRole)) {
+      return NextResponse.json({ error: 'Invalid role.' }, { status: 400 });
     }
 
-    // Manager can create Support accounts only
-    if (requesterRole === 'manager' && normalizedRole !== 'support') {
-      return NextResponse.json(
-        {
-          error:
-            'Access denied. Managers can create Support accounts only.',
-        },
-        { status: 403 }
-      );
+    if (requester.role === 'manager' && normalizedRole !== 'support') {
+      return NextResponse.json({ error: 'Managers can create Support users only.' }, { status: 403 });
     }
 
-    // Create user in database
     const result = await createUser({
       user_id: username,
       name: userName,
@@ -368,16 +518,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
-      return NextResponse.json(
-        {
-          error: result.error || 'Failed to create user in database.',
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: result.error || 'Failed to create user.' }, { status: 400 });
     }
 
-    // Send welcome email
-    // If email fails, the account remains created.
     let emailSent = false;
 
     try {
@@ -388,35 +531,21 @@ export async function POST(req: NextRequest) {
         password,
         role: normalizedRole,
       });
-
       emailSent = true;
-    } catch (emailError) {
-      console.error('Welcome email failed:', emailError);
+    } catch (error) {
+      console.error('Welcome email failed:', error);
     }
 
-    // Final response
-    return NextResponse.json(
-      {
-        success: true,
-        user: result.user,
-        emailSent,
-        message: emailSent
-          ? `Account created successfully. Welcome email sent to ${username}.`
-          : 'Account created successfully, but the welcome email could not be sent. Please check your SMTP configuration.',
-      },
-      { status: 201 }
-    );
-  } catch (error: unknown) {
+    return NextResponse.json({
+      success: true,
+      user: result.user,
+      emailSent,
+      message: emailSent
+        ? 'Account created and welcome email sent.'
+        : 'Account created, but welcome email failed.',
+    }, { status: 201 });
+  } catch (error) {
     console.error('Create user error:', error);
-
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Internal server error while creating user.',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create user.' }, { status: 500 });
   }
 }
