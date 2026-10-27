@@ -4482,7 +4482,7 @@ export default function ApprovedBillsView({
         onClose={() => setBillToPay(null)}
         onConfirm={handleConfirmSinglePayment}
       >
-        {billToPay && (
+        {/* {billToPay && (
           <div className="flex flex-col gap-3 text-xs">
             <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 flex flex-col gap-1.5">
               <div className="flex justify-between">
@@ -4540,7 +4540,69 @@ export default function ApprovedBillsView({
               />
             </div>
           </div>
-        )}
+        )} */}
+        {billToPay && (
+    <div className="flex flex-col gap-3 text-xs">
+        {/* Bill Details Summary Card */}
+        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-900/60 flex flex-col gap-1.5 transition-colors">
+            <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Bill ID:</span>
+                <span className="font-mono font-bold text-teal-800 dark:text-teal-300">#{billToPay.id}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Ticket ID:</span>
+                <span className="font-mono font-bold text-teal-800 dark:text-teal-300">{billToPay.ticket_id}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Subscriber / User ID:</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{billToPay.user_id}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Support Staff:</span>
+                <span className="font-semibold text-teal-700 dark:text-teal-400">{billToPay.created_by || 'Support Staff'}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Authorized / Approved By:</span>
+                <span className="font-semibold text-teal-800 dark:text-teal-300">{billToPay.approved_by || 'Manager'}</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-emerald-200 dark:border-emerald-900/60">
+                <span className="text-slate-800 dark:text-slate-200 font-bold">Disbursement Amount:</span>
+                <span className="text-base font-mono font-bold text-emerald-800 dark:text-emerald-400">
+                    ৳ {Number(billToPay.amount).toLocaleString()}
+                </span>
+            </div>
+        </div>
+
+        {/* Payment Method Select */}
+        <div className="flex flex-col gap-1">
+            <label className="font-semibold text-slate-500 dark:text-slate-400 uppercase text-[11px]">Payment Method</label>
+            <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="p-2.5 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-500 text-xs text-slate-800 dark:text-slate-100 cursor-pointer"
+            >
+                <option value="Cash">Cash at Counter</option>
+                <option value="Bank Transfer">Bank Transfer / EFT</option>
+                <option value="bKash / Nagad">Mobile Banking (bKash / Nagad)</option>
+                <option value="Cheque">Bank Cheque</option>
+            </select>
+        </div>
+
+        {/* Voucher Note Input */}
+        <div className="flex flex-col gap-1">
+            <label className="font-semibold text-slate-500 dark:text-slate-400 uppercase text-[11px]">
+                Voucher / Payment Reference Note (Optional)
+            </label>
+            <input
+                type="text"
+                value={paymentNote}
+                onChange={(e) => setPaymentNote(e.target.value)}
+                placeholder="e.g. Voucher #V-9042, TxID 8X9J21..."
+                className="p-2.5 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-500 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-600"
+            />
+        </div>
+    </div>
+)}
       </ConfirmModal>
 
       {/* Batch Payment Modal */}

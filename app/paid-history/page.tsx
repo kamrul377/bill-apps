@@ -1100,9 +1100,28 @@ export default function PaidHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-slate-950 text-on-surface-variant dark:text-slate-300 font-label-lg">
+      // <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-slate-950 text-on-surface-variant dark:text-slate-300 font-label-lg">
+      //   Loading Paid History Ledger...
+      // </div>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-surface dark:bg-slate-950 text-slate-600 dark:text-slate-300">
+    <div className="relative flex items-center justify-center">
+        {/* Outer glowing pulse ring */}
+        <div className="absolute h-16 w-16 rounded-2xl bg-teal-500/20 animate-ping" />
+        
+        {/* Logo Container */}
+        <div className="relative h-14 w-14 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg flex items-center justify-center p-2.5">
+            <img
+                src="/fnf-logo.png"
+                alt="Loading..."
+                className="h-full w-full object-contain animate-pulse"
+            />
+        </div>
+    </div>
+    
+    <p className="text-xs font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400 mt-1">
         Loading Paid History Ledger...
-      </div>
+    </p>
+</div>
     )
   }
 
