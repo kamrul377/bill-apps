@@ -1065,10 +1065,24 @@ export default function UserManagementView({
             <tbody className="divide-y divide-outline-variant/20">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-10 text-center text-secondary">
-                    Loading accounts...
-                  </td>
-                </tr>
+    <td colSpan={5} className="py-12 text-center">
+        <div className="flex flex-col items-center justify-center gap-2.5">
+            <div className="relative flex items-center justify-center">
+                <div className="absolute h-10 w-10 rounded-xl bg-teal-500/20 animate-ping" />
+                <div className="relative h-9 w-9 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md flex items-center justify-center p-1.5">
+                    <img
+                        src="/fnf-logo.png"
+                        alt="Loading..."
+                        className="h-full w-full object-contain animate-pulse"
+                    />
+                </div>
+            </div>
+            <p className="text-xs font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400 mt-1">
+                Loading accounts...
+            </p>
+        </div>
+    </td>
+</tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-10 text-center text-secondary">
