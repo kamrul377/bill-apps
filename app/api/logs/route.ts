@@ -1,3 +1,6 @@
+
+
+
 import { NextRequest, NextResponse } from 'next/server';
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { getPool } from '@/lib/db';
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
         const clientId = cleanString(body.clientId);
         const clientName = cleanString(body.clientName);
         const details = cleanString(body.details);
-        const performedBy = cleanString(body.performedBy) || 'Admin';
+        const performedBy = cleanString(body.performedBy) || 'System User';
 
         if (!action || !['CREATE_CLIENT', 'UPDATE_CLIENT', 'DELETE_CLIENT'].includes(action)) {
             return NextResponse.json(
