@@ -4505,38 +4505,103 @@ export default function ClientInfoPage() {
                 </AnimatePresence>
 
                 {/* POC MANAGEMENT MODAL */}
-                {isPocManagementOpen && (
-                    <div onClick={() => setIsPocManagementOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                        <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-5 space-y-4">
-                            <div className="flex justify-between items-center border-b pb-3 dark:border-slate-800">
-                                <h3 className="font-bold text-slate-800 dark:text-white">POC Management</h3>
-                                <button type="button" onClick={() => setIsPocManagementOpen(false)} className="text-slate-400 cursor-pointer">
-                                    <span className="material-symbols-outlined text-sm">close</span>
+{isPocManagementOpen && (
+    <div onClick={() => setIsPocManagementOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-teal-600 dark:text-teal-400 text-xl">manage_accounts</span>
+                    <h3 className="font-bold text-slate-800 dark:text-white text-base">POC Management</h3>
+                </div>
+                <button type="button" onClick={() => setIsPocManagementOpen(false)} className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            {/* POC Search Input */}
+            <div className="relative">
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
+                    search
+                </span>
+                <input
+                    type="text"
+                    id="poc-search-input"
+                    placeholder="Search POC by name..."
+                    className="w-full pl-10 pr-4 py-2.5 text-xs font-medium bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-teal-500"
+                    onChange={(e) => {
+                        const term = e.target.value.toLowerCase();
+                        const listItems = document.querySelectorAll('.poc-item-row');
+                        listItems.forEach((item) => {
+                            const name = item.getAttribute('data-poc-name') || '';
+                            if (name.includes(term)) {
+                                (item as HTMLElement).style.display = 'flex';
+                            } else {
+                                (item as HTMLElement).style.display = 'none';
+                            }
+                        });
+                    }}
+                />
+            </div>
+
+            {/* POC List */}
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                {pocs.length === 0 ? (
+                    <p className="text-center text-xs text-slate-400 py-6">No POCs found.</p>
+                ) : (
+                    pocs.map((poc, index) => (
+                        <div
+                            key={poc.id}
+                            data-poc-name={(poc.name || '').toLowerCase()}
+                            className="poc-item-row flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 transition hover:border-teal-300 dark:hover:border-teal-800"
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <span className="font-mono text-[11px] font-bold text-slate-400 bg-white dark:bg-slate-800 h-6 w-6 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                                    {index + 1}
+                                </span>
+                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{poc.name}</span>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={() => handleEditPoc(poc)}
+                                    className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 cursor-pointer transition"
+                                    title="Edit POC"
+                                >
+                                    <span className="material-symbols-outlined text-sm">edit</span>
                                 </button>
-                            </div>
-                            <div className="space-y-2 max-h-[350px] overflow-y-auto">
-                                {pocs.map((poc) => (
-                                    <div key={poc.id} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-                                        <span className="text-xs font-medium text-slate-800 dark:text-slate-200">{poc.name}</span>
-                                        <div className="flex items-center gap-1">
-                                            <button type="button" onClick={() => handleEditPoc(poc)} className="p-1 text-amber-600 cursor-pointer">
-                                                <span className="material-symbols-outlined text-sm">edit</span>
-                                            </button>
-                                            <button type="button" onClick={() => setDeletePocTargetId(poc.id.toString())} className="p-1 text-rose-600 cursor-pointer">
-                                                <span className="material-symbols-outlined text-sm">delete</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="flex justify-end pt-2">
-                                <button type="button" onClick={handleOpenAddPoc} className="px-4 py-2 text-xs font-semibold bg-teal-600 text-white rounded-xl cursor-pointer">
-                                    Add POC
+                                <button
+                                    type="button"
+                                    onClick={() => setDeletePocTargetId(poc.id.toString())}
+                                    className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 cursor-pointer transition"
+                                    title="Delete POC"
+                                >
+                                    <span className="material-symbols-outlined text-sm">delete</span>
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    ))
                 )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[11px] text-slate-400 font-medium">
+                    Total POCs: <span className="font-bold text-slate-700 dark:text-slate-300">{pocs.length}</span>
+                </span>
+                <button
+                    type="button"
+                    onClick={handleOpenAddPoc}
+                    className="px-4 py-2 text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-sm transition cursor-pointer"
+                >
+                    + Add New POC
+                </button>
+            </div>
+        </div>
+    </div>
+)}
 
                 {/* ADD / EDIT POC MODAL */}
                 {isPocModalOpen && (
