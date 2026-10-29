@@ -308,14 +308,23 @@ export default function DashboardView({
               </span>
             </div>
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="text-xl sm:text-2xl font-bold text-on-surface font-data-mono">
               {stats?.totalBills || 0}
             </span>
             <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">
               ৳{(stats?.totalVolumeTk || 0).toLocaleString()}
             </span>
-          </div>
+          </div> */}
+          <div className="mt-2">
+  <span className="text-xl sm:text-2xl font-bold text-on-surface font-data-mono block">
+    {stats?.totalBills || 0}
+  </span>
+  <span className="text-[11px] sm:text-xs text-secondary flex items-center gap-0.5 mt-0.5 font-data-mono">
+    <span>৳</span>
+    <span>{(stats?.totalVolumeTk || 0).toLocaleString()}</span>
+  </span>
+</div>
         </motion.div>
 
         {/* Pending Card */}
@@ -342,14 +351,23 @@ export default function DashboardView({
               </span>
             </div>
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="text-xl sm:text-2xl font-bold text-amber-600 font-data-mono">
               {stats?.pendingBills || 0}
             </span>
             <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">
               ৳{(stats?.pendingVolumeTk || 0).toLocaleString()}
             </span>
-          </div>
+          </div> */}
+          
+ <div className="mt-2">
+  <span className="text-xl sm:text-2xl font-bold text-amber-600 font-data-mono block">
+    {stats?.pendingBills || 0}
+  </span>
+  <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+    ৳{(stats?.pendingVolumeTk || 0).toLocaleString()}
+  </span>
+</div>
         </motion.div>
 
         {/* Approved Card */}
@@ -376,14 +394,23 @@ export default function DashboardView({
               </span>
             </div>
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="text-xl sm:text-2xl font-bold text-teal-600 font-data-mono">
               {stats?.approvedBills || 0}
             </span>
             <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">
               ৳{(stats?.approvedVolumeTk || 0).toLocaleString()}
             </span>
-          </div>
+          </div> */}
+
+          <div className="mt-2">
+  <span className="text-xl sm:text-2xl font-bold text-teal-600 font-data-mono block">
+    {stats?.approvedBills || 0}
+  </span>
+  <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+    ৳{(stats?.approvedVolumeTk || 0).toLocaleString()}
+  </span>
+</div>
         </motion.div>
 
         {/* Paid & Cleared Card */}
@@ -410,14 +437,23 @@ export default function DashboardView({
               </span>
             </div>
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="text-xl sm:text-2xl font-bold text-emerald-600 font-data-mono">
               {stats?.paidBills ?? 0}
             </span>
             <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">
               ৳{(stats?.paidVolumeTk ?? 0).toLocaleString()}
             </span>
-          </div>
+          </div> */}
+
+          <div className="mt-2">
+  <span className="text-xl sm:text-2xl font-bold text-emerald-600 font-data-mono block">
+    {stats?.paidBills ?? 0}
+  </span>
+  <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+    ৳{(stats?.paidVolumeTk ?? 0).toLocaleString()}
+  </span>
+</div>
         </motion.div>
 
         {/* Rejected Card */}
@@ -444,14 +480,23 @@ export default function DashboardView({
               </span>
             </div>
           </div>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <span className="text-xl sm:text-2xl font-bold text-rose-600 font-data-mono">
               {stats?.rejectedBills || 0}
             </span>
             <span className="text-[11px] sm:text-xs text-secondary block mt-0.5">
               ৳{(stats?.rejectedVolumeTk || 0).toLocaleString()}
             </span>
-          </div>
+          </div> */}
+          <div className="mt-2">
+  <span className="text-xl sm:text-2xl font-bold text-rose-600 font-data-mono block">
+    {stats?.rejectedBills || 0}
+  </span>
+  <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+    ৳{(stats?.rejectedVolumeTk || 0).toLocaleString()}
+  </span>
+</div>
+
         </motion.div>
       </div>
 
