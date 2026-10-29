@@ -7,7 +7,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #0d9488;
+   --color-primary: #0d9488;
   --color-primary-container: #0f766e;
   --color-on-primary: #ffffff;
   --color-on-primary-container: #f0fdfa;
@@ -56,7 +56,10 @@
   --spacing-margin: 1.5rem;
   --spacing-margin-mobile: 0.75rem;
   --spacing-gutter: 1rem;
-  --spacing-gutter-compact: 0.5rem;
+  --spacing-gutter-compact: 0.5rem; 
+
+
+
 }
 
 /* Dark Theme Overrides */
