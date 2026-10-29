@@ -7,6 +7,54 @@
       "password": "kamrul.cse9@gmail.com",
       "role": "admin",
       "created_at": "2026-10-01T15:24:17.950Z"
+    },
+    {
+      "id": 2,
+      "user_id": "km1@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$hW7NXkW2a35vKGLR22NAlega8A.gYOIUZHHzNH9p/iZYx2RJ0GPqq",
+      "role": "support",
+      "created_at": "2026-10-28T18:07:30.864Z"
+    },
+    {
+      "id": 3,
+      "user_id": "km2@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$QjVVownGGg45HwbQV3jFS.6pZUxnjjbYbuUwbyo9gzPp.5MGAYKoy",
+      "role": "support",
+      "created_at": "2026-10-28T18:09:03.923Z"
+    },
+    {
+      "id": 4,
+      "user_id": "km3@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$sJ5Tn5pOQq0m0Mfc4MXADuCKm8MkpkapBeYrCrsFZrXrvJCrUw4lS",
+      "role": "support",
+      "created_at": "2026-10-28T18:22:54.818Z"
+    },
+    {
+      "id": 5,
+      "user_id": "km4@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$iPLSVhdgVz7b40QxxvpDJOMVGDsFmNq0BlVpEy8P39MjXaI/OjRjO",
+      "role": "support",
+      "created_at": "2026-10-28T18:29:56.132Z"
+    },
+    {
+      "id": 6,
+      "user_id": "km5@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$s7Jh2oSVvb401DtVu9rZA.hEjvov2K82fLugK4eo73EAVOP8IVm5C",
+      "role": "support",
+      "created_at": "2026-10-28T18:30:55.707Z"
+    },
+    {
+      "id": 7,
+      "user_id": "km6@gmail.com",
+      "name": "kamrul",
+      "password": "$2b$10$JvRVt5nlGLRIB73azjZni.QkieCI3QzsOSKBNdCK9MtRsUpGgglFq",
+      "role": "support",
+      "created_at": "2026-10-28T18:37:57.739Z"
     }
   ],
   "bills": [

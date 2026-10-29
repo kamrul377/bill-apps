@@ -530,6 +530,188 @@ export async function authenticateUser(email: string, password: string): Promise
   }
 }
 
+
+
+// export async function createUser(userData: {
+//   user_id: string;
+//   name: string;
+//   password: string;
+//   role: UserRole;
+// }): Promise<{ success: boolean; user?: User; error?: string }> {
+//   const cleanEmail = userData.user_id.trim().toLowerCase();
+//   const name = userData.name.trim();
+//   const password = userData.password.trim();
+//   const role = userData.role.toLowerCase().trim() as UserRole;
+
+//   if (!cleanEmail || !name || !password) {
+//     return { success: false, error: 'Email, Name, and Password are required.' };
+//   }
+
+//   // পাসওয়ার্ড ডাটাবেজে সেভ করার আগে bcrypt দিয়ে হ্যাশ করে নেওয়া হচ্ছে
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+
+//     const [existing] = await p.query<RowDataPacket[]>(
+//       'SELECT id FROM users WHERE LOWER(user_id) = ? LIMIT 1',
+//       [cleanEmail]
+//     );
+//     if (existing && existing.length > 0) {
+//       return { success: false, error: `Account with email "${cleanEmail}" already exists.` };
+//     }
+
+//     const [res] = await p.query<ResultSetHeader>(
+//       'INSERT INTO users (user_id, name, password, role, created_at) VALUES (?, ?, ?, ?, NOW())',
+//       [cleanEmail, name, hashedPassword, role]
+//     );
+
+//     const newUser: User = {
+//       id: res.insertId,
+//       user_id: cleanEmail,
+//       name,
+//       role,
+//       created_at: new Date().toISOString(),
+//     };
+
+//     return { success: true, user: newUser };
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     const exists = store.users.some((u) => u.user_id.toLowerCase() === cleanEmail);
+//     if (exists) {
+//       return { success: false, error: `Account with email "${cleanEmail}" already exists.` };
+//     }
+
+//     const nextId = store.users.length > 0 ? Math.max(...store.users.map((u) => u.id)) + 1 : 1;
+//     const newUser = {
+//       id: nextId,
+//       user_id: cleanEmail,
+//       name,
+//       password: hashedPassword, // LocalStorage-এও হ্যাশ করা পাসওয়ার্ড সেভ করা হচ্ছে
+//       role,
+//       created_at: new Date().toISOString(),
+//     };
+
+//     store.users.push(newUser);
+//     writeLocalStorage(store);
+
+//     return {
+//       success: true,
+//       user: {
+//         id: newUser.id,
+//         user_id: newUser.user_id,
+//         name: newUser.name,
+//         role: newUser.role as UserRole,
+//         created_at: newUser.created_at,
+//       },
+//     };
+//   }
+// }
+
+// export async function updateUser(
+//   id: number,
+//   updates: Partial<Omit<User, 'id'>> & { password?: string }
+// ): Promise<{ success: boolean; user?: User; error?: string }> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [existing] = await p.query<RowDataPacket[]>(
+//       'SELECT id, user_id, name, role, created_at FROM users WHERE id = ? LIMIT 1',
+//       [id]
+//     );
+//     if (!existing || existing.length === 0) {
+//       return { success: false, error: 'User not found.' };
+//     }
+
+//     const currentUser = existing[0];
+//     const newEmail = updates.user_id ? updates.user_id.trim().toLowerCase() : currentUser.user_id;
+//     const newName = updates.name ? updates.name.trim() : currentUser.name;
+//     const newRole = updates.role ? (updates.role.toLowerCase().trim() as UserRole) : currentUser.role;
+
+//     if (updates.password) {
+//       // পাসওয়ার্ড আপডেট করার সময় হ্যাশ করা হচ্ছে
+//       const hashedPassword = await bcrypt.hash(updates.password.trim(), 10);
+//       await p.query(
+//         'UPDATE users SET user_id = ?, name = ?, role = ?, password = ? WHERE id = ?',
+//         [newEmail, newName, newRole, hashedPassword, id]
+//       );
+//     } else {
+//       await p.query(
+//         'UPDATE users SET user_id = ?, name = ?, role = ? WHERE id = ?',
+//         [newEmail, newName, newRole, id]
+//       );
+//     }
+
+//     return {
+//       success: true,
+//       user: {
+//         id,
+//         user_id: newEmail,
+//         name: newName,
+//         role: newRole as UserRole,
+//         created_at: safeIsoDate(currentUser.created_at),
+//       },
+//     };
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     const idx = store.users.findIndex((u) => u.id === id);
+//     if (idx === -1) return { success: false, error: 'User not found.' };
+
+//     if (updates.user_id) store.users[idx].user_id = updates.user_id.trim().toLowerCase();
+//     if (updates.name) store.users[idx].name = updates.name.trim();
+//     if (updates.role) store.users[idx].role = updates.role as UserRole;
+//     if (updates.password) {
+//       store.users[idx].password = await bcrypt.hash(updates.password.trim(), 10);
+//     }
+
+//     writeLocalStorage(store);
+//     const u = store.users[idx];
+//     return {
+//       success: true,
+//       user: {
+//         id: u.id,
+//         user_id: u.user_id,
+//         name: u.name,
+//         role: u.role as UserRole,
+//         created_at: u.created_at,
+//       },
+//     };
+//   }
+// }
+
+// export async function deleteUser(id: number): Promise<{ success: boolean; error?: string }> {
+//   try {
+//     await ensureTables();
+//     const p = getPool();
+//     const [rows] = await p.query<RowDataPacket[]>(
+//       'SELECT user_id FROM users WHERE id = ? LIMIT 1',
+//       [id]
+//     );
+//     if (!rows || rows.length === 0) {
+//       return { success: false, error: 'User not found.' };
+//     }
+
+//     if (String(rows[0].user_id).toLowerCase() === 'kamrul.cse9@gmail.com') {
+//       return { success: false, error: 'Cannot delete the primary system administrator.' };
+//     }
+
+//     await p.query('DELETE FROM users WHERE id = ?', [id]);
+//     return { success: true };
+//   } catch (error) {
+//     const store = readLocalStorage();
+//     const target = store.users.find((u) => u.id === id);
+//     if (!target) return { success: false, error: 'User not found.' };
+//     if (target.user_id.toLowerCase() === 'kamrul.cse9@gmail.com') {
+//       return { success: false, error: 'Cannot delete the primary system administrator.' };
+//     }
+
+//     store.users = store.users.filter((u) => u.id !== id);
+//     writeLocalStorage(store);
+//     return { success: true };
+//   }
+// }
+
 export async function createUser(userData: {
   user_id: string;
   name: string;
@@ -545,19 +727,29 @@ export async function createUser(userData: {
     return { success: false, error: 'Email, Name, and Password are required.' };
   }
 
-  // পাসওয়ার্ড ডাটাবেজে সেভ করার আগে bcrypt দিয়ে হ্যাশ করে নেওয়া হচ্ছে
+  // পাসওয়ার্ড ডাটাবেজে সেভ করার আগে bcrypt দিয়ে হ্যাশ করে নেওয়া হচ্ছে
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     await ensureTables();
     const p = getPool();
 
-    const [existing] = await p.query<RowDataPacket[]>(
+    // ১. ইমেইল অলরেডি আছে কিনা চেক
+    const [existingEmail] = await p.query<RowDataPacket[]>(
       'SELECT id FROM users WHERE LOWER(user_id) = ? LIMIT 1',
       [cleanEmail]
     );
-    if (existing && existing.length > 0) {
-      return { success: false, error: `Account with email "${cleanEmail}" already exists.` };
+    if (existingEmail && existingEmail.length > 0) {
+      return { success: false, error: `Email (User ID) already exists.` };
+    }
+
+    // ২. নেম অলরেডি আছে কিনা চেক (যেহেতু name কলাম UNIQUE)
+    const [existingName] = await p.query<RowDataPacket[]>(
+      'SELECT id FROM users WHERE LOWER(name) = LOWER(?) LIMIT 1',
+      [name]
+    );
+    if (existingName && existingName.length > 0) {
+      return { success: false, error: `User name already exists.` };
     }
 
     const [res] = await p.query<ResultSetHeader>(
@@ -574,11 +766,30 @@ export async function createUser(userData: {
     };
 
     return { success: true, user: newUser };
-  } catch (error) {
+  } catch (error: any) {
+    console.error('MySQL createUser error:', error);
+
+    // MySQL এরর চেক (ER_DUP_ENTRY / 1062)
+    const errorMsg = (error.message || '').toLowerCase();
+    if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062 || errorMsg.includes('duplicate')) {
+      if (errorMsg.includes('name')) {
+        return { success: false, error: 'User name already exists.' };
+      }
+      return { success: false, error: 'Email (User ID) already exists.' };
+    }
+
+    // ডাটাবেজ অফলাইন থাকলে কেবল তখনই ফাইল স্টোরেজে ফলব্যাক করবে
     const store = readLocalStorage();
-    const exists = store.users.some((u) => u.user_id.toLowerCase() === cleanEmail);
-    if (exists) {
-      return { success: false, error: `Account with email "${cleanEmail}" already exists.` };
+
+    // ফাইল স্টোরেজেও ডুপ্লিকেট নাম বা ইমেইল চেক
+    const existsEmail = store.users.some((u) => u.user_id.toLowerCase() === cleanEmail);
+    if (existsEmail) {
+      return { success: false, error: `Email (User ID) already exists.` };
+    }
+
+    const existsName = store.users.some((u) => u.name.toLowerCase() === name.toLowerCase());
+    if (existsName) {
+      return { success: false, error: `User name already exists.` };
     }
 
     const nextId = store.users.length > 0 ? Math.max(...store.users.map((u) => u.id)) + 1 : 1;
@@ -586,7 +797,7 @@ export async function createUser(userData: {
       id: nextId,
       user_id: cleanEmail,
       name,
-      password: hashedPassword, // LocalStorage-এও হ্যাশ করা পাসওয়ার্ড সেভ করা হচ্ছে
+      password: hashedPassword,
       role,
       created_at: new Date().toISOString(),
     };
@@ -627,8 +838,28 @@ export async function updateUser(
     const newName = updates.name ? updates.name.trim() : currentUser.name;
     const newRole = updates.role ? (updates.role.toLowerCase().trim() as UserRole) : currentUser.role;
 
+    // আপডেট করার সময়ে অন্য কারো সাথে ইমেইল বা নেম মিলে যাচ্ছে কিনা চেক
+    if (updates.user_id && updates.user_id.trim().toLowerCase() !== currentUser.user_id.toLowerCase()) {
+      const [dupEmail] = await p.query<RowDataPacket[]>(
+        'SELECT id FROM users WHERE LOWER(user_id) = ? AND id != ? LIMIT 1',
+        [newEmail, id]
+      );
+      if (dupEmail && dupEmail.length > 0) {
+        return { success: false, error: 'Email (User ID) already exists.' };
+      }
+    }
+
+    if (updates.name && updates.name.trim().toLowerCase() !== currentUser.name.toLowerCase()) {
+      const [dupName] = await p.query<RowDataPacket[]>(
+        'SELECT id FROM users WHERE LOWER(name) = LOWER(?) AND id != ? LIMIT 1',
+        [newName, id]
+      );
+      if (dupName && dupName.length > 0) {
+        return { success: false, error: 'User name already exists.' };
+      }
+    }
+
     if (updates.password) {
-      // পাসওয়ার্ড আপডেট করার সময় হ্যাশ করা হচ্ছে
       const hashedPassword = await bcrypt.hash(updates.password.trim(), 10);
       await p.query(
         'UPDATE users SET user_id = ?, name = ?, role = ?, password = ? WHERE id = ?',
@@ -651,7 +882,17 @@ export async function updateUser(
         created_at: safeIsoDate(currentUser.created_at),
       },
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.error('MySQL updateUser error:', error);
+
+    const errorMsg = (error.message || '').toLowerCase();
+    if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062 || errorMsg.includes('duplicate')) {
+      if (errorMsg.includes('name')) {
+        return { success: false, error: 'User name already exists.' };
+      }
+      return { success: false, error: 'Email (User ID) already exists.' };
+    }
+
     const store = readLocalStorage();
     const idx = store.users.findIndex((u) => u.id === id);
     if (idx === -1) return { success: false, error: 'User not found.' };
@@ -709,7 +950,6 @@ export async function deleteUser(id: number): Promise<{ success: boolean; error?
     return { success: true };
   }
 }
-
 
 
 
