@@ -696,7 +696,7 @@ export default function Home() {
         }
       />
 
-      <main className="md:ml-60 ml-0 mt-16 p-3 sm:p-5 md:p-6 min-h-[calc(100vh-4rem)] flex flex-col transition-all">
+      <main className="md:ml-60 ml-0 mt-16 p-3 sm:p-5 md:p-6 min-h-[calc(100vh-4rem)] flex flex-col transition-all ">
         {currentPath === 'dashboard' && (
           <DashboardView
             bills={bills}
