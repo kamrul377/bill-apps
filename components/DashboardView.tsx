@@ -1323,7 +1323,7 @@ export default function DashboardView({
     return `${year}-${month}`;
   };
 
-  // Filter & Sort Logic implementing Running Month vs Pending All Rule
+// Filter & Sort Logic implementing Selected Month Filter & Pending Rule
   const filteredBills = useMemo(() => {
     const result = bills.filter((b) => {
       const matchesSearch =
@@ -1354,26 +1354,24 @@ export default function DashboardView({
           );
       }
 
-      // Month & Pending Rule:
-      // Pending bills show all previous + current months. 
-      // Other statuses (Approved, Paid, Rejected) show strictly the selectedMonth.
+      // Exact Month & Pending Rule Logic:
       const billStatus = (b.status || '').toLowerCase();
       const isPending = billStatus === 'pending';
       const billYM = getBillYearMonth(b.date);
 
-      let matchesMonthOrPending = false;
+      // Selected month diye data filter hobe. 
+      // Jodi status 'Pending' hoy tahole sob month-er pending bill show korbe, 
+      // r baki status (Approved, Paid, Rejected, All)-er khetre shudhu user je month select korbe tar data-i asbe.
+      let matchesMonthFilter = false;
       if (statusFilter === 'Pending') {
-        // If Pending filter is explicitly selected, show all pending bills across all months
-        matchesMonthOrPending = isPending;
+        matchesMonthFilter = isPending;
       } else if (statusFilter === 'ALL') {
-        // In ALL view: Pending bills can show from all months, others must match selectedMonth
-        matchesMonthOrPending = isPending || billYM === selectedMonth;
+        matchesMonthFilter = isPending || billYM === selectedMonth;
       } else {
-        // For specific status (Approved, Paid, Rejected): must match selectedMonth
-        matchesMonthOrPending = billYM === selectedMonth;
+        matchesMonthFilter = billYM === selectedMonth;
       }
 
-      return matchesSearch && matchesStatus && matchesCategory && matchesMonthOrPending;
+      return matchesSearch && matchesStatus && matchesCategory && matchesMonthFilter;
     });
 
     if (sortField) {
@@ -1414,6 +1412,8 @@ export default function DashboardView({
 
     return result;
   }, [bills, search, statusFilter, categoryFilter, categories, selectedMonth, sortField, sortOrder]);
+
+
 
   const totalPages = Math.max(1, Math.ceil(filteredBills.length / pageSize));
   const paginatedBills = filteredBills.slice(
