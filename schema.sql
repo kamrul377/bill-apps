@@ -181,3 +181,8 @@ COLLATE=utf8mb4_unicode_ci;
 
 -- DELETE FROM bills
 -- WHERE id > 0;
+
+
+-- git fetch origin
+-- git reset --hard origin/main
+-- git clean -fd
