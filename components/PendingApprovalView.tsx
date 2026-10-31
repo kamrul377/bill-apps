@@ -34,6 +34,31 @@
 // type SortField = 'ticket_id' | 'user_id' | 'created_by' | 'date' | 'amount' | null;
 // type SortOrder = 'asc' | 'desc';
 
+// // Column Management Types
+// type ColumnKey = 
+//   | 'ticket_id' 
+//   | 'user_id' 
+//   | 'category' 
+//   | 'support_agent' 
+//   | 'date' 
+//   | 'description' 
+//   | 'amount';
+
+// interface ColumnConfig {
+//   key: ColumnKey;
+//   label: string;
+// }
+
+// const DEFAULT_COLUMNS: ColumnConfig[] = [
+//   { key: 'ticket_id', label: 'Ticket ID' },
+//   { key: 'user_id', label: 'User ID' },
+//   { key: 'category', label: 'Category' },
+//   { key: 'support_agent', label: 'Support Agent' },
+//   { key: 'date', label: 'Date' },
+//   { key: 'description', label: 'Description' },
+//   { key: 'amount', label: 'Amount' },
+// ];
+
 // export default function PendingApprovalView({
 //   bills,
 //   currentUser,
@@ -72,6 +97,48 @@
 //   // Sorting States
 //   const [sortField, setSortField] = useState<SortField>(null);
 //   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+//   // Column Customization States
+//   const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
+//   const [hiddenColumns, setHiddenColumns] = useState<Record<ColumnKey, boolean>>({
+//     ticket_id: true,
+//     user_id: true,
+//     category: true,
+//     support_agent: true,
+//     date: true,
+//     description: true,
+//     amount: true,
+//   });
+//   const [isColumnCustomizerOpen, setIsColumnCustomizerOpen] = useState(false);
+
+//   // Drag and Drop States for Table Headers
+//   const [draggedColumnIndex, setDraggedColumnIndex] = useState<number | null>(null);
+
+//   const handleDragStart = (e: React.DragEvent, index: number) => {
+//     setDraggedColumnIndex(index);
+//     e.dataTransfer.effectAllowed = 'move';
+//   };
+
+//   const handleDragOver = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.dataTransfer.dropEffect = 'move';
+//   };
+
+//   const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+//     e.preventDefault();
+//     if (draggedColumnIndex === null || draggedColumnIndex === targetIndex) return;
+
+//     const newCols = [...columns];
+//     const [movedCol] = newCols.splice(draggedColumnIndex, 1);
+//     newCols.splice(targetIndex, 0, movedCol);
+
+//     setColumns(newCols);
+//     setDraggedColumnIndex(null);
+//   };
+
+//   const handleToggleColumnVisibility = (key: ColumnKey) => {
+//     setHiddenColumns((prev) => ({ ...prev, [key]: !prev[key] }));
+//   };
 
 //   const handleSort = (field: SortField) => {
 //     if (sortField === field) {
@@ -384,6 +451,216 @@
 //     );
 //   };
 
+//   // Render Table Header Cell
+//   const renderHeaderCell = (colKey: ColumnKey, index: number) => {
+//     switch (colKey) {
+//       case 'ticket_id':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             onClick={() => handleSort('ticket_id')}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors cursor-pointer hover:text-on-surface"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Ticket ID {renderSortIcon('ticket_id')}</span>
+//             </div>
+//           </th>
+//         );
+//       case 'user_id':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             onClick={() => handleSort('user_id')}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors cursor-pointer hover:text-on-surface"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>User ID {renderSortIcon('user_id')}</span>
+//             </div>
+//           </th>
+//         );
+//       case 'category':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Category</span>
+//             </div>
+//           </th>
+//         );
+//       case 'support_agent':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             onClick={() => handleSort('created_by')}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors cursor-pointer hover:text-on-surface"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Support Agent {renderSortIcon('created_by')}</span>
+//             </div>
+//           </th>
+//         );
+//       case 'date':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             onClick={() => handleSort('date')}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors cursor-pointer hover:text-on-surface"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Date {renderSortIcon('date')}</span>
+//             </div>
+//           </th>
+//         );
+//       case 'description':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Description</span>
+//             </div>
+//           </th>
+//         );
+//       case 'amount':
+//         return (
+//           <th
+//             key={colKey}
+//             draggable
+//             onDragStart={(e) => handleDragStart(e, index)}
+//             onDragOver={handleDragOver}
+//             onDrop={(e) => handleDrop(e, index)}
+//             onClick={() => handleSort('amount')}
+//             className="px-3 font-semibold select-none cursor-grab active:cursor-grabbing hover:bg-surface-container transition-colors cursor-pointer hover:text-on-surface"
+//             title="Drag to reorder column"
+//           >
+//             <div className="flex items-center gap-1">
+//               <span className="material-symbols-outlined text-xs text-secondary/50 cursor-grab">drag_indicator</span>
+//               <span>Amount {renderSortIcon('amount')}</span>
+//             </div>
+//           </th>
+//         );
+//       default:
+//         return null;
+//     }
+//   };
+
+//   // Render Cell Content
+//   const renderCellContent = (colKey: ColumnKey, bill: Bill) => {
+//     switch (colKey) {
+//       case 'ticket_id':
+//         return (
+//           <td key={colKey} className="px-4 font-data-mono font-bold text-teal-700">
+//             <a
+//               href={`http://139.162.2.178/tms/dotproject/index.php?m=ticketsmith&a=view&ticket=${bill.ticket_id}`}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="cursor-pointer hover:text-teal-900 hover:underline"
+//             >
+//               #{bill.ticket_id}
+//             </a>
+//           </td>
+//         );
+//       case 'user_id':
+//         return (
+//           <td key={colKey} className="px-3 font-data-mono text-secondary">
+//             {bill.user_id}
+//           </td>
+//         );
+//       case 'category':
+//         return (
+//           <td key={colKey} className="px-3">
+//             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg
+//               bg-gradient-to-r from-primary/10 via-primary/5 to-transparent
+//               text-primary font-semibold text-[11px]
+//               border border-primary/15
+//               shadow-sm shadow-primary/5
+//               whitespace-nowrap">
+//               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+//               {getCategoryName(bill)}
+//             </span>
+//           </td>
+//         );
+//       case 'support_agent':
+//         return (
+//           <td key={colKey} className="px-3">
+//             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
+//               <span className="material-symbols-outlined text-xs">
+//                 person
+//               </span>
+//               <span className="truncate max-w-[130px]">
+//                 {bill.created_by || 'Support Staff'}
+//               </span>
+//             </span>
+//           </td>
+//         );
+//       case 'date':
+//         return (
+//           <td key={colKey} className="px-3 text-secondary font-data-mono">
+//             {bill.date}
+//           </td>
+//         );
+//       case 'description':
+//         return (
+//           <td key={colKey} className="px-3 max-w-xs">
+//             <div
+//               onClick={() => setSelectedDescriptionBill(bill)}
+//               className="truncate text-on-surface cursor-pointer hover:text-teal-700 hover:underline transition-colors flex items-center gap-1"
+//               title="Click to view full description"
+//             >
+//               <span className="truncate">{bill.description}</span>
+//             </div>
+//           </td>
+//         );
+//       case 'amount':
+//         return (
+//           <td key={colKey} className="px-3 font-data-mono font-bold text-on-surface">
+//             ৳{bill.amount.toLocaleString()}
+//           </td>
+//         );
+//       default:
+//         return null;
+//     }
+//   };
+
 //   return (
 //     <motion.div
 //       initial={{ opacity: 0, y: 10 }}
@@ -416,6 +693,19 @@
 //             </strong>
 //           </div>
 
+//           {/* Column Visibility Toggle Button */}
+          
+//           <button
+//   type="button"
+//   onClick={() => setIsColumnCustomizerOpen(!isColumnCustomizerOpen)}
+//   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/50 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-200 dark:border-teal-800 transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
+//   title="Toggle columns visibility & reorder"
+// >
+//   <span className="material-symbols-outlined text-[16px]">view_column</span>
+//   <span className="hidden sm:inline">Columns</span>
+// </button>
+
+
 //           {selectedBillIds.length > 0 && (
 //             <button
 //               type="button"
@@ -436,6 +726,55 @@
 //           )}
 //         </div>
 //       </div>
+
+//       {/* Column Visibility Settings Panel */}
+//       {isColumnCustomizerOpen && (
+//         <motion.div
+//           initial={{ opacity: 0, height: 0 }}
+//           animate={{ opacity: 1, height: 'auto' }}
+//           exit={{ opacity: 0, height: 0 }}
+//           className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 shadow-sm flex flex-col gap-3 text-xs"
+//         >
+//           <div className="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+//             <div className="flex items-center gap-2">
+//               <span className="material-symbols-outlined text-teal-600">tune</span>
+//               <h3 className="font-bold text-on-surface uppercase tracking-wider text-xs">
+//                 Show / Hide Columns
+//               </h3>
+//             </div>
+//             <button
+//               type="button"
+//               onClick={() => setIsColumnCustomizerOpen(false)}
+//               className="text-secondary hover:text-on-surface cursor-pointer"
+//             >
+//               <span className="material-symbols-outlined text-base">close</span>
+//             </button>
+//           </div>
+
+//           <p className="text-secondary text-[11px]">
+//             Check or uncheck columns to show or hide them. You can also **drag any table header** directly to reorder columns.
+//           </p>
+
+//           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+//             {columns.map((col) => (
+//               <label 
+//                 key={col.key} 
+//                 className="flex items-center gap-2 p-2 rounded-lg bg-surface border border-outline-variant/30 cursor-pointer truncate"
+//               >
+//                 <input
+//                   type="checkbox"
+//                   checked={hiddenColumns[col.key]}
+//                   onChange={() => handleToggleColumnVisibility(col.key)}
+//                   className="accent-teal-600 rounded cursor-pointer"
+//                 />
+//                 <span className="font-medium text-on-surface truncate" title={col.label}>
+//                   {col.label}
+//                 </span>
+//               </label>
+//             ))}
+//           </div>
+//         </motion.div>
+//       )}
 
 //       {/* Search & Filter Bar */}
 //       <div className="bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border border-outline-variant/30 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between text-xs">
@@ -576,48 +915,10 @@
 //                   />
 //                 </th>
 
-//                 <th
-//                   onClick={() => handleSort('ticket_id')}
-//                   className="px-3 font-semibold cursor-pointer hover:text-on-surface select-none"
-//                 >
-//                   Ticket ID {renderSortIcon('ticket_id')}
-//                 </th>
-
-//                 <th
-//                   onClick={() => handleSort('user_id')}
-//                   className="px-3 font-semibold cursor-pointer hover:text-on-surface select-none"
-//                 >
-//                   User ID {renderSortIcon('user_id')}
-//                 </th>
-
-//                 <th className="px-3 font-semibold">
-//                   Category
-//                 </th>
-
-//                 <th
-//                   onClick={() => handleSort('created_by')}
-//                   className="px-3 font-semibold cursor-pointer hover:text-on-surface select-none"
-//                 >
-//                   Support Agent {renderSortIcon('created_by')}
-//                 </th>
-
-//                 <th
-//                   onClick={() => handleSort('date')}
-//                   className="px-3 font-semibold cursor-pointer hover:text-on-surface select-none"
-//                 >
-//                   Date {renderSortIcon('date')}
-//                 </th>
-
-//                 <th className="px-3 font-semibold">
-//                   Description
-//                 </th>
-
-//                 <th
-//                   onClick={() => handleSort('amount')}
-//                   className="px-3 font-semibold cursor-pointer hover:text-on-surface select-none"
-//                 >
-//                   Amount {renderSortIcon('amount')}
-//                 </th>
+//                 {/* Render Draggable Columns */}
+//                 {columns.map((col, index) => 
+//                   hiddenColumns[col.key] ? renderHeaderCell(col.key, index) : null
+//                 )}
 
 //                 <th className="px-4 font-semibold text-right">
 //                   Actions
@@ -629,7 +930,7 @@
 //               {filteredPendingBills.length === 0 ? (
 //                 <tr>
 //                   <td
-//                     colSpan={9}
+//                     colSpan={columns.filter(c => hiddenColumns[c.key]).length + 2}
 //                     className="py-12 text-center text-secondary"
 //                   >
 //                     <div className="flex flex-col items-center justify-center">
@@ -678,72 +979,10 @@
 //                       />
 //                     </td>
 
-//                     <td className="px-4 font-data-mono font-bold text-teal-700">
-//                       <a
-//                         href={`http://139.162.2.178/tms/dotproject/index.php?m=ticketsmith&a=view&ticket=${bill.ticket_id}`}
-//                         target="_blank"
-//                         rel="noopener noreferrer"
-//                         className="cursor-pointer hover:text-teal-900 hover:underline"
-//                       >
-//                         #{bill.ticket_id}
-//                       </a>
-//                     </td>
-
-//                     <td className="px-3 font-data-mono text-secondary">
-//                       {bill.user_id}
-//                     </td>
-
-//                     <td className="px-3">
-//                       <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg
-//                         bg-gradient-to-r from-primary/10 via-primary/5 to-transparent
-//                         text-primary font-semibold text-[11px]
-//                         border border-primary/15
-//                         shadow-sm shadow-primary/5
-//                         whitespace-nowrap">
-//                         <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-//                         {getCategoryName(bill)}
-//                       </span>
-//                     </td>
-
-//                     <td className="px-3">
-//                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
-//                         <span className="material-symbols-outlined text-xs">
-//                           person
-//                         </span>
-
-//                         <span className="truncate max-w-[130px]">
-//                           {bill.created_by ||
-//                             'Support Staff'}
-//                         </span>
-//                       </span>
-//                     </td>
-
-//                     <td className="px-3 text-secondary font-data-mono">
-//                       {bill.date}
-//                     </td>
-
-//                     {/* Clickable Description Cell */}
-//                     <td className="px-3 max-w-xs">
-//                       <div
-//                         onClick={() => setSelectedDescriptionBill(bill)}
-//                         className="truncate text-on-surface cursor-pointer hover:text-teal-700 hover:underline transition-colors flex items-center gap-1"
-//                         title="Click to view full description"
-//                       >
-//                         <span className="truncate">{bill.description}</span>
-//                         {/* 👁️ Eye Icon Code - 6px size */}
-//                         {/* <span
-//                           className="material-symbols-outlined text-secondary shrink-0"
-//                           style={{ fontSize: '16px' }}
-//                         >
-//                           visibility
-//                         </span> */}
-//                       </div>
-//                     </td>
-
-
-//                     <td className="px-3 font-data-mono font-bold text-on-surface">
-//                       ৳{bill.amount.toLocaleString()}
-//                     </td>
+//                     {/* Render columns content corresponding to header order */}
+//                     {columns.map((col) => 
+//                       hiddenColumns[col.key] ? renderCellContent(col.key, bill) : null
+//                     )}
 
 //                     <td className="px-4 text-right whitespace-nowrap">
 //                       <div className="flex items-center justify-end gap-1.5">
@@ -996,7 +1235,11 @@
 
 
 
-// ================================2nd================================
+
+
+
+// =======================2nd with pagination ============================
+
 
 
 
@@ -1096,6 +1339,10 @@ export default function PendingApprovalView({
     useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
 
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number | 'ALL'>(10);
+
   // Sorting States
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -1191,7 +1438,7 @@ export default function PendingApprovalView({
     return 'General';
   };
 
-  // Filter only Pending bills
+  // Filter only Pending bills[cite: 2]
   const pendingBills = useMemo(
     () => bills.filter((b) => b.status === 'Pending'),
     [bills]
@@ -1332,6 +1579,14 @@ export default function PendingApprovalView({
     sortOrder,
   ]);
 
+  // Pagination Slicing
+  const totalPages = pageSize === 'ALL' ? 1 : Math.max(1, Math.ceil(filteredPendingBills.length / Number(pageSize)));
+  const paginatedPendingBills = useMemo(() => {
+    if (pageSize === 'ALL') return filteredPendingBills;
+    const start = (currentPage - 1) * Number(pageSize);
+    return filteredPendingBills.slice(start, start + Number(pageSize));
+  }, [filteredPendingBills, currentPage, pageSize]);
+
   const filteredTotalTk = useMemo(
     () =>
       filteredPendingBills.reduce(
@@ -1341,16 +1596,18 @@ export default function PendingApprovalView({
     [filteredPendingBills]
   );
 
-  // Select / unselect all using UNIQUE BILL ID
+  // Select / unselect all using CURRENT PAGE'S PAGINATED BILL IDs only
   const handleSelectAll = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    const currentPageIds = paginatedPendingBills.map((b) => Number(b.id));
     if (e.target.checked) {
-      setSelectedBillIds(
-        filteredPendingBills.map((b) => Number(b.id))
-      );
+      setSelectedBillIds((prev) => {
+        const combined = new Set([...prev, ...currentPageIds]);
+        return Array.from(combined);
+      });
     } else {
-      setSelectedBillIds([]);
+      setSelectedBillIds((prev) => prev.filter((id) => !currentPageIds.includes(id)));
     }
   };
 
@@ -1696,17 +1953,15 @@ export default function PendingApprovalView({
           </div>
 
           {/* Column Visibility Toggle Button */}
-          
           <button
-  type="button"
-  onClick={() => setIsColumnCustomizerOpen(!isColumnCustomizerOpen)}
-  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/50 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-200 dark:border-teal-800 transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
-  title="Toggle columns visibility & reorder"
->
-  <span className="material-symbols-outlined text-[16px]">view_column</span>
-  <span className="hidden sm:inline">Columns</span>
-</button>
-
+            type="button"
+            onClick={() => setIsColumnCustomizerOpen(!isColumnCustomizerOpen)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/50 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 text-xs font-semibold border border-teal-200 dark:border-teal-800 transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
+            title="Toggle columns visibility & reorder"
+          >
+            <span className="material-symbols-outlined text-[16px]">view_column</span>
+            <span className="hidden sm:inline">Columns</span>
+          </button>
 
           {selectedBillIds.length > 0 && (
             <button
@@ -1790,9 +2045,10 @@ export default function PendingApprovalView({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) =>
-                setSearchQuery(e.target.value)
-              }
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               placeholder="Search Ticket, User, Agent, Category..."
               className="w-full pl-8 pr-8 py-2 bg-surface text-on-surface rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-medium placeholder:text-secondary/70"
             />
@@ -1800,9 +2056,10 @@ export default function PendingApprovalView({
             {searchQuery && (
               <button
                 type="button"
-                onClick={() =>
-                  setSearchQuery('')
-                }
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                }}
                 className="absolute right-2.5 top-2 text-secondary hover:text-on-surface p-0.5 rounded cursor-pointer"
                 title="Clear search"
               >
@@ -1817,7 +2074,10 @@ export default function PendingApprovalView({
           <div className="flex items-center gap-1.5">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setCurrentPage(1);
+              }}
               className="bg-surface px-3 py-2 rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-medium text-xs text-on-surface w-full sm:w-auto cursor-pointer"
             >
               <option value="ALL">All Categories</option>
@@ -1841,11 +2101,10 @@ export default function PendingApprovalView({
           <div className="flex items-center gap-1.5">
             <select
               value={selectedSupportAgent}
-              onChange={(e) =>
-                setSelectedSupportAgent(
-                  e.target.value
-                )
-              }
+              onChange={(e) => {
+                setSelectedSupportAgent(e.target.value);
+                setCurrentPage(1);
+              }}
               className="bg-surface px-3 py-2 rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600 font-medium text-xs text-on-surface w-full sm:w-auto cursor-pointer"
             >
               <option value="ALL">
@@ -1884,6 +2143,7 @@ export default function PendingApprovalView({
                   setSearchQuery('');
                   setSortField(null);
                   setSortOrder('asc');
+                  setCurrentPage(1);
                 }}
                 className="text-secondary hover:text-rose-600 hover:bg-rose-50 px-2 py-1 rounded transition-colors cursor-pointer font-medium"
               >
@@ -1894,7 +2154,7 @@ export default function PendingApprovalView({
       </div>
 
       {/* Queue Table */}
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-xs overflow-hidden">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-xs overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs min-w-[750px]">
             <thead>
@@ -1903,8 +2163,8 @@ export default function PendingApprovalView({
                   <input
                     type="checkbox"
                     checked={
-                      filteredPendingBills.length > 0 &&
-                      filteredPendingBills.every(
+                      paginatedPendingBills.length > 0 &&
+                      paginatedPendingBills.every(
                         (b) =>
                           selectedBillIds.includes(
                             Number(b.id)
@@ -1929,7 +2189,7 @@ export default function PendingApprovalView({
             </thead>
 
             <tbody className="divide-y divide-outline-variant/20">
-              {filteredPendingBills.length === 0 ? (
+              {paginatedPendingBills.length === 0 ? (
                 <tr>
                   <td
                     colSpan={columns.filter(c => hiddenColumns[c.key]).length + 2}
@@ -1955,7 +2215,7 @@ export default function PendingApprovalView({
                   </td>
                 </tr>
               ) : (
-                filteredPendingBills.map((bill) => (
+                paginatedPendingBills.map((bill) => (
                   <tr
                     key={bill.id}
                     className={`hover:bg-surface-container-low/60 transition-colors h-14 ${selectedBillIds.includes(
@@ -2037,6 +2297,60 @@ export default function PendingApprovalView({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between p-3.5 bg-surface-bright border-t border-outline-variant/20 text-xs gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-secondary">
+              Showing {filteredPendingBills.length === 0 ? 0 : (currentPage - 1) * (pageSize === 'ALL' ? filteredPendingBills.length : Number(pageSize)) + 1} to {pageSize === 'ALL' ? filteredPendingBills.length : Math.min(filteredPendingBills.length, currentPage * Number(pageSize))} of {filteredPendingBills.length} entries
+            </span>
+
+            <div className="flex items-center gap-1.5">
+              <span className="text-secondary">Show:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  const val = e.target.value === 'ALL' ? 'ALL' : Number(e.target.value);
+                  setPageSize(val);
+                  setCurrentPage(1);
+                }}
+                className="bg-surface text-on-surface text-xs rounded-lg border border-outline-variant/40 px-2 py-1 focus:outline-none cursor-pointer font-medium"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={500}>500</option>
+                <option value="ALL">All</option>
+              </select>
+            </div>
+          </div>
+
+          {totalPages > 1 && pageSize !== 'ALL' && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-secondary mr-2">
+                Page <span className="font-semibold text-foreground">{currentPage}</span> of {totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="px-3 py-1 rounded-full bg-outline-variant/10 text-secondary hover:bg-outline-variant/20 disabled:opacity-30 transition-all cursor-pointer font-medium"
+              >
+                ← Prev
+              </button>
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="px-3 py-1 rounded-full bg-outline-variant/10 text-secondary hover:bg-outline-variant/20 disabled:opacity-30 transition-all cursor-pointer font-medium"
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2231,3 +2545,16 @@ export default function PendingApprovalView({
     </motion.div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
