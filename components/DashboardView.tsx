@@ -3893,7 +3893,7 @@ export default function DashboardView({
         </div>
 
         {/* Minimal Pagination */}
-        {totalPages > 1 && (
+        {/* {totalPages > 1 && (
           <div className="p-3 bg-surface-bright flex items-center justify-between text-xs border-t border-outline-variant/20">
             <span className="text-secondary">
               Page {currentPage} of {totalPages}
@@ -3919,7 +3919,34 @@ export default function DashboardView({
               </button>
             </div>
           </div>
-        )}
+        )} */}
+      {totalPages > 1 && (
+  <div className="flex items-center justify-between p-3 bg-surface-bright border-t border-outline-variant/20 text-xs">
+    <span className="text-secondary">
+      Page <span className="font-semibold text-foreground">{currentPage}</span> of {totalPages}
+    </span>
+    <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        className="px-3 py-1 rounded-full bg-outline-variant/10 text-secondary hover:bg-outline-variant/20 disabled:opacity-30 transition-all cursor-pointer font-medium"
+      >
+        ← Prev
+      </button>
+      <button
+        type="button"
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        className="px-3 py-1 rounded-full bg-outline-variant/10 text-secondary hover:bg-outline-variant/20 disabled:opacity-30 transition-all cursor-pointer font-medium"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+)}
+
+        
       </div>
 
       {/* Admin Category Management Modal */}
