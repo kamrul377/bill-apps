@@ -1466,17 +1466,18 @@ export default function ApprovedBillsView({
         return (
           <td key={colKey} className="px-3 whitespace-nowrap">
             <div className="flex flex-col gap-0.5">
+              
               {isPaid ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
-                  <span className="material-symbols-outlined text-xs">check_circle</span>
-                  <span>PAID</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300 w-fit">
-                  <span className="material-symbols-outlined text-xs">schedule</span>
-                  <span>Awaiting Pay</span>
-                </span>
-              )}
+  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 w-fit">
+    <span className="material-symbols-outlined text-xs text-emerald-700 dark:text-emerald-400">check_circle</span>
+    <span>PAID</span>
+  </span>
+) : (
+  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 w-fit">
+    <span className="material-symbols-outlined text-xs text-amber-700 dark:text-amber-400">schedule</span>
+    <span>Awaiting Pay</span>
+  </span>
+)}
 
               {bill.approved_by && (
                 <span className="text-[10px] text-teal-700 font-medium truncate max-w-[130px]" title={`Approved by: ${bill.approved_by}`}>
@@ -1561,9 +1562,9 @@ export default function ApprovedBillsView({
             <h1 className="text-lg sm:text-xl font-bold text-on-surface">
               Accounts & Ledger
             </h1>
-            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Disbursement
-            </span>
+           <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+  Disbursement
+</span>
           </div>
           <p className="text-xs text-secondary mt-0.5">
             Accounts Clearance: Disburse approved bills, record payments, and track payout audit records.
@@ -1571,12 +1572,12 @@ export default function ApprovedBillsView({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="px-3 py-1.5 rounded-lg bg-teal-50 border border-teal-200 text-xs">
-            <span className="text-secondary mr-1">Filtered Total:</span>
-            <strong className="text-teal-800 font-data-mono font-bold">
-              ৳{totalAmountTk.toLocaleString()} ({filteredBills.length})
-            </strong>
-          </div>
+          <div className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-xs">
+  <span className="text-secondary dark:text-slate-400 mr-1">Filtered Total:</span>
+  <strong className="text-teal-800 dark:text-teal-300 font-data-mono font-bold">
+    ৳{totalAmountTk.toLocaleString()} ({filteredBills.length})
+  </strong>
+</div>
 
           {/* Column Visibility Toggle Button */}
           <button
@@ -2000,7 +2001,7 @@ export default function ApprovedBillsView({
                       )}
 
                       <td className="px-4 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
+                        {/* <div className="flex items-center justify-end gap-1.5">
                           {isAccountsOrAdmin && !isPaid && onPayBill && (
                             <button
                               type="button"
@@ -2034,7 +2035,46 @@ export default function ApprovedBillsView({
                           >
                             Details
                           </button>
-                        </div>
+                        </div> */}
+                        <div className="flex items-center justify-end gap-1.5">
+  {/* Pay Bill Button */}
+  {isAccountsOrAdmin && !isPaid && onPayBill && (
+    <button
+      type="button"
+      onClick={() => {
+        setBillToPay(bill);
+        setPaymentMethod('Cash');
+        setPaymentNote('');
+      }}
+      className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1 shadow-xs cursor-pointer"
+      title="Disburse / Mark Bill as Paid"
+    >
+      <span className="material-symbols-outlined text-sm">payments</span>
+      <span>Pay Bill</span>
+    </button>
+  )}
+
+  {/* Print Slip Button */}
+  <button
+    type="button"
+    onClick={handlePrintSlipClick}
+    className="px-2.5 py-1 rounded bg-teal-50 dark:bg-teal-950/40 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 font-medium text-xs transition-colors flex items-center gap-1 cursor-pointer border border-transparent dark:border-teal-800/50"
+    title="Generate Slip / Voucher"
+  >
+    <span className="material-symbols-outlined text-sm text-teal-600 dark:text-teal-400">print</span>
+    <span className="hidden sm:inline">Slip</span>
+  </button>
+
+  {/* Details Button */}
+  <button
+    type="button"
+    onClick={handleDetailsClick}
+    className="px-2.5 py-1 rounded bg-surface-container dark:bg-slate-800 hover:bg-surface-container-high dark:hover:bg-slate-700 text-on-surface dark:text-slate-200 font-medium text-xs transition-colors cursor-pointer border border-transparent dark:border-slate-700"
+  >
+    Details
+  </button>
+</div>
+
                       </td>
                     </tr>
                   );

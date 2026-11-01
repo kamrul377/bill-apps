@@ -1953,16 +1953,17 @@ export default function PendingApprovalView({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-xs">
-            <span className="text-secondary mr-1">
-              Pending Queue:
-            </span>
+          
+          <div className="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs">
+  <span className="text-secondary dark:text-slate-400 mr-1">
+    Pending Queue:
+  </span>
 
-            <strong className="text-amber-800 font-data-mono font-bold">
-              {pendingBills.length} Bills (৳
-              {pendingTotalTk.toLocaleString()})
-            </strong>
-          </div>
+  <strong className="text-amber-800 dark:text-amber-300 font-data-mono font-bold">
+    {pendingBills.length} Bills (৳
+    {pendingTotalTk.toLocaleString()})
+  </strong>
+</div>
 
           {/* Column Visibility Toggle Button */}
           <button

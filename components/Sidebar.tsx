@@ -127,7 +127,7 @@ export default function Sidebar({
               </span>
             </div> */}
 
-            <div
+            {/* <div
               onClick={() => window.location.reload()}
               className="flex items-center gap-2 cursor-pointer select-none"
             >
@@ -151,7 +151,33 @@ export default function Sidebar({
               <span className="text-sm font-bold tracking-tight text-on-surface">
                 First n Fast IT LTD
               </span>
-            </div>
+            </div> */}
+          <div
+  onClick={() => window.location.reload()}
+  className="flex items-center gap-2 cursor-pointer select-none"
+>
+  <div className="relative flex h-20 w-20 items-center justify-center">
+    {!imageLoaded && (
+      <div className="absolute h-10 w-10 animate-spin rounded-full border-4 border-gray-200 dark:border-slate-700 border-t-teal-600 dark:border-t-teal-400" />
+    )}
+
+    <img
+      src="/fnf-logo.png"
+      alt="FnF Online Logo"
+      onLoad={() => setImageLoaded(true)}
+      onError={() => setImageLoaded(true)}
+      className={`h-20 w-20 object-contain transition-all duration-500 dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.35)] dark:brightness-110 ${
+        imageLoaded ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+      }`}
+    />
+  </div>
+
+  <span className="text-sm font-bold tracking-tight text-on-surface dark:text-slate-100">
+    First n Fast IT LTD
+  </span>
+</div>
+
+
 
 
             <button
