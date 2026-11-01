@@ -165,12 +165,12 @@ export default function Sidebar({
             </button>
           </div>
 
-          <div className="px-4 py-2 flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-secondary">
-            <span>Portal</span>
-            <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-bold border border-teal-200">
-              {userRole}
-            </span>
-          </div>
+          <div className="px-4 py-2 flex items-center justify-between text-[11px] uppercase tracking-wider font-semibold text-secondary dark:text-slate-400">
+  <span>Portal</span>
+  <span className="px-1.5 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold border border-teal-200 dark:border-teal-800/60">
+    {userRole}
+  </span>
+</div>
 
           <nav className="flex flex-col gap-1 px-3 py-1">
             {navItems.map((item: any) => {

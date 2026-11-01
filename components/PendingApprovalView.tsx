@@ -1880,16 +1880,28 @@ export default function PendingApprovalView({
         );
       case 'support_agent':
         return (
+          // <td key={colKey} className="px-3">
+          //   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
+          //     <span className="material-symbols-outlined text-xs">
+          //       person
+          //     </span>
+          //     <span className="truncate max-w-[130px]">
+          //       {bill.created_by || 'Support Staff'}
+          //     </span>
+          //   </span>
+          // </td>
           <td key={colKey} className="px-3">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
-              <span className="material-symbols-outlined text-xs">
-                person
-              </span>
-              <span className="truncate max-w-[130px]">
-                {bill.created_by || 'Support Staff'}
-              </span>
-            </span>
-          </td>
+  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-medium text-[11px] border border-teal-200 dark:border-teal-800/60">
+    <span className="material-symbols-outlined text-xs text-teal-700 dark:text-teal-400">
+      person
+    </span>
+    <span className="truncate max-w-[130px]" title={bill.created_by || 'Support Staff'}>
+      {bill.created_by || 'Support Staff'}
+    </span>
+  </span>
+</td>
+
+
         );
       case 'date':
         return (
@@ -2246,7 +2258,7 @@ export default function PendingApprovalView({
                       hiddenColumns[col.key] ? renderCellContent(col.key, bill) : null
                     )}
 
-                    <td className="px-4 text-right whitespace-nowrap">
+                    {/* <td className="px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
@@ -2291,7 +2303,46 @@ export default function PendingApprovalView({
                           <span>Reject</span>
                         </button>
                       </div>
-                    </td>
+                    </td> */}
+                    <td className="px-4 text-right whitespace-nowrap">
+  <div className="flex items-center justify-end gap-1.5">
+    {/* Approve Button */}
+    <button
+      type="button"
+      onClick={() => {
+        setActiveBillForAction(bill);
+        setActionType('Approved');
+        setApprovedAmount(String(Number(bill.amount) || 0));
+        setAmountError('');
+      }}
+      className="px-2.5 py-1 rounded bg-teal-50 dark:bg-teal-950/40 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer border border-teal-200/60 dark:border-teal-800/50"
+    >
+      <span className="material-symbols-outlined text-sm text-teal-600 dark:text-teal-400">
+        check
+      </span>
+      <span>Approve</span>
+    </button>
+
+    {/* Reject Button */}
+    <button
+      type="button"
+      onClick={() => {
+        setActiveBillForAction(bill);
+        setActionType('Rejected');
+        setRejectReason('');
+      }}
+      className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer border border-rose-200/60 dark:border-rose-800/50"
+    >
+      <span className="material-symbols-outlined text-sm text-rose-600 dark:text-rose-400">
+        close
+      </span>
+      <span>Reject</span>
+    </button>
+  </div>
+</td>
+
+
+                    
                   </tr>
                 ))
               )}

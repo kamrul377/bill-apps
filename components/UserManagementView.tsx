@@ -1030,34 +1030,62 @@ export default function UserManagementView({
     });
 
   const getRoleBadge = (role: UserRole) => {
+    // switch (role) {
+    //   case 'admin':
+    //     return (
+    //       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-50 text-purple-700 border border-purple-200">
+    //         Admin
+    //       </span>
+    //     );
+    //   case 'manager':
+    //     return (
+    //       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+    //         Manager
+    //       </span>
+    //     );
+    //   case 'support':
+    //     return (
+    //       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-teal-50 text-teal-700 border border-teal-200">
+    //         Support
+    //       </span>
+    //     );
+    //   case 'accounts':
+    //     return (
+    //       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+    //         Accounts
+    //       </span>
+    //     );
+    //   default:
+    //     return <span>{role}</span>;
+    // }
     switch (role) {
-      case 'admin':
-        return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-50 text-purple-700 border border-purple-200">
-            Admin
-          </span>
-        );
-      case 'manager':
-        return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
-            Manager
-          </span>
-        );
-      case 'support':
-        return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-teal-50 text-teal-700 border border-teal-200">
-            Support
-          </span>
-        );
-      case 'accounts':
-        return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-            Accounts
-          </span>
-        );
-      default:
-        return <span>{role}</span>;
-    }
+  case 'admin':
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+        Admin
+      </span>
+    );
+  case 'manager':
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
+        Manager
+      </span>
+    );
+  case 'support':
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60">
+        Support
+      </span>
+    );
+  case 'accounts':
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+        Accounts
+      </span>
+    );
+  default:
+    return <span className="text-on-surface dark:text-slate-300">{role}</span>;
+}
   };
 
   return (
@@ -1209,46 +1237,92 @@ export default function UserManagementView({
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-surface-container-low/60 transition-colors h-12">
-                    <td className="px-4 font-data-mono font-bold text-teal-700">
-                      {user.user_id}
-                    </td>
-                    <td className="px-3 font-semibold text-on-surface">
-                      {user.name}
-                    </td>
-                    <td className="px-3">
-                      {getRoleBadge(user.role)}
-                    </td>
-                    <td className="px-3 text-secondary font-data-mono">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingUser(user);
-                            setEditName(user.name);
-                            setEditRole(user.role);
-                            setEditPassword('');
-                            setEditError(null);
-                          }}
-                          className="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition-colors cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        {user.user_id.toLowerCase() !== 'kamrul.cse9@gmail.com' && (
-                          <button
-                            type="button"
-                            onClick={() => setDeletingUser(user)}
-                            className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium transition-colors cursor-pointer"
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                  // <tr key={user.id} className="hover:bg-surface-container-low/60 transition-colors h-12">
+                  //   <td className="px-4 font-data-mono font-bold text-teal-700">
+                  //     {user.user_id}
+                  //   </td>
+                  //   <td className="px-3 font-semibold text-on-surface">
+                  //     {user.name}
+                  //   </td>
+                  //   <td className="px-3">
+                  //     {getRoleBadge(user.role)}
+                  //   </td>
+                  //   <td className="px-3 text-secondary font-data-mono">
+                  //     {new Date(user.created_at).toLocaleDateString()}
+                  //   </td>
+                  //   <td className="px-4 text-right whitespace-nowrap">
+                  //     <div className="flex items-center justify-end gap-1.5">
+                  //       <button
+                  //         type="button"
+                  //         onClick={() => {
+                  //           setEditingUser(user);
+                  //           setEditName(user.name);
+                  //           setEditRole(user.role);
+                  //           setEditPassword('');
+                  //           setEditError(null);
+                  //         }}
+                  //         className="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition-colors cursor-pointer"
+                  //       >
+                  //         Edit
+                  //       </button>
+                  //       {user.user_id.toLowerCase() !== 'kamrul.cse9@gmail.com' && (
+                  //         <button
+                  //           type="button"
+                  //           onClick={() => setDeletingUser(user)}
+                  //           className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium transition-colors cursor-pointer"
+                  //         >
+                  //           Delete
+                  //         </button>
+                  //       )}
+                  //     </div>
+                  //   </td>
+                  // </tr>
+                  <tr key={user.id} className="hover:bg-surface-container-low/60 dark:hover:bg-slate-800/50 transition-colors h-12 border-b border-outline-variant/20 dark:border-slate-700/40">
+  <td className="px-4 font-data-mono font-bold text-teal-700 dark:text-teal-400">
+    {user.user_id}
+  </td>
+  <td className="px-3 font-semibold text-on-surface dark:text-slate-200">
+    {user.name}
+  </td>
+  <td className="px-3">
+    {getRoleBadge(user.role)}
+  </td>
+  <td className="px-3 text-secondary dark:text-slate-400 font-data-mono">
+    {new Date(user.created_at).toLocaleDateString()}
+  </td>
+  <td className="px-4 text-right whitespace-nowrap">
+    <div className="flex items-center justify-end gap-1.5">
+      {/* Edit Button */}
+      <button
+        type="button"
+        onClick={() => {
+          setEditingUser(user);
+          setEditName(user.name);
+          setEditRole(user.role);
+          setEditPassword('');
+          setEditError(null);
+        }}
+        className="px-2 py-1 rounded bg-surface-container dark:bg-slate-800 hover:bg-surface-container-high dark:hover:bg-slate-700 text-on-surface dark:text-slate-200 font-medium transition-colors cursor-pointer border border-transparent dark:border-slate-700"
+      >
+        Edit
+      </button>
+
+      {/* Delete Button */}
+      {user.user_id.toLowerCase() !== 'kamrul.cse9@gmail.com' && (
+        <button
+          type="button"
+          onClick={() => setDeletingUser(user)}
+          className="px-2 py-1 rounded bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-medium transition-colors cursor-pointer border border-transparent dark:border-rose-900/50"
+        >
+          Delete
+        </button>
+      )}
+    </div>
+  </td>
+</tr>
+                 
+
+
                 ))
               )}
             </tbody>

@@ -1439,14 +1439,26 @@ export default function ApprovedBillsView({
         return <td key={colKey} className="px-3 font-data-mono text-secondary">{bill.user_id}</td>;
       case 'support_staff':
         return (
+          // <td key={colKey} className="px-3">
+          //   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
+          //     <span className="material-symbols-outlined text-xs">person</span>
+          //     <span className="truncate max-w-[120px]" title={bill.created_by || 'Support Staff'}>
+          //       {bill.created_by || 'Support Staff'}
+          //     </span>
+          //   </span>
+          // </td>
           <td key={colKey} className="px-3">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
-              <span className="material-symbols-outlined text-xs">person</span>
-              <span className="truncate max-w-[120px]" title={bill.created_by || 'Support Staff'}>
-                {bill.created_by || 'Support Staff'}
-              </span>
-            </span>
-          </td>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-medium text-[11px] border border-teal-200 dark:border-teal-800/60">
+        <span className="material-symbols-outlined text-xs text-teal-700 dark:text-teal-400">
+          person
+        </span>
+        <span className="truncate max-w-[120px]" title={bill.created_by || 'Support Staff'}>
+          {bill.created_by || 'Support Staff'}
+        </span>
+      </span>
+    </td>
+
+
         );
       case 'date':
         return <td key={colKey} className="px-3 text-secondary font-data-mono">{bill.date}</td>;

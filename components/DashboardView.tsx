@@ -285,38 +285,70 @@ export default function DashboardView({
   );
 
   const getStatusBadge = (status: string) => {
+    // switch (status) {
+    //   case 'Paid':
+    //     return (
+    //       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+    //         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+    //         Paid
+    //       </span>
+    //     );
+    //   case 'Pending':
+    //     return (
+    //       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+    //         <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+    //         Pending
+    //       </span>
+    //     );
+    //   case 'Approved':
+    //     return (
+    //       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+    //         <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+    //         Approved
+    //       </span>
+    //     );
+    //   case 'Rejected':
+    //     return (
+    //       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+    //         <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+    //         Rejected
+    //       </span>
+    //     );
+    //   default:
+    //     return null;
+    // }
     switch (status) {
-      case 'Paid':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-            Paid
-          </span>
-        );
-      case 'Pending':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            Pending
-          </span>
-        );
-      case 'Approved':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-            Approved
-          </span>
-        );
-      case 'Rejected':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-            Rejected
-          </span>
-        );
-      default:
-        return null;
-    }
+  case 'Paid':
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+        Paid
+      </span>
+    );
+  case 'Pending':
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+        Pending
+      </span>
+    );
+  case 'Approved':
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-teal-400" />
+        Approved
+      </span>
+    );
+  case 'Rejected':
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400" />
+        Rejected
+      </span>
+    );
+  default:
+    return null;
+}
   };
 
   // Category Handlers
@@ -435,16 +467,28 @@ export default function DashboardView({
         );
       case 'support_agent':
         return (
+          // <td key={colKey} className="px-3">
+          //   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
+          //     <span className="material-symbols-outlined text-xs">
+          //       person
+          //     </span>
+          //     <span className="truncate max-w-[120px]">
+          //       {bill.created_by || 'Support Staff'}
+          //     </span>
+          //   </span>
+          // </td>
           <td key={colKey} className="px-3">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium text-[11px] border border-teal-200">
-              <span className="material-symbols-outlined text-xs">
-                person
-              </span>
-              <span className="truncate max-w-[120px]">
-                {bill.created_by || 'Support Staff'}
-              </span>
-            </span>
-          </td>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-medium text-[11px] border border-teal-200 dark:border-teal-800/60">
+        <span className="material-symbols-outlined text-xs">
+          person
+        </span>
+        <span className="truncate max-w-[120px]">
+          {bill.created_by || 'Support Staff'}
+        </span>
+      </span>
+    </td>
+
+    
         );
       case 'date':
         return (
@@ -496,23 +540,41 @@ export default function DashboardView({
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           {isAdmin && (
+            // <button
+            //   type="button"
+            //   onClick={() => setIsCategoryModalOpen(true)}
+            //   className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 cursor-pointer"
+            // >
+            //   <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
+            //     tune
+            //   </span>
+
+            //   <span className="text-xs font-semibold text-slate-600 group-hover:text-teal-700">
+            //     Manage Categories
+            //   </span>
+
+            //   <span className="material-symbols-outlined text-[15px] text-slate-400 group-hover:text-teal-500 transition-colors">
+            //     chevron_right
+            //   </span>
+            // </button>
             <button
-              type="button"
-              onClick={() => setIsCategoryModalOpen(true)}
-              className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
-                tune
-              </span>
+  type="button"
+  onClick={() => setIsCategoryModalOpen(true)}
+  className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:border-teal-200 dark:hover:border-teal-800/60 transition-all duration-200 cursor-pointer"
+>
+  <span className="material-symbols-outlined text-[18px] text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
+    tune
+  </span>
 
-              <span className="text-xs font-semibold text-slate-600 group-hover:text-teal-700">
-                Manage Categories
-              </span>
+  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
+    Manage Categories
+  </span>
 
-              <span className="material-symbols-outlined text-[15px] text-slate-400 group-hover:text-teal-500 transition-colors">
-                chevron_right
-              </span>
-            </button>
+  <span className="material-symbols-outlined text-[15px] text-slate-400 dark:text-slate-500 group-hover:text-teal-500 dark:group-hover:text-teal-400 transition-colors">
+    chevron_right
+  </span>
+</button>
+
           )}
          
           <button
