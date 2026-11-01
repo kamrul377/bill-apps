@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     if (!user) return unauthorized();
 
     // Only authorized roles may create bills.
-    if (!['admin', 'support', 'accounts'].includes(user.role)) {
+    if (!['admin', 'support', 'accounts','manager'].includes(user.role)) {
       return forbidden();
     }
 
