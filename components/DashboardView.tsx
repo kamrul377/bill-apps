@@ -589,7 +589,7 @@ export default function DashboardView({
       </div>
 
       {/* KPI Stats Cards with Click Filters & Smooth Scroll */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* Total Bills Card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -599,16 +599,17 @@ export default function DashboardView({
             setCurrentPage(1);
             scrollToTable();
           }}
-          className={`bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${statusFilter === 'ALL'
-            ? 'border-teal-600 ring-1 ring-teal-600/30 bg-teal-50/20'
-            : 'border-outline-variant/30 hover:border-teal-500/60 hover:shadow-sm'
-            } shadow-xs flex flex-col justify-between`}
+          className={`bg-surface-container-lowest dark:bg-slate-900/9it p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'ALL'
+              ? 'border-teal-600 ring-1 ring-teal-600/30 bg-teal-50/20 dark:bg-teal-950/30 dark:border-teal-500'
+              : 'border-outline-variant/30 dark:border-slate-800 hover:border-teal-500/60 dark:hover:border-teal-500/50 hover:shadow-sm'
+          } shadow-xs flex flex-col justify-between`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
+            <span className="text-xs font-semibold text-secondary dark:text-slate-400 uppercase tracking-wider">
               {currentUser?.role === 'support' ? 'Your Bills' : 'Total Bills'}
             </span>
-            <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">
                 receipt_long
               </span>
@@ -616,10 +617,10 @@ export default function DashboardView({
           </div>
           
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-bold text-on-surface font-data-mono block">
+            <span className="text-xl sm:text-2xl font-bold text-on-surface dark:text-slate-100 font-data-mono block">
               {stats?.totalBills || 0}
             </span>
-            <span className="text-[11px] sm:text-xs text-secondary flex items-center gap-0.5 mt-0.5 font-data-mono">
+            <span className="text-[11px] sm:text-xs text-secondary dark:text-slate-400 flex items-center gap-0.5 mt-0.5 font-data-mono">
               <span>৳</span>
               <span>{(stats?.totalVolumeTk || 0).toLocaleString()}</span>
             </span>
@@ -636,16 +637,17 @@ export default function DashboardView({
             setCurrentPage(1);
             scrollToTable();
           }}
-          className={`bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${statusFilter === 'Pending'
-            ? 'border-amber-500 ring-1 ring-amber-500/30 bg-amber-50/30'
-            : 'border-outline-variant/30 hover:border-amber-500/60 hover:shadow-sm'
-            } shadow-xs flex flex-col justify-between`}
+          className={`bg-surface-container-lowest dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'Pending'
+              ? 'border-amber-500 ring-1 ring-amber-500/30 bg-amber-50/30 dark:bg-amber-950/30 dark:border-amber-500'
+              : 'border-outline-variant/30 dark:border-slate-800 hover:border-amber-500/60 dark:hover:border-amber-500/50 hover:shadow-sm'
+          } shadow-xs flex flex-col justify-between`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
               {currentUser?.role === 'support' ? 'Your Pending' : 'Pending'}
             </span>
-            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">
                 pending_actions
               </span>
@@ -653,10 +655,10 @@ export default function DashboardView({
           </div>
         
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-bold text-amber-600 font-data-mono block">
+            <span className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400 font-data-mono block">
               {stats?.pendingBills || 0}
             </span>
-            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+            <span className="text-[11px] sm:text-xs text-secondary dark:text-slate-400 block mt-0.5 font-data-mono">
               ৳{(stats?.pendingVolumeTk || 0).toLocaleString()}
             </span>
           </div>
@@ -672,16 +674,17 @@ export default function DashboardView({
             setCurrentPage(1);
             scrollToTable();
           }}
-          className={`bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${statusFilter === 'Approved'
-            ? 'border-teal-500 ring-1 ring-teal-500/30 bg-teal-50/30'
-            : 'border-outline-variant/30 hover:border-teal-500/60 hover:shadow-sm'
-            } shadow-xs flex flex-col justify-between`}
+          className={`bg-surface-container-lowest dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'Approved'
+              ? 'border-teal-500 ring-1 ring-teal-500/30 bg-teal-50/30 dark:bg-teal-950/30 dark:border-teal-500'
+              : 'border-outline-variant/30 dark:border-slate-800 hover:border-teal-500/60 dark:hover:border-teal-500/50 hover:shadow-sm'
+          } shadow-xs flex flex-col justify-between`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">
               {currentUser?.role === 'support' ? 'Your Approved' : 'Approved'}
             </span>
-            <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">
                 verified
               </span>
@@ -689,10 +692,10 @@ export default function DashboardView({
           </div>
           
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-bold text-teal-600 font-data-mono block">
+            <span className="text-xl sm:text-2xl font-bold text-teal-600 dark:text-teal-400 font-data-mono block">
               {stats?.approvedBills || 0}
             </span>
-            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+            <span className="text-[11px] sm:text-xs text-secondary dark:text-slate-400 block mt-0.5 font-data-mono">
               ৳{(stats?.approvedVolumeTk || 0).toLocaleString()}
             </span>
           </div>
@@ -708,16 +711,17 @@ export default function DashboardView({
             setCurrentPage(1);
             scrollToTable();
           }}
-          className={`bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${statusFilter === 'Paid'
-            ? 'border-emerald-500 ring-1 ring-emerald-500/30 bg-emerald-50/30'
-            : 'border-outline-variant/30 hover:border-emerald-500/60 hover:shadow-sm'
-            } shadow-xs flex flex-col justify-between`}
+          className={`bg-surface-container-lowest dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'Paid'
+              ? 'border-emerald-500 ring-1 ring-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-950/30 dark:border-emerald-500'
+              : 'border-outline-variant/30 dark:border-slate-800 hover:border-emerald-500/60 dark:hover:border-emerald-500/50 hover:shadow-sm'
+          } shadow-xs flex flex-col justify-between`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
               {currentUser?.role === 'support' ? 'Your Paid' : 'Paid & Cleared'}
             </span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">
                 payments
               </span>
@@ -725,10 +729,10 @@ export default function DashboardView({
           </div>
           
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-bold text-emerald-600 font-data-mono block">
+            <span className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-data-mono block">
               {stats?.paidBills ?? 0}
             </span>
-            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+            <span className="text-[11px] sm:text-xs text-secondary dark:text-slate-400 block mt-0.5 font-data-mono">
               ৳{(stats?.paidVolumeTk ?? 0).toLocaleString()}
             </span>
           </div>
@@ -744,16 +748,17 @@ export default function DashboardView({
             setCurrentPage(1);
             scrollToTable();
           }}
-          className={`bg-surface-container-lowest p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${statusFilter === 'Rejected'
-            ? 'border-rose-500 ring-1 ring-rose-500/30 bg-rose-50/30'
-            : 'border-outline-variant/30 hover:border-rose-500/60 hover:shadow-sm'
-            } shadow-xs flex flex-col justify-between col-span-2 sm:col-span-1`}
+          className={`bg-surface-container-lowest dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'Rejected'
+              ? 'border-rose-500 ring-1 ring-rose-500/30 bg-rose-50/30 dark:bg-rose-950/30 dark:border-rose-500'
+              : 'border-outline-variant/30 dark:border-slate-800 hover:border-rose-500/60 dark:hover:border-rose-500/50 hover:shadow-sm'
+          } shadow-xs flex flex-col justify-between col-span-2 sm:col-span-1`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
               {currentUser?.role === 'support' ? 'Your Rejected' : 'Rejected'}
             </span>
-            <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
               <span className="material-symbols-outlined text-base">
                 cancel
               </span>
@@ -761,15 +766,18 @@ export default function DashboardView({
           </div>
          
           <div className="mt-2">
-            <span className="text-xl sm:text-2xl font-bold text-rose-600 font-data-mono block">
+            <span className="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 font-data-mono block">
               {stats?.rejectedBills || 0}
             </span>
-            <span className="text-[11px] sm:text-xs text-secondary block mt-0.5 font-data-mono">
+            <span className="text-[11px] sm:text-xs text-secondary dark:text-slate-400 block mt-0.5 font-data-mono">
               ৳{(stats?.rejectedVolumeTk || 0).toLocaleString()}
             </span>
           </div>
         </motion.div>
       </div>
+
+
+      
 
       {/* Graphs / Charts */}
       {stats && <AmountCharts stats={stats} />}
