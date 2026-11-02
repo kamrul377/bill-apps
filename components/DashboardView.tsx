@@ -540,23 +540,7 @@ export default function DashboardView({
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           {isAdmin && (
-            // <button
-            //   type="button"
-            //   onClick={() => setIsCategoryModalOpen(true)}
-            //   className="group inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 cursor-pointer"
-            // >
-            //   <span className="material-symbols-outlined text-[18px] text-teal-600 group-hover:scale-110 transition-transform">
-            //     tune
-            //   </span>
-
-            //   <span className="text-xs font-semibold text-slate-600 group-hover:text-teal-700">
-            //     Manage Categories
-            //   </span>
-
-            //   <span className="material-symbols-outlined text-[15px] text-slate-400 group-hover:text-teal-500 transition-colors">
-            //     chevron_right
-            //   </span>
-            // </button>
+            
             <button
   type="button"
   onClick={() => setIsCategoryModalOpen(true)}
@@ -785,126 +769,132 @@ export default function DashboardView({
       {/* Bills Table Container with Ref attached */}
       <div ref={tableSectionRef} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-xs flex flex-col scroll-mt-6">
         {/* Toolbar */}
-        <div className="p-3.5 bg-surface-bright flex flex-col sm:flex-row items-center justify-between gap-2.5 border-b border-outline-variant/20">
-          <div className="relative w-full sm:w-80">
-            <span className="material-symbols-outlined absolute left-2.5 top-2 text-secondary text-base">
-              search
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Search Ticket, User ID, Support Agent..."
-              className="w-full pl-8 pr-3 py-1.5 bg-surface text-on-surface text-xs rounded-lg border border-outline-variant/40 focus:outline-none focus:border-teal-600"
-            />
-          </div>
+        
+        <div className="p-3.5 bg-surface-bright dark:bg-slate-900/80 flex flex-col sm:flex-row items-center justify-between gap-2.5 border-b border-outline-variant/20 dark:border-slate-800">
+  {/* Search Bar */}
+  <div className="relative w-full sm:w-72">
+    <span className="material-symbols-outlined absolute left-3 top-2.5 text-secondary dark:text-slate-400 text-sm">
+      search
+    </span>
+    <input
+      type="text"
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        setCurrentPage(1);
+      }}
+      placeholder="Search Ticket, User ID, Support Agent..."
+      className="w-full h-9 pl-9 pr-3 bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-100 text-xs rounded-xl border border-outline-variant/40 dark:border-slate-800 focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 placeholder:text-secondary/60 dark:placeholder:text-slate-500 shadow-xs"
+    />
+  </div>
 
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-            {/* Category Filter */}
-            {canFilterCategory && (
-              <select
-                value={categoryFilter}
-                onChange={(e) => {
-                  setCategoryFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="bg-surface text-on-surface text-xs rounded-lg border border-outline-variant/40 px-2.5 py-1.5 focus:outline-none cursor-pointer"
-              >
-                <option value="ALL">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={String(cat.id)}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            )}
+  {/* Filters & Customizer Bar (Same Single Row on Desktop) */}
+  <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full sm:w-auto justify-end">
+    {/* Category Filter */}
+    {canFilterCategory && (
+      <select
+        value={categoryFilter}
+        onChange={(e) => {
+          setCategoryFilter(e.target.value);
+          setCurrentPage(1);
+        }}
+        className="bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-100 text-xs rounded-xl border border-outline-variant/40 dark:border-slate-800 px-3 h-9 focus:outline-none cursor-pointer shadow-xs w-full sm:w-auto"
+      >
+        <option value="ALL">All Categories</option>
+        {categories.map((cat) => (
+          <option key={cat.id} value={String(cat.id)}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
+    )}
 
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="bg-surface text-on-surface text-xs rounded-lg border border-outline-variant/40 px-2.5 py-1.5 focus:outline-none cursor-pointer"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Paid">Paid (Cleared)</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+    {/* Status Filter */}
+    <select
+      value={statusFilter}
+      onChange={(e) => {
+        setStatusFilter(e.target.value);
+        setCurrentPage(1);
+      }}
+      className="bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-100 text-xs rounded-xl border border-outline-variant/40 dark:border-slate-800 px-3 h-9 focus:outline-none cursor-pointer shadow-xs w-full sm:w-auto"
+    >
+      <option value="ALL">All Statuses</option>
+      <option value="Pending">Pending</option>
+      <option value="Approved">Approved</option>
+      <option value="Paid">Paid (Cleared)</option>
+      <option value="Rejected">Rejected</option>
+    </select>
 
-            {/* Column Visibility Toggle Button */}
-            <div className="relative">
+    {/* Column Visibility Toggle Button */}
+    <div className="relative col-span-2 sm:col-span-1 w-full sm:w-auto">
+      <button
+        type="button"
+        onClick={() => setIsColumnCustomizerOpen(!isColumnCustomizerOpen)}
+        className={`w-full sm:w-auto h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs ${
+          isColumnCustomizerOpen
+            ? 'bg-teal-50 text-teal-700 border-teal-500 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-600'
+            : 'bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-100 border-outline-variant/40 dark:border-slate-800 hover:border-teal-600 dark:hover:border-teal-500'
+        }`}
+        title="Toggle columns visibility & reorder"
+      >
+        <span className="material-symbols-outlined text-[14px] text-teal-600 dark:text-teal-400">view_column</span>
+        <span>Columns</span>
+      </button>
+
+      {/* Column Customizer Dropdown Popover */}
+      <AnimatePresence>
+        {isColumnCustomizerOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 sm:right-0 left-0 sm:left-auto mt-2 w-full sm:w-64 bg-surface-container-lowest dark:bg-slate-900 p-3.5 rounded-xl border border-outline-variant/30 dark:border-slate-800 shadow-xl z-30 flex flex-col gap-2.5 text-xs"
+          >
+            <div className="flex items-center justify-between border-b border-outline-variant/20 dark:border-slate-800 pb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-teal-600 dark:text-teal-400 text-base">tune</span>
+                <h3 className="font-bold text-on-surface dark:text-slate-100 uppercase tracking-wider text-[11px]">
+                  Show / Hide Columns
+                </h3>
+              </div>
               <button
                 type="button"
-                onClick={() => setIsColumnCustomizerOpen(!isColumnCustomizerOpen)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer shadow-xs ${
-                  isColumnCustomizerOpen
-                    ? 'bg-teal-50 text-teal-700 border-teal-500'
-                    : 'bg-surface text-on-surface border-outline-variant/40 hover:border-teal-600'
-                }`}
-                title="Toggle columns visibility & reorder"
+                onClick={() => setIsColumnCustomizerOpen(false)}
+                className="text-secondary dark:text-slate-400 hover:text-on-surface dark:hover:text-slate-200 cursor-pointer p-0.5"
               >
-                <span className="material-symbols-outlined text-[12px] text-teal-600">view_column</span>
-                <span>Columns</span>
+                <span className="material-symbols-outlined text-base">close</span>
               </button>
-
-              {/* Column Customizer Dropdown Popover */}
-              <AnimatePresence>
-                {isColumnCustomizerOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-64 bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant/30 shadow-xl z-30 flex flex-col gap-2.5 text-xs"
-                  >
-                    <div className="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-teal-600 text-base">tune</span>
-                        <h3 className="font-bold text-on-surface uppercase tracking-wider text-[11px]">
-                          Show / Hide Columns
-                        </h3>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsColumnCustomizerOpen(false)}
-                        className="text-secondary hover:text-on-surface cursor-pointer p-0.5"
-                      >
-                        <span className="material-symbols-outlined text-base">close</span>
-                      </button>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1">
-                      {columns.map((col) => (
-                        <label 
-                          key={col.key} 
-                          className="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface border border-transparent hover:border-outline-variant/30 cursor-pointer select-none"
-                        >
-                          <span className="font-medium text-on-surface text-xs" title={col.label}>
-                            {col.label}
-                          </span>
-                          <input
-                            type="checkbox"
-                            checked={hiddenColumns[col.key]}
-                            onChange={() => handleToggleColumnVisibility(col.key)}
-                            className="accent-teal-600 rounded cursor-pointer w-4 h-4"
-                          />
-                        </label>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-            
-          </div>
-        </div>
+
+            <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1">
+              {columns.map((col) => (
+                <label 
+                  key={col.key} 
+                  className="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface dark:hover:bg-slate-950 border border-transparent hover:border-outline-variant/30 dark:hover:border-slate-800 cursor-pointer select-none"
+                >
+                  <span className="font-medium text-on-surface dark:text-slate-200 text-xs" title={col.label}>
+                    {col.label}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={hiddenColumns[col.key]}
+                    onChange={() => handleToggleColumnVisibility(col.key)}
+                    className="accent-teal-600 dark:accent-teal-500 rounded cursor-pointer w-4 h-4"
+                  />
+                </label>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  </div>
+</div>
+
+
+           
+        
 
         {/* Table */}
         <div className="overflow-x-auto">
