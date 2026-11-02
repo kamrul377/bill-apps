@@ -1,4 +1,120 @@
 
+// 'use client';
+
+// import React, { useState } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+
+// interface ConfirmDialogProps {
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     onConfirm: () => void | Promise<void>;
+//     onCancel: () => void;
+// }
+
+// export default function ConfirmDialog({
+//     isOpen,
+//     title,
+//     message,
+//     onConfirm,
+//     onCancel,
+// }: ConfirmDialogProps) {
+//     const [isLoading, setIsLoading] = useState(false);
+
+//     const handleConfirm = async () => {
+//         try {
+//             setIsLoading(true);
+//             await onConfirm();
+//         } catch (error) {
+//             console.error('Confirmation action failed:', error);
+//         } finally {
+//             setIsLoading(false);
+//         }
+//     };
+
+//     return (
+//         <AnimatePresence>
+//             {isOpen && (
+//                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+//                     {/* Backdrop Animation */}
+//                     <motion.div
+//                         initial={{ opacity: 0 }}
+//                         animate={{ opacity: 1 }}
+//                         exit={{ opacity: 0 }}
+//                         transition={{ duration: 0.2 }}
+//                         onClick={() => !isLoading && onCancel()}
+//                         className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs"
+//                     />
+
+//                     {/* Modal Box Animation */}
+//                     <motion.div
+//                         initial={{ opacity: 0, scale: 0.95, y: 15 }}
+//                         animate={{ opacity: 1, scale: 1, y: 0 }}
+//                         exit={{ opacity: 0, scale: 0.95, y: 15 }}
+//                         transition={{ duration: 0.25, ease: 'easeOut' }}
+//                         onClick={(e) => e.stopPropagation()}
+//                         className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white p-6 text-left shadow-2xl border border-slate-100"
+//                     >
+//                         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 mb-4 shadow-sm">
+//                             <span className="material-symbols-outlined text-2xl">warning</span>
+//                         </div>
+
+//                         <h3 className="text-center text-base font-bold text-slate-800">{title}</h3>
+//                         <p className="mt-2 text-center text-xs text-slate-500 leading-relaxed">{message}</p>
+
+//                         <div className="mt-6 flex items-center justify-center gap-3">
+//                             <button
+//                                 type="button"
+//                                 disabled={isLoading}
+//                                 onClick={onCancel}
+//                                 className="w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+//                             >
+//                                 Cancel
+//                             </button>
+//                             <button
+//                                 type="button"
+//                                 disabled={isLoading}
+//                                 onClick={handleConfirm}
+//                                 className="w-full rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-rose-700 shadow-md transition cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+//                             >
+//                                 {isLoading ? (
+//                                     <>
+//                                         <motion.span
+//                                             animate={{ rotate: 360 }}
+//                                             transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+//                                             className="material-symbols-outlined text-base"
+//                                         >
+//                                             progress_activity
+//                                         </motion.span>
+//                                         <span>Deleting...</span>
+//                                     </>
+//                                 ) : (
+//                                     <span>Yes, Delete</span>
+//                                 )}
+//                             </button>
+//                         </div>
+//                     </motion.div>
+//                 </div>
+//             )}
+//         </AnimatePresence>
+//     );
+// }
+
+
+
+
+
+
+// =============2nd================
+
+
+
+
+
+
+
+
+
 'use client';
 
 import React, { useState } from 'react';
@@ -53,21 +169,21 @@ export default function ConfirmDialog({
                         exit={{ opacity: 0, scale: 0.95, y: 15 }}
                         transition={{ duration: 0.25, ease: 'easeOut' }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white p-6 text-left shadow-2xl border border-slate-100"
+                        className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 text-left shadow-2xl border border-slate-100 dark:border-slate-800"
                     >
-                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 mb-4 shadow-sm">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 mb-4 shadow-sm">
                             <span className="material-symbols-outlined text-2xl">warning</span>
                         </div>
 
-                        <h3 className="text-center text-base font-bold text-slate-800">{title}</h3>
-                        <p className="mt-2 text-center text-xs text-slate-500 leading-relaxed">{message}</p>
+                        <h3 className="text-center text-base font-bold text-slate-800 dark:text-slate-100">{title}</h3>
+                        <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{message}</p>
 
                         <div className="mt-6 flex items-center justify-center gap-3">
                             <button
                                 type="button"
                                 disabled={isLoading}
                                 onClick={onCancel}
-                                className="w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Cancel
                             </button>
@@ -75,7 +191,7 @@ export default function ConfirmDialog({
                                 type="button"
                                 disabled={isLoading}
                                 onClick={handleConfirm}
-                                className="w-full rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-rose-700 shadow-md transition cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className="w-full rounded-xl bg-rose-600 dark:bg-rose-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-rose-700 dark:hover:bg-rose-500 shadow-md transition cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {isLoading ? (
                                     <>
